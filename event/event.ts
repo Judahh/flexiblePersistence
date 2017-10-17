@@ -29,10 +29,10 @@ export class Event {
     }
 
     private currentTimestamp() {
-        var date = new Date();
-        var dash = "-";
-        var colon = ":";
-        var dot = ".";
+        let date = new Date();
+        let dash = "-";
+        let colon = ":";
+        let dot = ".";
         return date.getFullYear() + dash +
             this.pad(date.getMonth() + 1) + dash +
             this.pad(date.getDate()) + " " +

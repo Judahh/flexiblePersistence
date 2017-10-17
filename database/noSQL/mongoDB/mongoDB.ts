@@ -22,7 +22,7 @@ export class MongoDB implements PersistenceAdapter {
         }
         this.database = database;
 
-        var mongoose = new Mongoose();
+        let mongoose = new Mongoose();
         this.mongooseInstance = mongoose.connect("mongodb://" + this.host + ":" + this.port + "/" + this.database, function(error) {
             console.error(error);
         });
@@ -30,23 +30,23 @@ export class MongoDB implements PersistenceAdapter {
     }
 
     public updateItem(array: string, item: any, callback) {
-        var Item = this.mongooseInstance.model(array, this.genericSchema);
+        let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.findOneAndUpdate(item, callback);
     }
     public readArray(array: string, callback) {
-        var Item = this.mongooseInstance.model(array, this.genericSchema);
+        let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.find(callback);
     }
     public deleteArray(array: string, callback) {
-        var Item = this.mongooseInstance.model(array, this.genericSchema);
+        let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.remove(callback);
     }
     public addItem(array: string, item: any, callback) {
-        var Item = this.mongooseInstance.model(array, this.genericSchema);
+        let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.create(item, callback);
     }
     public deleteItem(array: string, item: any, callback) {
-        var Item = this.mongooseInstance.model(array, this.genericSchema);
+        let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.findByIdAndRemove(item, callback);
     }
 
