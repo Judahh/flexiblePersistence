@@ -13,12 +13,12 @@ export class MongoDB implements PersistenceAdapter {
         if (host) {
             this.host = host;
         } else {
-            this.host = "localhost";
+            this.host = process.env.MONGODB_HOST || "localhost";
         }
         if (port) {
             this.port = port;
         } else {
-            this.port = 27017;
+            this.port = (+process.env.MONGODB_PORT) || 27017;
         }
         this.database = database;
 

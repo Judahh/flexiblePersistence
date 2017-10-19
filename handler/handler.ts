@@ -5,21 +5,10 @@ import { Operation } from "./../event/operation";
 export class Handler {
     private read: Read;
     private write: Write;
-    private static instance: Handler = new Handler();
 
-    constructor() {
-        this.read = Read.getInstance();
-        this.write = Write.getInstance();
-        
-        if (Handler.instance) {
-            throw new Error("The Write is a singleton class and cannot be created!");
-        }
-
-        Handler.instance = this;
-    }
-
-    public static getInstance(): Handler {
-        return Handler.instance;
+    constructor(name: string, host?: string, port?: number) {
+        this.write = new Write(name, host, port);
+        this.read = this.write.getRead();
     }
 
     public addEvent(event: Event) {

@@ -6,20 +6,14 @@ import * as MongoDB from "mongodb";
 export class Write {
     private read: Read;
     private eventDB: EventDB;
-    private static instance: Write = new Write();
 
-    constructor() {
-        this.read = Read.getInstance();
-        this.eventDB = EventDB.getInstance();
-        if (Write.instance) {
-            throw new Error("The Write is a singleton class and cannot be created!");
-        }
-
-        Write.instance = this;
+    constructor(name: string, host?: string, port?: number) {
+        this.read = new Read(name, host, port);
+        this.eventDB = new EventDB(name, host, port);
     }
 
-    public static getInstance(): Write {
-        return Write.instance;
+    public getRead(): Read{
+        return this.read;
     }
 
     public addEvent(event: Event) {

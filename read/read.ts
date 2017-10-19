@@ -6,19 +6,9 @@ export class Read {
     private readDB: ReadDB;
     private readMongoDB: MongoDB.Db;
     private objects: MongoDB.Collection;
-    private static instance: Read = new Read();
 
-    constructor() {
-        this.readDB = ReadDB.getInstance();
-        if (Read.instance) {
-            throw new Error("The Read is a singleton class and cannot be created!");
-        }
-
-        Read.instance = this;
-    }
-
-    public static getInstance(): Read {
-        return Read.instance;
+    constructor(name: string, host?: string, port?: number) {
+        this.readDB = new ReadDB(name, host, port);
     }
 
     public newEvent(event: Event) {
