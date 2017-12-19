@@ -18,4 +18,12 @@ export class Handler {
     public readArray(array: string, callback) {
         this.read.readArray(array, callback);
     }
+
+    public readOne(array: string, item: any, callback) {
+        this.read.read(array, item, callback);
+    }  
+
+    public readById(array: string, id, callback) {
+        this.read.readById(array, id, callback);
+    } 
 }
