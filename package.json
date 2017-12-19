@@ -37,7 +37,7 @@
     "@types/mongoose": "^4.7.23",
     "mongodb": "^2.2.33",
     "mongoose": "^4.12.3",
-    "typescript": "2.5.3"
+    "typescript": "2.6.2"
   },
   "devDependencies": {}
 }
