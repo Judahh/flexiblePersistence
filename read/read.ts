@@ -44,6 +44,14 @@ export class Read {
         });
     }
 
+    public read(array: string, item: any, callback) {
+        this.readDB.readItem(array, item, callback);
+    }  
+    
+    public readById(array: string, id, callback) {
+        this.readDB.readItemById(array, id, callback);
+    } 
+
     public readArray(array: string, callback) {
         this.readDB.readArray(array, callback);
     }    
