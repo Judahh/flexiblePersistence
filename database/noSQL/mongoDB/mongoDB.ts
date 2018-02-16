@@ -1,12 +1,13 @@
 import { MongoClient, Db } from "mongodb";
-import { Mongoose, MongooseThenable, Schema } from "mongoose";
+import { Mongoose, Schema } from "mongoose";
 import { PersistenceAdapter } from "./../../../persistenceAdapter/persistenceAdapter";
 
 export class MongoDB implements PersistenceAdapter {
     private host: string;
     private port: number;
     private database: string;
-    private mongooseInstance: MongooseThenable;
+    // private mongooseInstance: MongooseThenable;
+    private mongooseInstance: Mongoose;
     private genericSchema: Schema;
 
     constructor(database: string, host?: string, port?: number) {
@@ -22,8 +23,10 @@ export class MongoDB implements PersistenceAdapter {
         }
         this.database = database;
 
-        let mongoose = new Mongoose();
-        this.mongooseInstance = mongoose.connect("mongodb://" + this.host + ":" + this.port + "/" + this.database, function(error) {
+        // let mongoose = new Mongoose();
+        this.mongooseInstance = new Mongoose();
+        // this.mongooseInstance = 
+        this.mongooseInstance.connect("mongodb://" + this.host + ":" + this.port + "/" + this.database, function(error) {
             if(error){
                 console.error("Error:"+error);
             }
