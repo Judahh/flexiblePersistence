@@ -17,7 +17,7 @@ export class Write {
         }
 
         this.read = new Read(database);
-            this.eventDB = new EventDB(database2);
+        this.eventDB = new EventDB(database2);
     }
 
     public getRead(): Read {
