@@ -3,13 +3,21 @@ import { EventDB } from './../database/eventDB/eventDB';
 import { Event } from './../event/event';
 import { Read } from './../read/read';
 import * as MongoDB from 'mongodb';
+import { Database } from '../database/database';
 export class Write {
     private read: Read;
     private eventDB: EventDB;
 
-    constructor(name: string, host?: string, port?: number, username?: string, password?: string) {
-        this.read = new Read(name, host, port, username, password);
-        this.eventDB = new EventDB(name, host, port);
+    constructor(database: Database, database2?: Database) {
+        this.read = new Read(database);
+        if (database2 === undefined) {
+            database2 = JSON.parse(JSON.stringify(database));
+            database.database = database.database + 'ReadDB';
+            database2.database = database2.database + 'EventDB';
+        }
+
+        this.read = new Read(database);
+            this.eventDB = new EventDB(database2);
     }
 
     public getRead(): Read {

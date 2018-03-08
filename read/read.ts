@@ -2,13 +2,14 @@ import { ReadDB } from './../database/readDB/readDB';
 import { Event } from './../event/event';
 import { Operation } from './../event/operation';
 import * as MongoDB from 'mongodb';
+import { Database } from '../database/database';
 export class Read {
     private readDB: ReadDB;
     private readMongoDB: MongoDB.Db;
     private objects: MongoDB.Collection;
 
-    constructor(name: string, host?: string, port?: number, username?: string, password?: string) {
-        this.readDB = new ReadDB(name, host, port, username, password);
+    constructor(database: Database) {
+        this.readDB = new ReadDB(database);
     }
 
     public newEvent(event: Event) {

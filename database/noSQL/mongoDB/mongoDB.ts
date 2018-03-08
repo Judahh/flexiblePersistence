@@ -1,28 +1,19 @@
 import { MongoClient, Db } from 'mongodb';
 import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
+import { Database } from '../../database';
 
 export class MongoDB implements PersistenceAdapter {
-    private host: string;
-    private port: number;
-    private database: string;
-    // private mongooseInstance: MongooseThenable;
+    private database: Database;
     private mongooseInstance: Mongoose;
     private genericSchema: Schema;
 
-    constructor(database: string, host?: string, port?: number, username?: string, password?: string) {
-        if (host) {
-            this.host = host;
+    constructor(database: Database) {
+        let string;
+        if (database.username !== undefined && database.password !== undefined) {
+            string = database.username + ':' + database.password + '@' + database.host;
         } else {
-            this.host = process.env.MONGODB_HOST || 'localhost';
-        }
-        if (port) {
-            this.port = port;
-        } else {
-            this.port = (+process.env.MONGODB_PORT) || 27017;
-        }
-        if (username) {
-            this.host = username + ':' + password + '@' + this.host;
+            string = database.host;
         }
 
         this.database = database;
@@ -30,7 +21,7 @@ export class MongoDB implements PersistenceAdapter {
         // let mongoose = new Mongoose();
         this.mongooseInstance = new Mongoose();
         // this.mongooseInstance =
-        this.mongooseInstance.connect('mongodb://' + this.host + ':' + this.port + '/' + this.database, function (error) {
+        this.mongooseInstance.connect('mongodb://' + string + ':' + database.port + '/' + database.database, function (error) {
             if (error) {
                 console.error('Error:' + error);
             }
