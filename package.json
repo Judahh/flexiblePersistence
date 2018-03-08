@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,19 +8,8 @@
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
     "prestart": "",
-    "pree2e": "webdriver-manager update",
-    "e2e": "protractor",
     "tsc": "tsc",
-    "tsc:w": "tsc -w",
-    "build": "gulp build",
-    "clean": "shx rm -Rf build/",
-    "gulp": "gulp",
-    "electronStart": "electron .",
-    "tryWeb": "npm-run-all build lite",
-    "tryDesktop": "npm-run-all build electron",
-    "packDesktop": "electron-packager . --platform=all --arch=all --overwrite --icon=favicon.ico --ignore=node_modules/electron-*",
-    "packDesktopX64": "electron-packager . --platform=all --arch=x64 --overwrite --icon=favicon.ico --ignore=node_modules/electron-*",
-    "packDesktopWinX64": "electron-packager . --platform=win32 --arch=x64 --overwrite --icon=favicon.ico --ignore=node_modules/electron-*"
+    "tsc:w": "tsc -w"
   },
   "repository": {
     "type": "git",
@@ -33,10 +22,10 @@
   },
   "homepage": "https://github.com/Judahh/flexiblePersistence#readme",
   "dependencies": {
-    "@types/mongodb": "3.0.5",
-    "@types/mongoose": "^5.0.2",
-    "mongodb": "^3.0.2",
-    "mongoose": "^5.0.6",
+    "@types/mongodb": "3.0.7",
+    "@types/mongoose": "^5.0.6",
+    "mongodb": "^3.0.4",
+    "mongoose": "^5.0.9",
     "typescript": "2.7.2"
   },
   "devDependencies": {}

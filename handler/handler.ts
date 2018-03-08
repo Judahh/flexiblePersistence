@@ -1,7 +1,7 @@
-import { Write } from "./../write/write";
-import { Read } from "./../read/read";
-import { Event } from "./../event/event";
-import { Operation } from "./../event/operation";
+import { Write } from './../write/write';
+import { Read } from './../read/read';
+import { Event } from './../event/event';
+import { Operation } from './../event/operation';
 export class Handler {
     private read: Read;
     private write: Write;
@@ -21,9 +21,9 @@ export class Handler {
 
     public readOne(array: string, item: any, callback) {
         this.read.read(array, item, callback);
-    }  
+    }
 
     public readById(array: string, id, callback) {
         this.read.readById(array, id, callback);
-    } 
+    }
 }

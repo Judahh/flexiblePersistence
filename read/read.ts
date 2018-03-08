@@ -1,7 +1,7 @@
-import { ReadDB } from "./../database/readDB/readDB";
-import { Event } from "./../event/event";
-import { Operation } from "./../event/operation";
-import * as MongoDB from "mongodb";
+import { ReadDB } from './../database/readDB/readDB';
+import { Event } from './../event/event';
+import { Operation } from './../event/operation';
+import * as MongoDB from 'mongodb';
 export class Read {
     private readDB: ReadDB;
     private readMongoDB: MongoDB.Db;
@@ -33,9 +33,21 @@ export class Read {
         }
     }
 
+    public read(array: string, item: any, callback) {
+        this.readDB.readItem(array, item, callback);
+    }
+
+    public readById(array: string, id, callback) {
+        this.readDB.readItemById(array, id, callback);
+    }
+
+    public readArray(array: string, callback) {
+        this.readDB.readArray(array, callback);
+    }
+
     private create(event: Event) {
         this.readDB.addItem(event.getName(), event.getContent(), (error, result) => {
-            console.log("RESULT CREATE ON:" + this.readDB.getDatabase());
+            console.log('RESULT CREATE ON:' + this.readDB.getDatabase());
             if (error) {
                 console.error(error);
             } else {
@@ -44,21 +56,9 @@ export class Read {
         });
     }
 
-    public read(array: string, item: any, callback) {
-        this.readDB.readItem(array, item, callback);
-    }  
-    
-    public readById(array: string, id, callback) {
-        this.readDB.readItemById(array, id, callback);
-    } 
-
-    public readArray(array: string, callback) {
-        this.readDB.readArray(array, callback);
-    }    
-
     private update(event: Event) {
         this.readDB.updateItem(event.getName(), event.getContent(), function (error, result) {
-            console.log("RESULT UPDATE");
+            console.log('RESULT UPDATE');
             if (error) {
                 console.error(error);
             } else {
@@ -69,7 +69,7 @@ export class Read {
 
     private delete(event: Event) {
         this.readDB.deleteItem(event.getName(), event.getContent(), function (error, result) {
-            console.log("RESULT DELETE");
+            console.log('RESULT DELETE');
             if (error) {
                 console.error(error);
             } else {
