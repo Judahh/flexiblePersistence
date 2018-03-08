@@ -7,8 +7,8 @@ export class Write {
     private read: Read;
     private eventDB: EventDB;
 
-    constructor(name: string, host?: string, port?: number) {
-        this.read = new Read(name, host, port);
+    constructor(name: string, host?: string, port?: number, username?: string, password?: string) {
+        this.read = new Read(name, host, port, username, password);
         this.eventDB = new EventDB(name, host, port);
     }
 

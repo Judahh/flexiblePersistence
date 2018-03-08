@@ -6,8 +6,8 @@ export class Handler {
     private read: Read;
     private write: Write;
 
-    constructor(name: string, host?: string, port?: number) {
-        this.write = new Write(name, host, port);
+    constructor(name: string, host?: string, port?: number, username?: string, password?: string) {
+        this.write = new Write(name, host, port, username, password);
         this.read = this.write.getRead();
     }
 

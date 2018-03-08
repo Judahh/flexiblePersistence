@@ -7,8 +7,8 @@ export class Read {
     private readMongoDB: MongoDB.Db;
     private objects: MongoDB.Collection;
 
-    constructor(name: string, host?: string, port?: number) {
-        this.readDB = new ReadDB(name, host, port);
+    constructor(name: string, host?: string, port?: number, username?: string, password?: string) {
+        this.readDB = new ReadDB(name, host, port, username, password);
     }
 
     public newEvent(event: Event) {
