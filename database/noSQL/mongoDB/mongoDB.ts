@@ -34,9 +34,9 @@ export class MongoDB implements PersistenceAdapter {
         Item.findOneAndUpdate(item, callback);
     }
 
-    public readArray(array: string, callback) {
+    public readArray(array: string, item: any, callback) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.find(callback);
+        Item.find(item, callback);
     }
 
     public readItem(array: string, item: any, callback) {

@@ -1,7 +1,7 @@
 export interface PersistenceAdapter {
 	updateItem(array: string, item, callback);
 
-	readArray(array: string, callback);
+	readArray(array: string, item, callback);
 
 	deleteArray(array: string, callback);
 

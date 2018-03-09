@@ -42,8 +42,8 @@ export class Read {
         this.readDB.readItemById(array, id, callback);
     }
 
-    public readArray(array: string, callback) {
-        this.readDB.readArray(array, callback);
+    public readArray(array: string, item, callback) {
+        this.readDB.readArray(array, item, callback);
     }
 
     private create(event: Event) {

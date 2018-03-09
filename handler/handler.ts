@@ -16,8 +16,8 @@ export class Handler {
         this.write.addEvent(event);
     }
 
-    public readArray(array: string, callback) {
-        this.read.readArray(array, callback);
+    public readArray(array: string, item, callback) {
+        this.read.readArray(array, item, callback);
     }
 
     public readOne(array: string, item: any, callback) {
