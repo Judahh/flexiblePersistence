@@ -1,9 +1,10 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "tsc",
     "start": "node server.js",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
