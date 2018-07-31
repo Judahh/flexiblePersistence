@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -22,11 +22,11 @@
   },
   "homepage": "https://github.com/Judahh/flexiblePersistence#readme",
   "dependencies": {
-    "@types/mongodb": "3.0.7",
-    "@types/mongoose": "^5.0.6",
-    "mongodb": "^3.0.4",
-    "mongoose": "^5.0.9",
-    "typescript": "2.7.2"
+    "@types/mongodb": "3.1.2",
+    "@types/mongoose": "^5.2.3",
+    "mongodb": "^3.1.1",
+    "mongoose": "^5.2.6",
+    "typescript": "3.0.1"
   },
   "devDependencies": {}
 }
