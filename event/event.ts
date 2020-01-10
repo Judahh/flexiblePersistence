@@ -1,11 +1,13 @@
 import { Operation } from './operation';
 export class Event {
+    private _id: any;
+    private __v: any;
     private timestamp: string;
     private operation: Operation;
     private name: string;
     private content: any;
 
-    constructor(operation: Operation, name: string, content: any) {
+    constructor(operation: Operation, name: string, content?: any) {
         this.timestamp = this.currentTimestamp();
         this.operation = operation;
         this.name = name;
@@ -26,6 +28,14 @@ export class Event {
 
     public getContent() {
         return this.content;
+    }
+
+    public getId() {
+        return this._id;
+    }
+
+    public getV() {
+        return this.__v;
     }
 
     private currentTimestamp() {

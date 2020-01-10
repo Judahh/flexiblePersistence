@@ -11,19 +11,19 @@ export class Handler {
         this.read = this.write.getRead();
     }
 
-    public addEvent(event: Event, callback) {
+    public addEvent(event: Event, callback?) {
         this.write.addEvent(event, callback);
     }
 
-    public readArray(array: string, item, callback) {
+    public readArray(array: string, item, callback?) {
         this.read.readArray(array, item, callback);
     }
 
-    public readOne(array: string, item: any, callback) {
+    public readOne(array: string, item: any, callback?) {
         this.read.read(array, item, callback);
     }
 
-    public readById(array: string, id, callback) {
+    public readById(array: string, id, callback?) {
         this.read.readById(array, id, callback);
     }
 }

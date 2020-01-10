@@ -14,11 +14,13 @@ export class Write {
         return this.read;
     }
 
-    public addEvent(event: Event, callback) {
+    public addEvent(event: Event, callback?) {
         this.eventDB.addItem('events', event, (error, result) => {
             if (error) {
-                console.error(error);
+                throw new Error(error);
             } else {
+                event['_id'] = result._id;
+                event['__v'] = result.__v;
                 this.read.newEvent(event, callback);
             }
         });

@@ -26,37 +26,37 @@ export class MongoDB implements PersistenceAdapter {
         this.genericSchema = new this.mongooseInstance.Schema({}, { strict: false });
     }
 
-    public updateItem(array: string, item: any, callback) {
+    public updateItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.findOneAndUpdate(item, callback);
     }
 
-    public readArray(array: string, item: any, callback) {
+    public readArray(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.find(item, callback);
     }
 
-    public readItem(array: string, item: any, callback) {
+    public readItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.findOne(item, callback);
     }
 
-    public readItemById(array: string, id, callback) {
+    public readItemById(array: string, id, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.findById(id, callback);
     }
 
-    public deleteArray(array: string, callback) {
+    public deleteArray(array: string, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.remove(callback);
+        Item.deleteMany({}, callback);
     }
 
-    public addItem(array: string, item: any, callback) {
+    public addItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.create(item, callback);
     }
 
-    public deleteItem(array: string, item: any, callback) {
+    public deleteItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
         Item.findByIdAndRemove(item, callback);
     }

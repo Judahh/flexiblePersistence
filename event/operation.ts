@@ -4,5 +4,6 @@ export enum Operation {
     correct,
     update,
     nonexistent,
-    delete
+    delete,
+    clear
 }

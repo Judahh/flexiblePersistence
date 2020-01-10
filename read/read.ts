@@ -8,7 +8,7 @@ export class Read {
         this.readDB = readDB;
     }
 
-    public newEvent(event: Event, callback) {
+    public newEvent(event: Event, callback?) {
         switch (event.getOperation()) {
             case Operation.add:
                 this.create(event, callback);
@@ -26,30 +26,37 @@ export class Read {
             case Operation.nonexistent:
                 this.delete(event, callback);
                 break;
+            case Operation.clear:
+                this.clear(event, callback);
+                break;
         }
     }
 
-    public read(array: string, item: any, callback) {
+    public read(array: string, item: any, callback?) {
         this.readDB.readItem(array, item, callback);
     }
 
-    public readById(array: string, id, callback) {
+    public readById(array: string, id, callback?) {
         this.readDB.readItemById(array, id, callback);
     }
 
-    public readArray(array: string, item, callback) {
+    public readArray(array: string, item, callback?) {
         this.readDB.readArray(array, item, callback);
     }
 
-    private create(event: Event, callback) {
+    private create(event: Event, callback?) {
         this.readDB.addItem(event.getName(), event.getContent(), callback);
     }
 
-    private update(event: Event, callback) {
+    private update(event: Event, callback?) {
         this.readDB.updateItem(event.getName(), event.getContent(), callback);
     }
 
-    private delete(event: Event, callback) {
+    private delete(event: Event, callback?) {
         this.readDB.deleteItem(event.getName(), event.getContent(), callback);
+    }
+
+    private clear(event: Event, callback?) {
+        this.readDB.deleteArray(event.getName(), callback);
     }
 }
