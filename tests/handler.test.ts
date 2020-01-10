@@ -13,15 +13,18 @@ test('add and read array and find object', done => {
     let obj = new Object;
     obj['test'] = 'test';
     handler.addEvent(new Event(Operation.add, 'object', obj), (error0, result0) => {
+        expect(error0).toBe(null);
         handler.readArray('object', {}, (error1, result1) => {
+            expect(error1).toBe(null);
             let ok = false;
             for (let index = 0; index < result1.length; index++) {
-                const element = result1[index]._doc;
+                const element = result1[index];
                 if (element['test'] === obj['test']) {
                     ok = true;
                 }
             }
             handler.addEvent(new Event(Operation.clear, 'object'), (error2, result2) => {
+                expect(error2).toBe(null);
                 expect(ok).toBe(true);
                 done();
             });
@@ -36,13 +39,13 @@ test('add and read object', done => {
     let handler = new Handler(read, write);
     let obj = new Object;
     obj['test'] = 'test';
-    console.log('o:', obj)
     handler.addEvent(new Event(Operation.add, 'object', obj), (error0, result0) => {
-        console.log('result:', result0);
-        console.log('o:', result0._id);
+        expect(error0).toBe(null);
         handler.readById('object', result0._id, (error1, result1) => {
-            let ok = (result1._doc['test'] === obj['test']);
+            expect(error1).toBe(null);
+            let ok = (result1['test'] === obj['test']);
             handler.addEvent(new Event(Operation.clear, 'object'), (error2, result2) => {
+                expect(error2).toBe(null);
                 expect(ok).toBe(true);
                 done();
             });

@@ -28,37 +28,51 @@ export class MongoDB implements PersistenceAdapter {
 
     public updateItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findOneAndUpdate(item, callback);
+        Item.findOneAndUpdate(item, (error, doc, result) => {
+            callback(error, doc._doc)
+        });
     }
 
     public readArray(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.find(item, callback);
+        Item.find(item, (error, doc: Array<any>, result) => {
+            callback(error, doc.map(a => a._doc))
+        });
     }
 
     public readItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findOne(item, callback);
+        Item.findOne(item, (error, doc, result) => {
+            callback(error, doc._doc)
+        });
     }
 
     public readItemById(array: string, id, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findById(id, callback);
+        Item.findById(id, (error, doc, result) => {
+            callback(error, doc._doc)
+        });
     }
 
-    public deleteArray(array: string, callback?: any) {
+    public deleteArray(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.deleteMany({}, callback);
+        Item.deleteMany(item, (error) => {
+            callback(error)
+        });
     }
 
     public addItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.create(item, callback);
+        Item.create(item, (error, doc, result) => {
+            callback(error, doc._doc)
+        });
     }
 
     public deleteItem(array: string, item: any, callback?: any) {
         let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findByIdAndRemove(item, callback);
+        Item.findByIdAndDelete(item, (error, doc) => {
+            callback(error, doc)
+        });
     }
 
     public getDatabaseInfo() {

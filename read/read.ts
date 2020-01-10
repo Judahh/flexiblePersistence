@@ -57,6 +57,6 @@ export class Read {
     }
 
     private clear(event: Event, callback?) {
-        this.readDB.deleteArray(event.getName(), callback);
+        this.readDB.deleteArray(event.getName(), event.getContent(), callback);
     }
 }
