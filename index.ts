@@ -4,5 +4,5 @@ import { Operation } from './event/operation';
 import { Write } from './write/write';
 import { Read } from './read/read';
 import { PersistenceAdapter } from './persistenceAdapter/persistenceAdapter';
-import { Database } from './database/database';
-export { Handler, Event, Operation, Write, Read, PersistenceAdapter, Database }
+import { DatabaseInfo } from './database/databaseInfo';
+export { Handler, Event, Operation, Write, Read, PersistenceAdapter, DatabaseInfo }

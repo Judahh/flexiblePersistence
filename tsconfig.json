@@ -10,21 +10,25 @@
     "noImplicitAny": false,
     "suppressImplicitAnyIndexErrors": true,
     "typeRoots": [
+      "./types",
       "../node_modules/@types",
       "node_modules/@types"
     ],
     "types": [
-      "node"
+      "node",
+      "jest"
     ]
   },
-  "include": [ 
+  "include": [
     "../api/*",
     "../api",
     "../api/**/*",
     "**/*",
     "*"
   ],
-  "exclude": [ 
-    "node_modules"
+  "exclude": [
+    "node_modules",
+    "**/*.spec.ts",
+    "**/*.test.ts"
   ]
 }

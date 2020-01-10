@@ -1,27 +1,28 @@
-import { MongoClient, Db } from 'mongodb';
+// import { MongoClient, Db } from 'mongodb';
 import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
-import { Database } from '../../database';
+import { DatabaseInfo } from '../../databaseInfo';
 
 export class MongoDB implements PersistenceAdapter {
-    private database: Database;
+    private databaseInfo: DatabaseInfo;
     private mongooseInstance: Mongoose;
     private genericSchema: Schema;
 
-    constructor(database: Database) {
+    constructor(databaseInfo: DatabaseInfo) {
         let string;
-        if (database.username !== undefined && database.password !== undefined) {
-            string = database.username + ':' + database.password + '@' + database.host;
+        if (databaseInfo.username !== undefined && databaseInfo.password !== undefined) {
+            string = databaseInfo.username + ':' + databaseInfo.password + '@' + databaseInfo.host;
         } else {
-            string = database.host;
+            string = databaseInfo.host;
         }
 
-        this.database = database;
+        this.databaseInfo = databaseInfo;
 
         // let mongoose = new Mongoose();
         this.mongooseInstance = new Mongoose();
         // this.mongooseInstance =
-        this.mongooseInstance.connect('mongodb://' + string + ':' + database.port + '/' + database.database, {useNewUrlParser: true});
+        this.mongooseInstance.connect('mongodb://' + string + ':' + databaseInfo.port +
+            '/' + databaseInfo.database, { useNewUrlParser: true });
         this.genericSchema = new this.mongooseInstance.Schema({}, { strict: false });
     }
 
@@ -60,7 +61,7 @@ export class MongoDB implements PersistenceAdapter {
         Item.findByIdAndRemove(item, callback);
     }
 
-    public getDatabase() {
-        return this.database;
+    public getDatabaseInfo() {
+        return this.databaseInfo;
     }
 }

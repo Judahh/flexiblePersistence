@@ -1,4 +1,4 @@
-export class Database {
+export class DatabaseInfo {
     public host: string;
     public port: number;
     public database: string;

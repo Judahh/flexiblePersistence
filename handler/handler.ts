@@ -1,19 +1,18 @@
 import { Write } from './../write/write';
 import { Read } from './../read/read';
 import { Event } from './../event/event';
-import { Operation } from './../event/operation';
-import { Database } from '../database/database';
+import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 export class Handler {
     private read: Read;
     private write: Write;
 
-    constructor(database: Database, database2?: Database) {
+    constructor(database: PersistenceAdapter, database2: PersistenceAdapter) {
         this.write = new Write(database, database2);
         this.read = this.write.getRead();
     }
 
-    public addEvent(event: Event) {
-        this.write.addEvent(event);
+    public addEvent(event: Event, callback) {
+        this.write.addEvent(event, callback);
     }
 
     public readArray(array: string, item, callback) {

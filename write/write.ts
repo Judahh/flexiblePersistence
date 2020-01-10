@@ -1,37 +1,25 @@
-import { Operation } from './../event/operation';
-import { EventDB } from './../database/eventDB/eventDB';
 import { Event } from './../event/event';
 import { Read } from './../read/read';
-import * as MongoDB from 'mongodb';
-import { Database } from '../database/database';
+import { PersistenceAdapter } from '..';
 export class Write {
     private read: Read;
-    private eventDB: EventDB;
+    private eventDB: PersistenceAdapter;
 
-    constructor(database: Database, database2?: Database) {
-        this.read = new Read(database);
-        if (database2 === undefined) {
-            database2 = JSON.parse(JSON.stringify(database));
-            database.database = database.database + 'ReadDB';
-            database2.database = database2.database + 'EventDB';
-        }
-
-        this.read = new Read(database);
-        this.eventDB = new EventDB(database2);
+    constructor(read: PersistenceAdapter, event: PersistenceAdapter) {
+        this.read = new Read(read);
+        this.eventDB = event;
     }
 
     public getRead(): Read {
         return this.read;
     }
 
-    public addEvent(event: Event) {
+    public addEvent(event: Event, callback) {
         this.eventDB.addItem('events', event, (error, result) => {
-            console.log('RESULT EVENT ON ' + this.eventDB.getDatabase());
             if (error) {
                 console.error(error);
             } else {
-                console.log(result);
-                this.read.newEvent(event);
+                this.read.newEvent(event, callback);
             }
         });
     }

@@ -1,35 +1,30 @@
-import { ReadDB } from './../database/readDB/readDB';
 import { Event } from './../event/event';
 import { Operation } from './../event/operation';
-import * as MongoDB from 'mongodb';
-import { Database } from '../database/database';
+import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 export class Read {
-    private readDB: ReadDB;
-    private readMongoDB: MongoDB.Db;
-    private objects: MongoDB.Collection;
+    private readDB: PersistenceAdapter;
 
-    constructor(database: Database) {
-        this.readDB = new ReadDB(database);
+    constructor(readDB: PersistenceAdapter) {
+        this.readDB = readDB;
     }
 
-    public newEvent(event: Event) {
+    public newEvent(event: Event, callback) {
         switch (event.getOperation()) {
             case Operation.add:
-                this.create(event);
+                this.create(event, callback);
                 break;
 
             case Operation.read:
-                // this.read(event);
                 break;
 
             case Operation.correct:
             case Operation.update:
-                this.update(event);
+                this.update(event, callback);
                 break;
 
             case Operation.delete:
             case Operation.nonexistent:
-                this.delete(event);
+                this.delete(event, callback);
                 break;
         }
     }
@@ -46,36 +41,15 @@ export class Read {
         this.readDB.readArray(array, item, callback);
     }
 
-    private create(event: Event) {
-        this.readDB.addItem(event.getName(), event.getContent(), (error, result) => {
-            console.log('RESULT CREATE ON:' + this.readDB.getDatabase());
-            if (error) {
-                console.error(error);
-            } else {
-                console.log(result);
-            }
-        });
+    private create(event: Event, callback) {
+        this.readDB.addItem(event.getName(), event.getContent(), callback);
     }
 
-    private update(event: Event) {
-        this.readDB.updateItem(event.getName(), event.getContent(), function (error, result) {
-            console.log('RESULT UPDATE');
-            if (error) {
-                console.error(error);
-            } else {
-                console.log(result);
-            }
-        });
+    private update(event: Event, callback) {
+        this.readDB.updateItem(event.getName(), event.getContent(), callback);
     }
 
-    private delete(event: Event) {
-        this.readDB.deleteItem(event.getName(), event.getContent(), function (error, result) {
-            console.log('RESULT DELETE');
-            if (error) {
-                console.error(error);
-            } else {
-                console.log(result);
-            }
-        });
+    private delete(event: Event, callback) {
+        this.readDB.deleteItem(event.getName(), event.getContent(), callback);
     }
 }
