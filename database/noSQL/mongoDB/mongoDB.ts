@@ -27,50 +27,50 @@ export class MongoDB implements PersistenceAdapter {
     }
 
     public updateItem(array: string, item: any, callback?: any) {
-        let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findOneAndUpdate(item, (error, doc, result) => {
+        let model = this.mongooseInstance.model(array, this.genericSchema);
+        model.findOneAndUpdate(item, (error, doc, result) => {
             callback(error, doc._doc)
         });
     }
 
     public readArray(array: string, item: any, callback?: any) {
-        let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.find(item, (error, doc: Array<any>, result) => {
+        let model = this.mongooseInstance.model(array, this.genericSchema);
+        model.find(item, (error, doc: Array<any>, result) => {
             callback(error, doc.map(a => a._doc))
         });
     }
 
     public readItem(array: string, item: any, callback?: any) {
-        let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findOne(item, (error, doc, result) => {
+        let model = this.mongooseInstance.model(array, this.genericSchema);
+        model.findOne(item, (error, doc, result) => {
             callback(error, doc._doc)
         });
     }
 
     public readItemById(array: string, id, callback?: any) {
-        let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findById(id, (error, doc, result) => {
+        let model = this.mongooseInstance.model(array, this.genericSchema);
+        model.findById(id, (error, doc, result) => {
             callback(error, doc._doc)
         });
     }
 
     public deleteArray(array: string, item: any, callback?: any) {
-        let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.deleteMany(item, (error) => {
+        let model = this.mongooseInstance.model(array, this.genericSchema);
+        model.deleteMany(item, (error) => {
             callback(error)
         });
     }
 
     public addItem(array: string, item: any, callback?: any) {
-        let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.create(item, (error, doc, result) => {
+        let model = this.mongooseInstance.model(array, this.genericSchema);
+        model.create(item, (error, doc, result) => {
             callback(error, doc._doc)
         });
     }
 
     public deleteItem(array: string, item: any, callback?: any) {
-        let Item = this.mongooseInstance.model(array, this.genericSchema);
-        Item.findByIdAndDelete(item, (error, doc) => {
+        let model = this.mongooseInstance.model(array, this.genericSchema);
+        model.findByIdAndDelete(item, (error, doc) => {
             callback(error, doc)
         });
     }
