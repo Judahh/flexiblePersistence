@@ -5,4 +5,5 @@ import { Write } from './write/write';
 import { Read } from './read/read';
 import { PersistenceAdapter } from './persistenceAdapter/persistenceAdapter';
 import { DatabaseInfo } from './database/databaseInfo';
-export { Handler, Event, Operation, Write, Read, PersistenceAdapter, DatabaseInfo }
+import { MongoDB } from './database/noSQL/mongoDB/mongoDB';
+export { Handler, Event, Operation, Write, Read, PersistenceAdapter, DatabaseInfo, MongoDB }
