@@ -22,7 +22,7 @@ export class MongoDB implements PersistenceAdapter {
         this.mongooseInstance = new Mongoose();
         // this.mongooseInstance =
         this.mongooseInstance.connect('mongodb://' + string + ':' + databaseInfo.port +
-            '/' + databaseInfo.database, { useNewUrlParser: true });
+            '/' + databaseInfo.database, { useNewUrlParser: true, useUnifiedTopology: true });
         this.genericSchema = new this.mongooseInstance.Schema({}, { strict: false });
     }
 
