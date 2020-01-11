@@ -6,24 +6,38 @@ export class Handler {
     private read: Read;
     private write: Write;
 
-    constructor(database: PersistenceAdapter, database2: PersistenceAdapter) {
-        this.write = new Write(database, database2);
-        this.read = this.write.getRead();
+    constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
+        this.write = new Write(read, event);
+        if (read) {
+            this.read = this.write.getRead();
+        }
     }
 
     public addEvent(event: Event, callback?) {
         this.write.addEvent(event, callback);
     }
 
-    public readArray(array: string, item, callback?) {
-        this.read.readArray(array, item, callback);
+    public readArray(scheme: string, item, callback?) {
+        if (this.read) {
+            this.read.readArray(scheme, item, callback);
+        } else {
+            this.write.readArray(scheme, item, callback);
+        }
     }
 
-    public readOne(array: string, item: any, callback?) {
-        this.read.read(array, item, callback);
+    public readOne(scheme: string, item: any, callback?) {
+        if (this.read) {
+            this.read.read(scheme, item, callback);
+        } else {
+            this.write.readOne(scheme, item, callback);
+        }
     }
 
-    public readById(array: string, id, callback?) {
-        this.read.readById(array, id, callback);
+    public readById(scheme: string, id, callback?) {
+        if (this.read) {
+            this.read.readById(scheme, id, callback);
+        } else {
+            this.write.readById(scheme, id, callback);
+        }
     }
 }

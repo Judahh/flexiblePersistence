@@ -5,9 +5,11 @@ export class Write {
     private read: Read;
     private eventDB: PersistenceAdapter;
 
-    constructor(read: PersistenceAdapter, event: PersistenceAdapter) {
-        this.read = new Read(read);
+    constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
         this.eventDB = event;
+        if (read) {
+            this.read = new Read(read);
+        }
     }
 
     public getRead(): Read {
@@ -21,8 +23,24 @@ export class Write {
             } else {
                 event['_id'] = result._id;
                 event['__v'] = result.__v;
-                this.read.newEvent(event, callback);
+                if (this.read) {
+                    this.read.newEvent(event, callback);
+                } else {
+                    callback(error, event);
+                }
             }
         });
+    }
+
+    public readArray(scheme: string, item, callback?) {
+        this.eventDB.readArray(scheme, item, callback);
+    }
+
+    public readOne(scheme: string, item: any, callback?) {
+        this.eventDB.readItem(scheme, item, callback);
+    }
+
+    public readById(scheme: string, id, callback?) {
+        this.eventDB.readItemById(scheme, id, callback);
     }
 }

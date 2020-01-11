@@ -9,7 +9,7 @@ test('add and read array and find object', done => {
     let read = new MongoDB(new DatabaseInfo('read'));
     let write = new MongoDB(new DatabaseInfo('write'));
 
-    let handler = new Handler(read, write);
+    let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
     handler.addEvent(new Event(Operation.add, 'object', obj), (error0, result0) => {

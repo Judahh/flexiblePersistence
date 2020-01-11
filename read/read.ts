@@ -32,16 +32,16 @@ export class Read {
         }
     }
 
-    public read(array: string, item: any, callback?) {
-        this.readDB.readItem(array, item, callback);
+    public read(scheme: string, item: any, callback?) {
+        this.readDB.readItem(scheme, item, callback);
     }
 
-    public readById(array: string, id, callback?) {
-        this.readDB.readItemById(array, id, callback);
+    public readById(scheme: string, id, callback?) {
+        this.readDB.readItemById(scheme, id, callback);
     }
 
-    public readArray(array: string, item, callback?) {
-        this.readDB.readArray(array, item, callback);
+    public readArray(scheme: string, item, callback?) {
+        this.readDB.readArray(scheme, item, callback);
     }
 
     private create(event: Event, callback?) {

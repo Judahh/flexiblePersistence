@@ -1,10 +1,10 @@
 export interface PersistenceAdapter {
-addItem(array: string, item: any, callback?: any);
-updateItem(array: string, item: any, callback?: any);
-readArray(array: string, item: any, callback?: any);
-readItem(array: string, item: any, callback?: any);
-readItemById(array: string, id: any, callback?: any);
-deleteArray(array: string, item: any, callback?: any);
-deleteItem(array: string, item: any, callback?: any);
+addItem(scheme: string, item: any, callback?: any);
+updateItem(scheme: string, item: any, callback?: any);
+readArray(scheme: string, item: any, callback?: any);
+readItem(scheme: string, item: any, callback?: any);
+readItemById(scheme: string, id: any, callback?: any);
+deleteArray(scheme: string, item: any, callback?: any);
+deleteItem(scheme: string, item: any, callback?: any);
 getDatabaseInfo();
 }
