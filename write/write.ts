@@ -36,11 +36,11 @@ export class Write {
         this.eventDB.readArray(scheme, item, callback);
     }
 
-    public readOne(scheme: string, item: any, callback?) {
+    public readItem(scheme: string, item: any, callback?) {
         this.eventDB.readItem(scheme, item, callback);
     }
 
-    public readById(scheme: string, id, callback?) {
+    public readItemById(scheme: string, id, callback?) {
         this.eventDB.readItemById(scheme, id, callback);
     }
 }

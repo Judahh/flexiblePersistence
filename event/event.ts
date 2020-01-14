@@ -7,10 +7,10 @@ export class Event {
     private name: string;
     private content: any;
 
-    constructor(operation: Operation, name: string, content?: any) {
+    constructor({ operation, name, content }: { operation: Operation; name?: string; content?: any; }) {
         this.timestamp = this.currentTimestamp();
         this.operation = operation;
-        this.name = name;
+        this.name = name || content.constructor.name;
         this.content = content;
     }
 

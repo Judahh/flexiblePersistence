@@ -12,7 +12,7 @@ test('add and read array and find object', done => {
     let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
-    handler.addEvent(new Event(Operation.add, 'object', obj), (error0, result0) => {
+    handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
         expect(error0).toBe(null);
         handler.readArray('object', {}, (error1, result1) => {
             expect(error1).toBe(null);
@@ -23,7 +23,7 @@ test('add and read array and find object', done => {
                     ok = true;
                 }
             }
-            handler.addEvent(new Event(Operation.clear, 'object'), (error2, result2) => {
+            handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
                 expect(error2).toBe(null);
                 expect(ok).toBe(true);
                 done();
@@ -39,12 +39,12 @@ test('add and read object', done => {
     let handler = new Handler(read, write);
     let obj = new Object;
     obj['test'] = 'test';
-    handler.addEvent(new Event(Operation.add, 'object', obj), (error0, result0) => {
+    handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
         expect(error0).toBe(null);
-        handler.readById('object', result0._id, (error1, result1) => {
+        handler.readItemById('object', result0._id, (error1, result1) => {
             expect(error1).toBe(null);
             let ok = (result1['test'] === obj['test']);
-            handler.addEvent(new Event(Operation.clear, 'object'), (error2, result2) => {
+            handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
                 expect(error2).toBe(null);
                 expect(ok).toBe(true);
                 done();

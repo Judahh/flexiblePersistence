@@ -1,153 +1,172 @@
 
-// class Manager {
-//     private static types: any;
+class Manager {
+    private static types: any;
 
-//     public static addConstructor(constructor: any) {
-//         let className = constructor.name;
-//         if (Manager.types === undefined) {
-//             Manager.types = {};
-//         }
-//         if (Manager.types[className] === undefined) {
-//             Manager.types[className] = constructor;
-//         }
-//     }
+    public static addConstructor(constructor: any) {
+        let className = constructor.name;
+        if (Manager.types === undefined) {
+            Manager.types = {};
+        }
+        if (Manager.types[className] === undefined) {
+            Manager.types[className] = constructor;
+        }
+    }
 
-//     public static generate(className: string, ...properties: any) {
-//         let object = Manager.types[className];
-//         let properElement;
-//         if (object !== null && object !== undefined) {
-//             properElement = new object(...properties);
-//         }
-//         return properElement;
-//     }
+    public static generate(className: string, ...properties: any) {
+        let object = Manager.types[className];
+        let properElement;
+        if (object !== null && object !== undefined) {
+            properElement = new object(...properties);
+        }
+        return properElement;
+    }
 
-//     public static generateDB(object: any) {
-//         let objectDB = Manager.generate(object.constructor.name + 'DB');
-//         Manager.getParents(object, objectDB);
-//         objectDB._id = object._id;
-//         let exists = Manager.simpleGenerateDB(object.__proto__.__proto__);
-//         for (let i = 0; i < Object.keys(object).length; i++) {
-//             let key = Object.keys(object)[i];
-//             let value = object[key];
-//             if (!exists.includes(key)) {
-//                 if (value instanceof Object) {
-//                     objectDB['_fk_' + value.constructor.name.toLowerCase() + 'DB_' + key] = value._id;
-//                 } else if (value instanceof Array) {
-//                     // TODO
-//                 } else {
-//                     objectDB[key] = value;
-//                 }
-//             }
-//         }
-//         return objectDB;
-//     }
+    public static generateDB(object: any) {
+        let objectDB = Manager.generate(object.constructor.name + 'DB');
+        Manager.getParents(object, objectDB);
+        objectDB._id = object._id;
+        let exists = Manager.simpleGenerateDB(object.__proto__.__proto__);
+        for (let i = 0; i < Object.keys(object).length; i++) {
+            let key = Object.keys(object)[i];
+            let value = object[key];
+            if (!exists.includes(key)) {
+                if (value instanceof Object) {
+                    objectDB['_fk_' + value.constructor.name.toLowerCase() + 'DB_' + key] = value._id;
+                } else if (value instanceof Array) {
+                    // TODO
+                } else {
+                    objectDB[key] = value;
+                }
+            }
+        }
+        return objectDB;
+    }
 
-//     private static getParents(object: any, objectDB: any, initial?: any) {
-//         if (object.__proto__.constructor.name !== 'Object') {
-//             console.log('1:', object.__proto__.constructor.name)
-//             if (object.__proto__.constructor.name !== object.constructor.name) {
-//                 console.log('2:', object.constructor.name)
-//                 let o = (initial === undefined) ? object : initial;
-//                 objectDB['_fk_' + object.__proto__.constructor.name + 'DB'] = o._id;
-//                 console.log(o)
-//             }
-//             console.log('3:', object.constructor.name)
-//             Manager.getParents(object.__proto__, objectDB, (initial === undefined) ? object : initial);
-//         }
-//     }
+    private static getParents(object: any, objectDB: any, initial?: any) {
+        if (object.__proto__.constructor.name !== 'Object') {
+            console.log('1:', object.__proto__.constructor.name)
+            if (object.__proto__.constructor.name !== object.constructor.name) {
+                console.log('2:', object.constructor.name)
+                let o = (initial === undefined) ? object : initial;
+                objectDB['_fk_' + object.__proto__.constructor.name + 'DB'] = o._id;
+                console.log(o)
+            }
+            console.log('3:', object.constructor.name)
+            Manager.getParents(object.__proto__, objectDB, (initial === undefined) ? object : initial);
+        }
+    }
 
-//     private static simpleGenerateDB(object: any) {
-//         let objectDB = Manager.generate(object.constructor.name + 'DB');
-//         for (let i = 0; i < Object.keys(object).length; i++) {
-//             let key = Object.keys(object)[i];
-//             let value = object[key];
-//             if (value instanceof Object) {
-//                 objectDB['_fk_' + value.constructor.name.toLowerCase() + 'DB_' + key] = value._id;
-//             } else if (value instanceof Array) {
-//                 // TODO
-//             } else {
-//                 objectDB[key] = value;
-//             }
-//         }
-//         return Object.keys(objectDB);
-//     }
-// }
+    private static simpleGenerateDB(object: any) {
+        let objectDB = Manager.generate(object.constructor.name + 'DB');
+        for (let i = 0; i < Object.keys(object).length; i++) {
+            let key = Object.keys(object)[i];
+            let value = object[key];
+            if (value instanceof Object) {
+                objectDB['_fk_' + value.constructor.name.toLowerCase() + 'DB_' + key] = value._id;
+            } else if (value instanceof Array) {
+                // TODO
+            } else {
+                objectDB[key] = value;
+            }
+        }
+        return Object.keys(objectDB);
+    }
+}
 
-// abstract class IIVendorDB {
-//     public _id: number;
-//     constructor(_id: number) {
-//         this._id = _id;
-//     }
-// }
-// Manager.addConstructor(IIVendorDB);
+abstract class BasicModel {
+    private _id: any;
 
-// abstract class IVendorDB extends IIVendorDB {
-//     public name: string;
-//     constructor(_id: number, name: string) {
-//         super(_id);
-//         this.name = name;
-//     }
-// }
-// Manager.addConstructor(IVendorDB);
+    constructor(_id: any) {
+        this._id = _id;
+    }
+}
 
-// abstract class IIVendor {
-//     public _id: number;
-//     constructor(_id: number) {
-//         this._id = _id;
-//     }
-// }
-// Manager.addConstructor(IIVendor);
+abstract class PersistenceModel extends BasicModel {
+    protected static map: {};
+    private static volatileModel: VolatileModel;
 
-// abstract class IVendor extends IIVendor {
-//     public name: string;
-//     constructor(_id: number, name: string) {
-//         super(_id);
-//         this.name = name;
-//     }
-// }
-// Manager.addConstructor(IVendor);
+    public static setVolatileModel(volatileModel: VolatileModel) {
+        this.volatileModel = volatileModel;
+    }
 
-// class Vendor extends IVendor {
-//     public vendor2: Vendor2;
+    public static generateVolatile(object: PersistenceModel) {
+        let objectDB = new (<any>this.volatileModel)();
+        for (let i = 0; i < Object.keys(object).length; i++) {
+            let key = Object.keys(object)[i];
+            let value = (<any>object)[key];
+            if (objectDB.hasOwnProperty(key)) {
+                objectDB[key] = value;
+            } else {
+                console.log((<any>object).map)
+            }
+        }
+        return objectDB;
+    }
+}
 
-//     constructor(_id: number, name: string, vendor2: Vendor2) {
-//         super(_id, name);
-//         this.vendor2 = vendor2;
-//     }
-// }
-// Manager.addConstructor(Vendor);
+abstract class VolatileModel extends BasicModel {
+    private static persistenceModel: PersistenceModel;
 
-// class VendorDB {
-//     public _id: number;
-//     public _fk_vendor2DB_vendor2: number;
+    public static setPersistenceModel(persistenceModel: PersistenceModel) {
+        this.persistenceModel = persistenceModel;
+    }
 
-//     constructor(_id: number, _fk_vendor2DB_vendor2: number) {
-//         this._id = _id;
-//         this._fk_vendor2DB_vendor2 = _fk_vendor2DB_vendor2;
-//     }
-// }
-// Manager.addConstructor(VendorDB);
+    public static generatePersistence(object: VolatileModel) {
+        let objectDB = new (<any>this.persistenceModel)();
+        for (let i = 0; i < Object.keys(object).length; i++) {
+            let key = Object.keys(object)[i];
+            let value = (<any>object)[key];
+            if (objectDB.hasOwnProperty(key)) {
+                objectDB[key] = value;
+            } else {
+                let map = (<any>this.persistenceModel).map;
+                let mKey = Object.keys(map[key])[0];
+                objectDB[mKey] = (<any>object)[map[key][mKey]]
+            }
+        }
+        return objectDB;
+    }
+}
 
-// class Vendor2 {
-//     public _id: number;
-//     public name: string;
+class ExampleVolatileModel0 extends VolatileModel {
 
-//     constructor(_id: number, name: string) {
-//         this._id = _id;
-//         this.name = name;
-//     }
-// }
-// Manager.addConstructor(Vendor2);
+}
 
-// // Because we indicated that there needs to be two arguments
-// // to create a new FoodTruck, TypeScript will provide errors
-// // when you only use one:
 
-// const vendor2 = new Vendor2(1, 'noob');
+class ExampleVolatileModel1 extends VolatileModel {
+    private exampleVolatileModel0: ExampleVolatileModel0;
+    constructor(_id: any, exampleVolatileModel0: ExampleVolatileModel0) {
+        super(_id);
+        this.exampleVolatileModel0 = exampleVolatileModel0;
+    }
+}
 
-// const vendor = new Vendor(0, 'a', vendor2);
-// const vendorDB = new VendorDB(0, 'a', vendor2._id);
+class ExamplePersistenceModel0 extends PersistenceModel {
 
-// console.log('vendor', vendor);
-// console.log('vendorDB', vendorDB);
-// console.log('value', Manager.generateDB(vendor));
+}
+
+class ExamplePersistenceModel1 extends PersistenceModel {
+    protected static map: { [key: string]: any } =
+        { 'exampleVolatileModel0': { id_examplePersistenceModel0: '_id' } };
+    private id_examplePersistenceModel0: any;
+    constructor(_id: any, id_examplePersistenceModel0: any) {
+        super(_id);
+        this.id_examplePersistenceModel0 = id_examplePersistenceModel0;
+    }
+}
+
+ExamplePersistenceModel0.setVolatileModel(<any>ExampleVolatileModel0);
+ExamplePersistenceModel1.setVolatileModel(<any>ExampleVolatileModel1);
+ExampleVolatileModel0.setPersistenceModel(<any>ExamplePersistenceModel0);
+ExampleVolatileModel1.setPersistenceModel(<any>ExamplePersistenceModel1);
+
+const e0 = new ExamplePersistenceModel0(0)
+const e1 = new ExamplePersistenceModel1(0, 0)
+const e2 = new ExampleVolatileModel0(0)
+const e3 = new ExampleVolatileModel1(0, e2)
+
+// console.log('EX1:',ExampleVolatileModel1.generatePersistence(e3));
+// console.log('EX2:', ExampleVolatileModel0.generatePersistence(e2));
+console.log('EX3:', ExampleVolatileModel1.generatePersistence(e3));
+  // console.log('EX1:',ExamplePersistenceModel1.generateVolatile(e1));
+  // console.log('EX2:', ExampleVolatileModel0.generatePersistence(e2));

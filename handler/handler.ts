@@ -25,19 +25,19 @@ export class Handler {
         }
     }
 
-    public readOne(scheme: string, item: any, callback?) {
+    public readItem(scheme: string, item: any, callback?) {
         if (this.read) {
-            this.read.read(scheme, item, callback);
+            this.read.readItem(scheme, item, callback);
         } else {
-            this.write.readOne(scheme, item, callback);
+            this.write.readItem(scheme, item, callback);
         }
     }
 
-    public readById(scheme: string, id, callback?) {
+    public readItemById(scheme: string, id, callback?) {
         if (this.read) {
-            this.read.readById(scheme, id, callback);
+            this.read.readItemById(scheme, id, callback);
         } else {
-            this.write.readById(scheme, id, callback);
+            this.write.readItemById(scheme, id, callback);
         }
     }
 }
