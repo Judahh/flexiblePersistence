@@ -1,10 +1,11 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.0.31",
+  "version": "1.0.32",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "tsc",
+    "postinstall": "",
+    "prepublish": "tsc",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "jest",
     "prestart": "",
@@ -23,8 +24,7 @@
   "homepage": "https://github.com/Judahh/flexiblePersistence#readme",
   "dependencies": {
     "mongodb": "^3.4.1",
-    "mongoose": "^5.8.6",
-    "typescript": "3.7.4"
+    "mongoose": "^5.8.7"
   },
   "devDependencies": {
     "@types/node": "^13.1.6",
@@ -35,6 +35,7 @@
     "jest": "^24.9.0",
     "ts-jest": "^24.3.0",
     "tslint": "^5.20.1",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "typescript": "3.7.4"
   }
 }
