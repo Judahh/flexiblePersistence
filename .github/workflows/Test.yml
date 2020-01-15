@@ -60,7 +60,7 @@ jobs:
         POSTGRES_HOST: postgres
         POSTGRES_PORT: ${{ job.services.postgres.ports[5432] }}
         MONGO_HOST: mongo
-        MONGO_PORT: ${{ job.services.postgres.ports[27017] }}
+        MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
     - name: Checkout
       uses: actions/checkout@v1
 
