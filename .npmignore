@@ -13,3 +13,4 @@ CVS
 npm-debug.log
 .test.ts
 temp.ts
+.yml
