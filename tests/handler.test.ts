@@ -111,8 +111,10 @@ test('add and read array and find object', done => {
     handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
         expect(error0).toBe(undefined);
         if (error0) {
+            console.log('DONE');
             done();
         }
+        console.log('NDONE');
         handler.readArray('object', {}, (error1, result1) => {
             expect(error1).toBe(undefined);
             if (error1) {
