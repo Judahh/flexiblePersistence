@@ -7,7 +7,7 @@ export class Handler {
     private write: Write;
 
     constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
-        this.write = new Write(read, event);
+        this.write = new Write(event, read);
         if (read) {
             this.read = this.write.getRead();
         }
