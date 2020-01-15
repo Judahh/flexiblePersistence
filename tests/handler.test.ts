@@ -14,8 +14,14 @@ test('add and read array and find object', done => {
     obj['test'] = 'test';
     handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
         expect(error0).toBe(null);
+        if (error0) {
+            done();
+        }
         handler.readArray('object', {}, (error1, result1) => {
             expect(error1).toBe(null);
+            if (error1) {
+                done();
+            }
             let ok = false;
             for (let index = 0; index < result1.length; index++) {
                 const element = result1[index];
@@ -41,8 +47,14 @@ test('add and read array and find object', done => {
     obj['test'] = 'test';
     handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
         expect(error0).toBe(null);
+        if (error0) {
+            done();
+        }
         handler.readArray('object', {}, (error1, result1) => {
             expect(error1).toBe(null);
+            if (error1) {
+                done();
+            }
             let ok = false;
             for (let index = 0; index < result1.length; index++) {
                 const element = result1[index];
@@ -68,8 +80,14 @@ test('add and read object', done => {
     obj['test'] = 'test';
     handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
         expect(error0).toBe(null);
+        if (error0) {
+            done();
+        }
         handler.readItemById('object', result0._id, (error1, result1) => {
             expect(error1).toBe(null);
+            if (error1) {
+                done();
+            }
             let ok = (result1['test'] === obj['test']);
             handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
                 expect(error2).toBe(null);
@@ -89,8 +107,14 @@ test('add and read array and find object', done => {
     obj['test'] = 'test';
     handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
         expect(error0).toBe(undefined);
+        if (error0) {
+            done();
+        }
         handler.readArray('object', {}, (error1, result1) => {
             expect(error1).toBe(undefined);
+            if (error1) {
+                done();
+            }
             let ok = false;
             for (let index = 0; index < result1.length; index++) {
                 const element = result1[index];
