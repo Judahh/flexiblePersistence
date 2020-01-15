@@ -1,6 +1,16 @@
 name: Node CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - '*'         # matches every branch
+      - '*/*'       # matches every branch containing a single '/'
+      - '!master'   # excludes master
+  pull_request:
+    branches:
+      - '*'         # matches every branch
+      - '*/*'       # matches every branch containing a single '/'
+      - '!master'   # excludes master
 
 jobs:
   build:
@@ -32,12 +42,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Install
     - uses: borales/actions-yarn@v2.0.0
       with:
         cmd: install # will run `yarn install` command
+    - name: Build
     - uses: borales/actions-yarn@v2.0.0
       with:
         cmd: build # will run `yarn build` command
+    - name: Test
     - uses: borales/actions-yarn@v2.0.0
       with:
         cmd: test # will run `yarn test` command
@@ -46,7 +59,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm publish
+    - name: Publish
       run: |
         npm publish
       env:
