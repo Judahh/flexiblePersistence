@@ -99,8 +99,11 @@ test('add and read object', done => {
 });
 
 test('add and read array and find object', done => {
-    let read = new PostgresDB(new DatabaseInfo('postgres', process.env.POSTGRES_HOST || 'localhost', (+process.env.POSTGRES_PORT) || 5432));
+    let read = new PostgresDB(new DatabaseInfo('postgres', process.env.POSTGRES_HOST || 'localhost',
+    (+process.env.POSTGRES_PORT) || 5432, process.env.POSTGRES_USER));
     let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
+
+    console.log('USER', process.env.POSTGRES_USER);
 
     let handler = new Handler(write, read);
     let obj = new Object;
