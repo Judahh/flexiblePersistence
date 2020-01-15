@@ -87,12 +87,10 @@ test('add and read array and find object', done => {
     let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
-    console.log('a')
     handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
-        console.log('b')
-        expect(error0).toBe(null);
+        expect(error0).toBe(undefined);
         handler.readArray('object', {}, (error1, result1) => {
-            expect(error1).toBe(null);
+            expect(error1).toBe(undefined);
             let ok = false;
             for (let index = 0; index < result1.length; index++) {
                 const element = result1[index];
@@ -101,7 +99,7 @@ test('add and read array and find object', done => {
                 }
             }
             handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
-                expect(error2).toBe(null);
+                expect(error2).toBe(undefined);
                 expect(ok).toBe(true);
                 done();
             });

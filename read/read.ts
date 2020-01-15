@@ -11,52 +11,29 @@ export class Read {
     public newEvent(event: Event, callback?) {
         switch (event.getOperation()) {
             case Operation.add:
-                this.addItem(event, callback);
+                this.readDB.addItem(event.getName(), event.getContent(), callback);
                 break;
 
             case Operation.read:
+                this.readDB.readArray(event.getName(), event.getSelection(), callback);
                 break;
 
             case Operation.correct:
             case Operation.update:
-                this.updateItem(event, callback);
+                this.readDB.updateItem(event.getName(), event.getSelection(), event.getContent(), callback);
                 break;
 
             case Operation.delete:
             case Operation.nonexistent:
-                this.deleteItem(event, callback);
+                this.readDB.deleteItem(event.getName(), event.getSelection(), callback);
                 break;
             case Operation.clear:
-                this.deleteArray(event, callback);
+                this.readDB.deleteArray(event.getName(), event.getSelection(), callback);
                 break;
         }
     }
 
-    public readItem(scheme: string, item: any, callback?) {
-        this.readDB.readItem(scheme, item, callback);
-    }
-
-    public readItemById(scheme: string, id, callback?) {
-        this.readDB.readItemById(scheme, id, callback);
-    }
-
-    public readArray(scheme: string, item, callback?) {
-        this.readDB.readArray(scheme, item, callback);
-    }
-
-    private addItem(event: Event, callback?) {
-        this.readDB.addItem(event.getName(), event.getContent(), callback);
-    }
-
-    private updateItem(event: Event, callback?) {
-        this.readDB.updateItem(event.getName(), event.getContent(), callback);
-    }
-
-    private deleteItem(event: Event, callback?) {
-        this.readDB.deleteItem(event.getName(), event.getContent(), callback);
-    }
-
-    private deleteArray(event: Event, callback?) {
-        this.readDB.deleteArray(event.getName(), event.getContent(), callback);
+    public getReadDB(): PersistenceAdapter {
+        return this.readDB;
     }
 }

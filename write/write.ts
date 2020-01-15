@@ -32,12 +32,12 @@ export class Write {
         });
     }
 
-    public readArray(scheme: string, item, callback?) {
-        this.eventDB.readArray(scheme, item, callback);
+    public readArray(scheme: string, selectedItem: any, callback?) {
+        this.eventDB.readArray(scheme, selectedItem, callback);
     }
 
-    public readItem(scheme: string, item: any, callback?) {
-        this.eventDB.readItem(scheme, item, callback);
+    public readItem(scheme: string, selectedItem: any, callback?) {
+        this.eventDB.readItem(scheme, selectedItem, callback);
     }
 
     public readItemById(scheme: string, id, callback?) {

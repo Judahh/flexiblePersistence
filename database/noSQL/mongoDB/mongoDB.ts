@@ -26,52 +26,53 @@ export class MongoDB implements PersistenceAdapter {
         this.genericSchema = new this.mongooseInstance.Schema({}, { strict: false });
     }
 
-    public updateItem(scheme: string, item: any, callback?: any) {
+    public updateItem(scheme: string, selectedItem: any, item: any, callback?: any) {
         let model = this.mongooseInstance.model(scheme, this.genericSchema);
-        model.findOneAndUpdate(item, (error, doc, result) => {
-            callback(error, doc._doc)
+        model.findOneAndUpdate(selectedItem, item, (error, doc, result) => {
+            callback(error, (doc === undefined) ? undefined : (<any>doc)._doc, result, selectedItem, item);
         });
     }
 
-    public readArray(scheme: string, item: any, callback?: any) {
+    public readArray(scheme: string, selectedItem: any, callback?: any) {
         let model = this.mongooseInstance.model(scheme, this.genericSchema);
-        model.find(item, (error, doc: Array<any>, result) => {
-            callback(error, doc.map(a => a._doc))
+        model.find(selectedItem, (error, doc: Array<any>, result) => {
+            callback(error, (doc === undefined) ? undefined : doc.map(a => a._doc), result, selectedItem, undefined);
         });
     }
 
-    public readItem(scheme: string, item: any, callback?: any) {
+    public readItem(scheme: string, selectedItem: any, callback?: any) {
         let model = this.mongooseInstance.model(scheme, this.genericSchema);
-        model.findOne(item, (error, doc, result) => {
-            callback(error, doc._doc)
+        model.findOne(selectedItem, (error, doc, result) => {
+            callback(error, (doc === undefined) ? undefined : doc._doc, result, selectedItem, undefined);
         });
     }
 
     public readItemById(scheme: string, id, callback?: any) {
         let model = this.mongooseInstance.model(scheme, this.genericSchema);
         model.findById(id, (error, doc, result) => {
-            callback(error, doc._doc)
+            callback(error, (doc === undefined) ? undefined : doc._doc, result, id, undefined);
         });
     }
 
-    public deleteArray(scheme: string, item: any, callback?: any) {
+    public deleteArray(scheme: string, selectedItem: any, callback?: any) {
         let model = this.mongooseInstance.model(scheme, this.genericSchema);
-        model.deleteMany(item, (error) => {
-            callback(error)
+        model.deleteMany(selectedItem, (error) => {
+            callback(error, undefined, undefined, selectedItem, undefined);
         });
     }
 
     public addItem(scheme: string, item: any, callback?: any) {
         let model = this.mongooseInstance.model(scheme, this.genericSchema);
         model.create(item, (error, doc, result) => {
-            callback(error, doc._doc)
+            callback(error, (doc === undefined) ? undefined : doc._doc, result, undefined, item);
         });
     }
 
-    public deleteItem(scheme: string, item: any, callback?: any) {
+    public deleteItem(scheme: string, selectedItem: any, callback?: any) {
         let model = this.mongooseInstance.model(scheme, this.genericSchema);
-        model.findByIdAndDelete(item, (error, doc) => {
+        model.findByIdAndDelete(selectedItem, (error, doc) => {
             callback(error, doc)
+            callback(error, doc, undefined, selectedItem, undefined);
         });
     }
 

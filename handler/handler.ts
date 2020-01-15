@@ -17,25 +17,25 @@ export class Handler {
         this.write.addEvent(event, callback);
     }
 
-    public readArray(scheme: string, item, callback?) {
+    public readArray(scheme: string, selectedItem: any, callback?) {
         if (this.read) {
-            this.read.readArray(scheme, item, callback);
+            this.read.getReadDB().readArray(scheme, selectedItem, callback);
         } else {
-            this.write.readArray(scheme, item, callback);
+            this.write.readArray(scheme, selectedItem, callback);
         }
     }
 
-    public readItem(scheme: string, item: any, callback?) {
+    public readItem(scheme: string, selectedItem: any, callback?) {
         if (this.read) {
-            this.read.readItem(scheme, item, callback);
+            this.read.getReadDB().readItem(scheme, selectedItem, callback);
         } else {
-            this.write.readItem(scheme, item, callback);
+            this.write.readItem(scheme, selectedItem, callback);
         }
     }
 
     public readItemById(scheme: string, id, callback?) {
         if (this.read) {
-            this.read.readItemById(scheme, id, callback);
+            this.read.getReadDB().readItemById(scheme, id, callback);
         } else {
             this.write.readItemById(scheme, id, callback);
         }

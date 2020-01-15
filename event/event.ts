@@ -6,12 +6,14 @@ export class Event {
     private operation: Operation;
     private name: string;
     private content: any;
+    private selection: any;
 
-    constructor({ operation, name, content }: { operation: Operation; name?: string; content?: any; }) {
+    constructor({ operation, name, selection, content }: { operation: Operation; name?: string; selection?: any; content?: any; }) {
         this.timestamp = this.currentTimestamp();
         this.operation = operation;
         this.name = name || content.constructor.name;
         this.content = content;
+        this.selection = selection;
     }
 
     public getOperation() {
@@ -28,6 +30,10 @@ export class Event {
 
     public getContent() {
         return this.content;
+    }
+
+    public getSelection() {
+        return this.selection;
     }
 
     public getId() {
