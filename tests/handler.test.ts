@@ -6,8 +6,8 @@ import { MongoDB } from '../database/noSQL/mongoDB/mongoDB';
 import { PostgresDB } from '../database/sQL/postgresDB/postgresDB';
 
 test('add and read array and find object', done => {
-    let read = new MongoDB(new DatabaseInfo('read'));
-    let write = new MongoDB(new DatabaseInfo('write'));
+    let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
+    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
 
     let handler = new Handler(write, read);
     let obj = new Object;
@@ -33,8 +33,8 @@ test('add and read array and find object', done => {
 });
 
 test('add and read array and find object', done => {
-    let read = new MongoDB(new DatabaseInfo('read'));
-    let write = new MongoDB(new DatabaseInfo('write'));
+    let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
+    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
 
     let handler = new Handler(write, read);
     let obj = new Object;
@@ -60,8 +60,8 @@ test('add and read array and find object', done => {
 });
 
 test('add and read object', done => {
-    let read = new MongoDB(new DatabaseInfo('read'));
-    let write = new MongoDB(new DatabaseInfo('write'));
+    let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
+    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
 
     let handler = new Handler(read, write);
     let obj = new Object;
@@ -81,8 +81,8 @@ test('add and read object', done => {
 });
 
 test('add and read array and find object', done => {
-    let read = new PostgresDB(new DatabaseInfo('postgres', 'localhost', 5432));
-    let write = new MongoDB(new DatabaseInfo('write'));
+    let read = new PostgresDB(new DatabaseInfo('postgres', process.env.POSTGRES_HOST || 'localhost', (+process.env.POSTGRES_PORT) || 5432));
+    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
 
     let handler = new Handler(write, read);
     let obj = new Object;
