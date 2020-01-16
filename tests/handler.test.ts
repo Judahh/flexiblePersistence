@@ -12,44 +12,27 @@ test('add and read array and find object', async (done) => {
     let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
-    let persistencePromise = await handler.addEvent(
-        new Event({ operation: Operation.add, name: 'object', content: obj })
-    ).catch(async (error) => {
+    try {
+        let persistencePromise = await handler.addEvent(
+            new Event({ operation: Operation.add, name: 'object', content: obj })
+        );
+        let persistencePromise1 = await handler.readArray('object', {});
+
+        let ok = false;
+        for (let index = 0; index < persistencePromise1.receivedItem.length; index++) {
+            const element = persistencePromise1.receivedItem[index];
+            if (element['test'] === obj['test']) {
+                ok = true;
+            }
+        }
+
+        await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' }));
+        expect(ok).toBe(true);
+    } catch (error) {
         expect(error).toBe(null);
         await read.close();
         await write.close();
         done();
-    });
-
-    if (persistencePromise) {
-        let persistencePromise1 = await handler.readArray('object', {}).catch(async (error) => {
-            expect(error).toBe(null);
-            await read.close();
-            await write.close();
-            done();
-        });
-
-
-        if (persistencePromise1) {
-            let ok = false;
-            for (let index = 0; index < persistencePromise1.receivedItem.length; index++) {
-                const element = persistencePromise1.receivedItem[index];
-                if (element['test'] === obj['test']) {
-                    ok = true;
-                }
-            }
-            let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' })).
-                catch(async (error) => {
-                    expect(error).toBe(null);
-                    await read.close();
-                    await write.close();
-                    done();
-                }
-            );
-            if (persistencePromise2) {
-                expect(ok).toBe(true);
-            }
-        }
     }
     await read.close();
     await write.close();
@@ -63,37 +46,21 @@ test('add and read object', async (done) => {
     let handler = new Handler(read, write);
     let obj = new Object;
     obj['test'] = 'test';
-    let persistencePromise = await handler.addEvent(
-        new Event({ operation: Operation.add, name: 'object', content: obj })
-    ).catch(async (error) => {
+    try {
+        let persistencePromise = await handler.addEvent(
+            new Event({ operation: Operation.add, name: 'object', content: obj })
+        );
+        let persistencePromise1 = await handler.readItemById('object', persistencePromise.receivedItem._id);
+        let ok = (persistencePromise1.receivedItem['test'] === obj['test']);
+        let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' }));
+        if (persistencePromise2) {
+            expect(ok).toBe(true);
+        }
+    } catch (error) {
         expect(error).toBe(null);
         await read.close();
         await write.close();
         done();
-    });
-
-    if (persistencePromise) {
-        let persistencePromise1 = await handler.readItemById('object', persistencePromise.receivedItem._id).catch(async (error) => {
-            expect(error).toBe(null);
-            await read.close();
-            await write.close();
-            done();
-        });
-
-        if (persistencePromise1) {
-            let ok = (persistencePromise1.receivedItem['test'] === obj['test']);
-            let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' })).
-                catch(async (error) => {
-                    expect(error).toBe(null);
-                    await read.close();
-                    await write.close();
-                    done();
-                }
-            );
-            if (persistencePromise2) {
-                expect(ok).toBe(true);
-            }
-        }
     }
     await read.close();
     await write.close();
@@ -110,44 +77,28 @@ test('add and read array and find object', async (done) => {
     let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
-    let persistencePromise = await handler.addEvent(
-        new Event({ operation: Operation.add, name: 'object', content: obj })
-    ).catch(async (error) => {
+    try {
+        let persistencePromise = await handler.addEvent(
+            new Event({ operation: Operation.add, name: 'object', content: obj })
+        );
+        let persistencePromise1 = await handler.readArray('object', {});
+
+
+        let ok = false;
+        for (let index = 0; index < persistencePromise1.receivedItem.length; index++) {
+            const element = persistencePromise1.receivedItem[index];
+            if (element['test'] === obj['test']) {
+                ok = true;
+            }
+        }
+        let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' }));
+        expect(ok).toBe(true);
+
+    } catch (error) {
         expect(error).toBe(null);
         await read.close();
         await write.close();
         done();
-    });
-
-    if (persistencePromise) {
-        let persistencePromise1 = await handler.readArray('object', {}).catch(async (error) => {
-            expect(error).toBe(null);
-            await read.close();
-            await write.close();
-            done();
-        });
-
-
-        if (persistencePromise1) {
-            let ok = false;
-            for (let index = 0; index < persistencePromise1.receivedItem.length; index++) {
-                const element = persistencePromise1.receivedItem[index];
-                if (element['test'] === obj['test']) {
-                    ok = true;
-                }
-            }
-            let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' })).
-                catch(async (error) => {
-                    expect(error).toBe(null);
-                    await read.close();
-                    await write.close();
-                    done();
-                }
-            );
-            if (persistencePromise2) {
-                expect(ok).toBe(true);
-            }
-        }
     }
     await read.close();
     await write.close();
