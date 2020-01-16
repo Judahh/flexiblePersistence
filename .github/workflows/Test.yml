@@ -62,6 +62,4 @@ jobs:
         POSTGRES_USER: postgres
         MONGO_HOST: mongo
         MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
-    - name: Checkout
-      uses: actions/checkout@v1
 
