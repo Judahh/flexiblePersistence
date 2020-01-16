@@ -65,6 +65,7 @@ jobs:
         MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
     - name: Publish
       run: |
-        npm publish
+        npm publish --access public
       env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         CI: true
