@@ -4,134 +4,118 @@ import { Operation } from '../event/operation';
 import { Event } from '../event/event';
 import { MongoDB } from '../database/noSQL/mongoDB/mongoDB';
 import { PostgresDB } from '../database/sQL/postgresDB/postgresDB';
+import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
 
-test('add and read array and find object', done => {
+test('add and read array and find object', async (done) => {
     let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
     let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
 
     let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
-    handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
-        expect(error0).toBe(null);
-        if (error0) {
-            done();
-        }
-        handler.readArray('object', {}, (error1, result1) => {
-            expect(error1).toBe(null);
-            if (error1) {
-                done();
-            }
+    let persistencePromise = await handler.addEvent(
+        new Event({ operation: Operation.add, name: 'object', content: obj })
+    ).catch((error) => {
+            expect(error).toBe(null);
+    });
+
+    if (persistencePromise) {
+        let persistencePromise1 = await handler.readArray('object', {}).catch((error) => {
+            expect(error).toBe(null);
+        });
+
+
+        if (persistencePromise1) {
             let ok = false;
-            for (let index = 0; index < result1.length; index++) {
-                const element = result1[index];
+            for (let index = 0; index < persistencePromise1.receivedItem.length; index++) {
+                const element = persistencePromise1.receivedItem[index];
                 if (element['test'] === obj['test']) {
                     ok = true;
                 }
             }
-            handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
-                expect(error2).toBe(null);
-                expect(ok).toBe(true);
-                done();
+            let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' })).catch((error) => {
+                expect(error).toBe(null);
             });
-        });
-    });
-});
-
-test('add and read array and find object', done => {
-    let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
-    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
-
-    let handler = new Handler(write, read);
-    let obj = new Object;
-    obj['test'] = 'test';
-    handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
-        expect(error0).toBe(null);
-        if (error0) {
-            done();
+            if (persistencePromise2) {
+                expect(ok).toBe(true);
+            }
         }
-        handler.readArray('object', {}, (error1, result1) => {
-            expect(error1).toBe(null);
-            if (error1) {
-                done();
-            }
-            let ok = false;
-            for (let index = 0; index < result1.length; index++) {
-                const element = result1[index];
-                if (element['test'] === obj['test']) {
-                    ok = true;
-                }
-            }
-            handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
-                expect(error2).toBe(null);
-                expect(ok).toBe(true);
-                done();
-            });
-        });
-    });
+    }
+    await read.close();
+    await write.close();
+    done();
 });
 
-test('add and read object', done => {
+test('add and read object', async (done) => {
     let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
     let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
 
     let handler = new Handler(read, write);
     let obj = new Object;
     obj['test'] = 'test';
-    handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
-        expect(error0).toBe(null);
-        if (error0) {
-            done();
-        }
-        handler.readItemById('object', result0._id, (error1, result1) => {
-            expect(error1).toBe(null);
-            if (error1) {
-                done();
-            }
-            let ok = (result1['test'] === obj['test']);
-            handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
-                expect(error2).toBe(null);
-                expect(ok).toBe(true);
-                done();
-            });
-        });
+    let persistencePromise = await handler.addEvent(
+        new Event({ operation: Operation.add, name: 'object', content: obj })
+    ).catch((error) => {
+            expect(error).toBe(null);
     });
+
+    if (persistencePromise) {
+        let persistencePromise1 = await handler.readItemById('object', persistencePromise.receivedItem._id).catch((error) => {
+            expect(error).toBe(null);
+        });
+
+        if (persistencePromise1) {
+            let ok = (persistencePromise1.receivedItem['test'] === obj['test']);
+            let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' })).catch((error) => {
+                expect(error).toBe(null);
+            });
+            if (persistencePromise2) {
+                expect(ok).toBe(true);
+            }
+        }
+    }
+    await read.close();
+    await write.close();
+    done();
 });
 
-test('add and read array and find object', done => {
+test('add and read array and find object', async (done) => {
     let read = new PostgresDB(new DatabaseInfo('postgres', process.env.POSTGRES_HOST || 'localhost',
-    (+process.env.POSTGRES_PORT) || 5432, process.env.POSTGRES_USER));
+        (+process.env.POSTGRES_PORT) || 5432, process.env.POSTGRES_USER));
     let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
-
-    console.log('USER', process.env.POSTGRES_USER);
 
     let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
-    handler.addEvent(new Event({operation: Operation.add, name: 'object', content: obj}), (error0, result0) => {
-        expect(error0).toBe(undefined);
-        if (error0) {
-            console.log('DONE');
-            done();
-        }
-        console.log('NDONE');
-        handler.readArray('object', {}, (error1, result1) => {
-            expect(error1).toBe(undefined);
-            if (error1) {
-                done();
-            }
+    let persistencePromise = await handler.addEvent(
+        new Event({ operation: Operation.add, name: 'object', content: obj })
+    ).catch((error) => {
+            expect(error).toBe(null);
+    });
+
+    if (persistencePromise) {
+        let persistencePromise1 = await handler.readArray('object', {}).catch((error) => {
+            expect(error).toBe(null);
+        });
+
+
+        if (persistencePromise1) {
             let ok = false;
-            for (let index = 0; index < result1.length; index++) {
-                const element = result1[index];
+            for (let index = 0; index < persistencePromise1.receivedItem.length; index++) {
+                const element = persistencePromise1.receivedItem[index];
                 if (element['test'] === obj['test']) {
                     ok = true;
                 }
             }
-            handler.addEvent(new Event({operation: Operation.clear, name: 'object'}), (error2, result2) => {
-                expect(error2).toBe(undefined);
-                expect(ok).toBe(true);
-                done();
+            let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' })).catch((error) => {
+                expect(error).toBe(null);
             });
-        });
-    });
+            if (persistencePromise2) {
+                expect(ok).toBe(true);
+            }
+        }
+    }
+    await read.close();
+    await write.close();
+    done();
 });

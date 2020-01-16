@@ -2,6 +2,7 @@ import { Write } from './../write/write';
 import { Read } from './../read/read';
 import { Event } from './../event/event';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
+import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
 export class Handler {
     private read: Read;
     private write: Write;
@@ -13,31 +14,39 @@ export class Handler {
         }
     }
 
-    public addEvent(event: Event, callback?) {
-        this.write.addEvent(event, callback);
+    public addEvent(event: Event): Promise<PersistencePromise> {
+        return new Promise<PersistencePromise>((resolve, reject) => {
+            this.write.addEvent(event).then(resolve).catch(reject);
+        });
     }
 
-    public readArray(scheme: string, selectedItem: any, callback?) {
-        if (this.read) {
-            this.read.getReadDB().readArray(scheme, selectedItem, callback);
-        } else {
-            this.write.readArray(scheme, selectedItem, callback);
-        }
+    public readArray(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+        return new Promise<PersistencePromise>((resolve, reject) => {
+            if (this.read) {
+                this.read.getReadDB().readArray(scheme, selectedItem).then(resolve).catch(reject);
+            } else {
+                this.write.readArray(scheme, selectedItem).then(resolve).catch(reject);
+            }
+        });
     }
 
-    public readItem(scheme: string, selectedItem: any, callback?) {
-        if (this.read) {
-            this.read.getReadDB().readItem(scheme, selectedItem, callback);
-        } else {
-            this.write.readItem(scheme, selectedItem, callback);
-        }
+    public readItem(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+        return new Promise<PersistencePromise>((resolve, reject) => {
+            if (this.read) {
+                this.read.getReadDB().readItem(scheme, selectedItem).then(resolve).catch(reject);
+            } else {
+                this.write.readItem(scheme, selectedItem).then(resolve).catch(reject);
+            }
+        });
     }
 
-    public readItemById(scheme: string, id, callback?) {
-        if (this.read) {
-            this.read.getReadDB().readItemById(scheme, id, callback);
-        } else {
-            this.write.readItemById(scheme, id, callback);
-        }
+    public readItemById(scheme: string, id): Promise<PersistencePromise> {
+        return new Promise<PersistencePromise>((resolve, reject) => {
+            if (this.read) {
+                this.read.getReadDB().readItemById(scheme, id).then(resolve).catch(reject);
+            } else {
+                this.write.readItemById(scheme, id).then(resolve).catch(reject);
+            }
+        });
     }
 }
