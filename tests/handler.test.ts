@@ -4,6 +4,7 @@ import { Operation } from '../event/operation';
 import { Event } from '../event/event';
 import { MongoDB } from '../database/noSQL/mongoDB/mongoDB';
 import { PostgresDB } from '../database/sQL/postgresDB/postgresDB';
+import * as fs from 'fs';
 
 test('add and read array and find object', async (done) => {
     let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
@@ -76,6 +77,10 @@ test('add and read array and find object', async (done) => {
     let obj = new Object;
     obj['test'] = 'test';
     try {
+        let script = await fs.promises.readFile('./tests/test.sql', 'utf8');
+        await read.getPool().query(script);
+
+
         let persistencePromise = await handler.addEvent(
             new Event({ operation: Operation.add, name: 'object', content: obj })
         );

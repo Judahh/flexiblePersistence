@@ -232,6 +232,10 @@ export class PostgresDB implements PersistenceAdapter {
         return this.databaseInfo;
     }
 
+    public getPool() { // TODO: remove
+        return this.pool;
+    }
+
     public close(): Promise<any> {
         return new Promise<any>((resolve, reject) => {
             this.pool.end((error) => {
