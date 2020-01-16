@@ -65,6 +65,7 @@ jobs:
         MONGO_HOST: mongo
         MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
     - name: Publish
+      if: matrix.node-version == 13.x
       run: |
         npm publish --access public
       env:
