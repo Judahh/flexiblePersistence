@@ -29,9 +29,9 @@ test('add and read array and find object', async (done) => {
         await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' }));
         expect(ok).toBe(true);
     } catch (error) {
-        expect(error).toBe(null);
         await read.close();
         await write.close();
+        expect(error).toBe(null);
         done();
     }
     await read.close();
@@ -57,9 +57,9 @@ test('add and read object', async (done) => {
             expect(ok).toBe(true);
         }
     } catch (error) {
-        expect(error).toBe(null);
         await read.close();
         await write.close();
+        expect(error).toBe(null);
         done();
     }
     await read.close();
@@ -71,8 +71,6 @@ test('add and read array and find object', async (done) => {
     let read = new PostgresDB(new DatabaseInfo('postgres', process.env.POSTGRES_HOST || 'localhost',
         (+process.env.POSTGRES_PORT) || 5432, process.env.POSTGRES_USER));
     let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
-
-    console.log('USER:', process.env.POSTGRES_USER);
 
     let handler = new Handler(write, read);
     let obj = new Object;
@@ -95,9 +93,9 @@ test('add and read array and find object', async (done) => {
         expect(ok).toBe(true);
 
     } catch (error) {
-        expect(error).toBe(null);
         await read.close();
         await write.close();
+        expect(error).toBe(null);
         done();
     }
     await read.close();

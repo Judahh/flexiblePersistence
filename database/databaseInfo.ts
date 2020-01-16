@@ -3,11 +3,13 @@ export class DatabaseInfo {
     public port: number;
     public database: string;
     public username: string;
+    public user: string;
     public password: string;
 
     constructor(database: string, host?: string, port?: number, username?: string, password?: string) {
         this.database = database;
         this.username = username;
+        this.user = username;
         this.password = password;
         if (host) {
             this.host = host;
