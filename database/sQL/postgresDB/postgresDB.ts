@@ -14,6 +14,21 @@ export class PostgresDB implements PersistenceAdapter {
         return element + ' = ' + PostgresDB.getDBVariableIndex(element, index, array, initial);
     }
 
+    private static querySelectArray(scheme, selectedKeys, selectVar?) {
+        if (!selectVar) {
+            selectVar = '*';
+        }
+        return (selectedKeys.length === 0) ?
+                `SELECT ${selectVar} FROM ${scheme} ORDER BY _id ASC` : `SELECT ${selectVar} FROM ${scheme} WHERE (${selectedKeys.map((element, index, array) => {
+                    return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
+                }
+                ).join(', ')}) ORDER BY _id ASC`;
+    }
+
+    private static querySelectItem(scheme, selectedKeys, selectVar?) {
+        return PostgresDB.querySelectArray(scheme, selectedKeys, selectVar) + ` LIMIT 1`;
+    }
+
     constructor(databaseInfo: DatabaseInfo) {
         this.databaseInfo = databaseInfo;
         this.pool = new Pool(this.databaseInfo);
@@ -86,11 +101,7 @@ export class PostgresDB implements PersistenceAdapter {
             let selectedKeys = Object.keys(selectedItem);
             let selectedValues = (selectedKeys.length === 0) ?
                 undefined : Object.values(selectedItem);
-            let query = (selectedKeys.length === 0) ?
-                `SELECT * FROM ${scheme} ORDER BY _id ASC` : `SELECT * FROM ${scheme} WHERE (${selectedKeys.map((element, index, array) => {
-                    return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
-                }
-                ).join(', ')}) ORDER BY _id ASC`;
+            let query = PostgresDB.querySelectArray(scheme, selectedKeys);
             this.pool.query(
                 query,
                 selectedValues,
@@ -117,11 +128,7 @@ export class PostgresDB implements PersistenceAdapter {
             let selectedKeys = Object.keys(selectedItem);
             let selectedValues = (selectedKeys.length === 0) ?
                 undefined : Object.values(selectedItem);
-            let query = (selectedKeys.length === 0) ?
-                `SELECT * FROM ${scheme} ORDER BY _id ASC LIMIT 1` : `SELECT * FROM ${scheme} WHERE (${selectedKeys.map((element, index, array) => {
-                    return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
-                }
-                ).join(', ')}) ORDER BY _id ASC LIMIT 1`;
+            let query = PostgresDB.querySelectItem(scheme, selectedKeys);
             this.pool.query(
                 query,
                 selectedValues,
@@ -172,11 +179,7 @@ export class PostgresDB implements PersistenceAdapter {
             let selectedKeys = Object.keys(selectedItem);
             let selectedValues = (selectedKeys.length === 0) ?
                 undefined : Object.values(selectedItem);
-            let query = (selectedKeys.length === 0) ?
-                `DELETE FROM ${scheme} LIMIT 1` : `DELETE FROM ${scheme} WHERE (${selectedKeys.map((element, index, array) => {
-                    return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
-                }
-                ).join(', ')}) LIMIT 1`;
+            let query = `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectItem(scheme, selectedKeys, '_id')})`;
             this.pool.query(
                 query,
                 selectedValues,
@@ -203,11 +206,7 @@ export class PostgresDB implements PersistenceAdapter {
             let selectedKeys = Object.keys(selectedItem);
             let selectedValues = (selectedKeys.length === 0) ?
                 undefined : Object.values(selectedItem);
-            let query = (selectedKeys.length === 0) ?
-                `DELETE FROM ${scheme} ` : `DELETE FROM ${scheme} WHERE (${selectedKeys.map((element, index, array) => {
-                    return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
-                }
-                ).join(', ')})`;
+            let query = `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectArray(scheme, selectedKeys, '_id')})`;
             this.pool.query(
                 query,
                 selectedValues,

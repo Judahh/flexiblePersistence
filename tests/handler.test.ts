@@ -94,10 +94,25 @@ test('add and read array and find object', async (done) => {
                 ok = true;
             }
         }
-        let persistencePromise2 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' }));
+
         expect(ok).toBe(true);
 
+        let persistencePromise2 = await handler.readItem('object', {});
+        expect(persistencePromise2.receivedItem[0]['test']).toBe('test');
+        let persistencePromise3 = await handler.addEvent(new Event({ operation: Operation.update, name: 'object', selection: {test: obj['test']}, content: {test: 'bob'} }));
+        expect(persistencePromise3.result.rowCount).toBe(1);
+
+        let persistencePromise4 = await handler.addEvent(new Event({
+            operation: Operation.delete, name: 'object', selection: {test: 'bob'}
+        }));
+
+        let persistencePromise5 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' }));
+
     } catch (error) {
+        let persistencePromise6 = await handler.addEvent(new Event({ operation: Operation.clear, name: 'object' }));
+        console.log(persistencePromise6);
+        let persistencePromise7 = await handler.readArray('object', {});
+        expect(persistencePromise7.result.rowCount).toBe(0);
         await read.close();
         await write.close();
         expect(error).toBe(null);

@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.0.36",
+  "version": "1.0.37",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@types/jest": "^25.1.0",
-    "@types/mongodb": "3.3.14",
+    "@types/mongodb": "3.3.15",
     "@types/mongoose": "^5.5.43",
     "@types/node": "^13.5.0",
     "@types/reflect-metadata": "^0.1.0",
