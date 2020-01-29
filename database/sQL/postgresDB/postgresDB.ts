@@ -2,23 +2,25 @@ import { PersistenceAdapter } from '../../../persistenceAdapter/persistenceAdapt
 import { DatabaseInfo } from '../../databaseInfo';
 import { Pool } from 'pg';
 import { PersistencePromise } from '../../../persistenceAdapter/persistencePromise';
+import { RelationValuePostgresDB } from './relationValuePostgresDB';
+import { SelectedItemValue } from '../../../model/selectedItemValue';
 export class PostgresDB implements PersistenceAdapter {
     private databaseInfo: DatabaseInfo;
     private pool: Pool;
 
     private static getDBVariableIndex(element: string, index: number, array: string[], initial: number): string {
-        return ('$' + (index + initial));
+        return ('$' + (index + initial) + '');
     }
 
     private static getDBVariableSetIndex(element: string, index: number, array: string[], initial: number): string {
-        console.log('element:', element)
-        console.log('index:', index)
-        console.log('array:', array)
-        console.log('initial:', initial)
-        return element + ' = ' + PostgresDB.getDBVariableIndex(element, index, array, initial);
+        // console.log('element:', element)
+        // console.log('index:', index)
+        // console.log('array:', array)
+        // console.log('initial:', initial)
+        return element + ' ' + PostgresDB.getDBVariableIndex(element, index, array, initial);
     }
 
-    private static querySelectArray(scheme, selectedKeys, selectVar?) {
+    private static querySelectArray(scheme: string, selectedKeys: Array<string>, selectVar?: string) {
         if (!selectVar) {
             selectVar = '*';
         }
@@ -29,24 +31,24 @@ export class PostgresDB implements PersistenceAdapter {
             ).join(', ')}) ORDER BY _id ASC`;
     }
 
-    private static querySelectItem(scheme, selectedKeys, selectVar?) {
+    private static querySelectItem(scheme: string, selectedKeys: Array<string>, selectVar?: string) {
         return PostgresDB.querySelectArray(scheme, selectedKeys, selectVar) + ` LIMIT 1`;
     }
 
-    private static querySelectItemById(scheme, selectVar?) {
+    private static querySelectItemById(scheme: string, selectVar?: string) {
         if (!selectVar) {
             selectVar = '*';
         }
         return `SELECT ${selectVar} FROM ${scheme} WHERE _id = $1`;
     }
 
-    private static queryInsertItem(scheme, keys) {
+    private static queryInsertItem(scheme: string, keys: Array<string>) {
         return (`INSERT INTO ${scheme} (${keys.join(', ')}) VALUES (${keys.map((element, index, array) => {
             return PostgresDB.getDBVariableIndex(element, index, array, 1)
         }).join(', ')})`);
     }
 
-    private static queryUpdateItem(scheme, keys, selectedKeys) {
+    private static queryUpdateItem(scheme: string, keys: Array<string>, selectedKeys: Array<string>) {
         return (`UPDATE ${scheme} SET ${keys.map((element, index, array) => {
             return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
         }).join(', ')} WHERE (${selectedKeys.map((element, index, array) => {
@@ -55,11 +57,11 @@ export class PostgresDB implements PersistenceAdapter {
         ).join(', ')})`);
     }
 
-    private static queryDeleteItem(scheme, selectedKeys) {
+    private static queryDeleteItem(scheme: string, selectedKeys: Array<string>) {
         return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectItem(scheme, selectedKeys, '_id')})`;
     }
 
-    private static queryDeleteArray(scheme, selectedKeys) {
+    private static queryDeleteArray(scheme: string, selectedKeys: Array<string>) {
         return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectArray(scheme, selectedKeys, '_id')})`;
     }
 
@@ -67,12 +69,25 @@ export class PostgresDB implements PersistenceAdapter {
         return (selectedItem === undefined || selectedItem === null) ? {} : selectedItem;
     }
 
+    private static resolveKeys(item: any) {
+        return Object.keys(item);
+    }
+
     private static resolveSelectedKeys(selectedItem: any) {
         return Object.keys(selectedItem);
     }
 
-    private static resolveSelectedValues(selectedItem: any) {
-        return Object.values(selectedItem);
+    private static resolveSelectedValues(selectedItem: any): Array<any> {
+        return Object.values(selectedItem).map((element, index, array) => {
+            if (!(element instanceof SelectedItemValue)) {
+                element = new SelectedItemValue(<string> element, new RelationValuePostgresDB());
+            }
+            return element.toString();
+        });
+    }
+
+    private static resolveValues(item: any): Array<any> {
+        return Object.values(item);
     }
 
     constructor(databaseInfo: DatabaseInfo) {
@@ -81,8 +96,8 @@ export class PostgresDB implements PersistenceAdapter {
     }
 
     public addItem(scheme: string, item: any) {
-        let keys = Object.keys(item);
-        let values = Object.values(item);
+        let keys = PostgresDB.resolveKeys(item);
+        let values = PostgresDB.resolveValues(item);
         let query = PostgresDB.queryInsertItem(scheme, keys);
         return this.query(
             query,
@@ -93,14 +108,15 @@ export class PostgresDB implements PersistenceAdapter {
 
     public updateItem(scheme: string, selectedItem: any, item: any) {
         selectedItem = PostgresDB.resolveSelectedItem(selectedItem);
-        let keys = Object.keys(item);
-        let values = Object.values(item);
+        let keys = PostgresDB.resolveKeys(item);
+        let values = PostgresDB.resolveSelectedValues(item);
         let selectedKeys = PostgresDB.resolveSelectedKeys(selectedItem);
         let selectedValues = PostgresDB.resolveSelectedValues(selectedItem);
+        let allValues = values.concat(selectedValues);
         let query = PostgresDB.queryUpdateItem(scheme, keys, selectedKeys);
         return this.query(
             query,
-            values.concat(selectedValues),
+            allValues,
             { selectedItem: selectedItem, sentItem: item }
         );
     }
@@ -187,7 +203,10 @@ export class PostgresDB implements PersistenceAdapter {
         });
     }
 
-    private query(query, values, toPromise: { selectedItem?, sentItem?}): Promise<PersistencePromise> {
+    private query(query: string, values: Array<any>, toPromise: { selectedItem?, sentItem?}): Promise<PersistencePromise> {
+        console.log('query:', query);
+        console.log('values:', values);
+        console.log(`${query}`, values);
         return new Promise<PersistencePromise>((resolve, reject) => {
             this.pool.query(
                 query,

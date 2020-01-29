@@ -8,6 +8,6 @@ export class PersistenceFunction {
     }
 
     public toString() {
-        return `${this.name}(${this.statements})`
+        return `${this.name}(${this.statements.toString()})`
     }
 }

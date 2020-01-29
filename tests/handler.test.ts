@@ -4,6 +4,8 @@ import { Operation } from '../event/operation';
 import { Event } from '../event/event';
 import { MongoDB } from '../database/noSQL/mongoDB/mongoDB';
 import { PostgresDB } from '../database/sQL/postgresDB/postgresDB';
+import { SelectedItemValue } from '../model/selectedItemValue'
+import { RelationValuePostgresDB } from '../database/sQL/postgresDB/relationValuePostgresDB';
 import * as fs from 'fs';
 
 test('add and read array and find object', async (done) => {
@@ -99,7 +101,10 @@ test('add and read array and find object', async (done) => {
 
         let persistencePromise2 = await handler.readItem('object', {});
         expect(persistencePromise2.receivedItem[0]['test']).toBe('test');
-        let persistencePromise3 = await handler.addEvent(new Event({ operation: Operation.update, name: 'object', selection: {test: obj['test']}, content: {test: 'bob'} }));
+        let selectedItemValue = new SelectedItemValue(obj['test'], new RelationValuePostgresDB());
+        let persistencePromise3 = await handler.addEvent(new Event({
+            operation: Operation.update, name: 'object', selection: {test: selectedItemValue}, content: {test: 'bob'}
+        }));
         expect(persistencePromise3.result.rowCount).toBe(1);
 
         let persistencePromise4 = await handler.addEvent(new Event({
@@ -115,6 +120,7 @@ test('add and read array and find object', async (done) => {
         expect(persistencePromise7.result.rowCount).toBe(0);
         await read.close();
         await write.close();
+        console.error(error);
         expect(error).toBe(null);
         done();
     }

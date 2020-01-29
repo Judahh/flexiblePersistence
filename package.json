@@ -26,7 +26,7 @@
   "dependencies": {
     "mongodb": "^3.5.2",
     "mongoose": "^5.8.10",
-    "pg": "^7.17.1"
+    "pg": "^7.18.0"
   },
   "devDependencies": {
     "@types/jest": "^25.1.0",

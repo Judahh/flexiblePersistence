@@ -1,19 +1,22 @@
 import { Relation } from './relation';
 
 export abstract class RelationValueAdapter {
-    protected map: { [key: number]: { value: string } } = {
-        0: { value: '=' },
-        1: { value: '!=' },
-        2: { value: 'LIKE' },
-        3: { value: 'SIMILAR' },
-        4: { value: '>' },
-        5: { value: '>=' },
-        6: { value: '<' },
-        7: { value: '<=' }
+    protected map: { [key: number]: string } = {
+        0: '=',
+        1: '!=',
+        2: 'LIKE',
+        3: 'SIMILAR',
+        4: '>',
+        5: '>=',
+        6: '<',
+        7: '<='
     };
 
     protected relation: Relation;
-    constructor(relation: Relation) {
+    constructor(relation?: Relation) {
+        if (!relation) {
+            relation = Relation.Equal;
+        }
         this.relation = relation;
     }
 
