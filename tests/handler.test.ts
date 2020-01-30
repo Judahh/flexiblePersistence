@@ -106,6 +106,7 @@ test('add and read array and find object', async (done) => {
             operation: Operation.update, name: 'object', selection: {test: selectedItemValue}, content: {test: 'bob'}
         }));
         expect(persistencePromise3.result.rowCount).toBe(1);
+        // console.log(await read.query('UPDATE object SET test = \'bob\', testNumber = \'10\' WHERE (test = \'test\')', [], {}));
 
         let persistencePromise4 = await handler.addEvent(new Event({
             operation: Operation.delete, name: 'object', selection: {test: 'bob'}

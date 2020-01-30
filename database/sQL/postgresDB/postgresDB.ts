@@ -8,86 +8,91 @@ export class PostgresDB implements PersistenceAdapter {
     private databaseInfo: DatabaseInfo;
     private pool: Pool;
 
-    private static getDBVariableIndex(element: string, index: number, array: string[], initial: number): string {
-        return ('$' + (index + initial) + '');
-    }
-
-    private static getDBVariableSetIndex(element: string, index: number, array: string[], initial: number): string {
-        // console.log('element:', element)
-        // console.log('index:', index)
-        // console.log('array:', array)
-        // console.log('initial:', initial)
-        return element + ' ' + PostgresDB.getDBVariableIndex(element, index, array, initial);
-    }
-
-    private static querySelectArray(scheme: string, selectedKeys: Array<string>, selectVar?: string) {
-        if (!selectVar) {
-            selectVar = '*';
+    private static inspectSelectedItemValue(element: any): SelectedItemValue {
+        if (!(element instanceof SelectedItemValue)) {
+            element = new SelectedItemValue(<string> element, new RelationValuePostgresDB());
         }
-        return (selectedKeys.length === 0) ?
-            `SELECT ${selectVar} FROM ${scheme} ORDER BY _id ASC` : `SELECT ${selectVar} FROM ${scheme} WHERE (${selectedKeys.map((element, index, array) => {
-                return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
-            }
-            ).join(', ')}) ORDER BY _id ASC`;
+        return element;
     }
 
-    private static querySelectItem(scheme: string, selectedKeys: Array<string>, selectVar?: string) {
-        return PostgresDB.querySelectArray(scheme, selectedKeys, selectVar) + ` LIMIT 1`;
+    private static getDBVariable(element: SelectedItemValue, index: number, array: string[]): string {
+        return ('' + element.toString() + '');
     }
 
-    private static querySelectItemById(scheme: string, selectVar?: string) {
-        if (!selectVar) {
-            selectVar = '*';
-        }
-        return `SELECT ${selectVar} FROM ${scheme} WHERE _id = $1`;
+    private static getDBSetVariable(name, element: any, index: number, array: string[]): string {
+        return name + ' ' + PostgresDB.getDBVariable(PostgresDB.inspectSelectedItemValue(element), index, array);
     }
 
-    private static queryInsertItem(scheme: string, keys: Array<string>) {
-        return (`INSERT INTO ${scheme} (${keys.join(', ')}) VALUES (${keys.map((element, index, array) => {
-            return PostgresDB.getDBVariableIndex(element, index, array, 1)
-        }).join(', ')})`);
-    }
-
-    private static queryUpdateItem(scheme: string, keys: Array<string>, selectedKeys: Array<string>) {
-        return (`UPDATE ${scheme} SET ${keys.map((element, index, array) => {
-            return PostgresDB.getDBVariableSetIndex(element, index, array, 1)
-        }).join(', ')} WHERE (${selectedKeys.map((element, index, array) => {
-            return PostgresDB.getDBVariableSetIndex(element, index, array, 1 + keys.length)
-        }
-        ).join(', ')})`);
-    }
-
-    private static queryDeleteItem(scheme: string, selectedKeys: Array<string>) {
-        return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectItem(scheme, selectedKeys, '_id')})`;
-    }
-
-    private static queryDeleteArray(scheme: string, selectedKeys: Array<string>) {
-        return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectArray(scheme, selectedKeys, '_id')})`;
-    }
-
-    private static resolveSelectedItem(selectedItem?: any) {
-        return (selectedItem === undefined || selectedItem === null) ? {} : selectedItem;
-    }
-
-    private static resolveKeys(item: any) {
-        return Object.keys(item);
-    }
-
-    private static resolveSelectedKeys(selectedItem: any) {
-        return Object.keys(selectedItem);
-    }
-
-    private static resolveSelectedValues(selectedItem: any): Array<any> {
-        return Object.values(selectedItem).map((element, index, array) => {
-            if (!(element instanceof SelectedItemValue)) {
-                element = new SelectedItemValue(<string> element, new RelationValuePostgresDB());
-            }
-            return element.toString();
+    private static getDBSetVariables(item) {
+        let keys = PostgresDB.resolveKeys(item);
+        return keys.map((element, index, array) => {
+            return PostgresDB.getDBSetVariable(element, item[element], index, array)
         });
     }
 
+    private static getDBVariables(item) {
+        return PostgresDB.resolveValues(item).map((element, index, array) => {
+            return '\'' + PostgresDB.getDBVariable(element, index, array) + '\''
+        }).join(', ');
+    }
+
+    private static querySelectArray(scheme: string, selectedItem: any, selectVar?: string) {
+        if (!selectVar) {
+            selectVar = '*';
+        }
+        return (PostgresDB.resolveKeys(selectedItem).length === 0) ?
+            `SELECT ${selectVar} FROM ${scheme} ORDER BY _id ASC` : `SELECT ${selectVar} FROM ${scheme} WHERE (${
+                PostgresDB.getDBSetVariables(selectedItem).join(', ')
+            }) ORDER BY _id ASC`;
+    }
+
+    private static querySelectItem(scheme: string, selectedItem: any, selectVar?: string) {
+        return PostgresDB.querySelectArray(scheme, selectedItem, selectVar) + ` LIMIT 1`;
+    }
+
+    private static queryInsertItem(scheme: string, item: any) {
+        return (`INSERT INTO ${scheme} (${PostgresDB.resolveKeys(item).join(', ')}) VALUES (${
+            PostgresDB.getDBVariables(item)
+        })`);
+    }
+
+    private static queryUpdateItem(scheme: string, selectedItem: any, item: any) {
+        return (`UPDATE ${scheme} SET ${
+            PostgresDB.getDBSetVariables(item).join(', ')
+        } WHERE (${
+            PostgresDB.getDBSetVariables(selectedItem).join(', ')
+        })`);
+    }
+
+    private static queryDeleteItem(scheme: string, selectedItem: any) {
+        return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectItem(scheme, selectedItem, '_id')})`;
+    }
+
+    private static queryDeleteArray(scheme: string, selectedItem: any) {
+        return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectArray(scheme, selectedItem, '_id')})`;
+    }
+
+    private static resolveKeys(item: any) {
+        return (item) ? Object.keys(item) : [];
+    }
+
     private static resolveValues(item: any): Array<any> {
-        return Object.values(item);
+        return (item) ? Object.values(item) : [];
+    }
+
+    private static queryResults(error, results, resolve, reject, toPromise: { selectedItem?, sentItem?}){
+        if (error) {
+            reject(new Error(error));
+        } else {
+            resolve(
+                new PersistencePromise({
+                    receivedItem: (results === undefined) ? undefined : results.rows,
+                    selectedItem: toPromise.selectedItem,
+                    result: results,
+                    sentItem: toPromise.sentItem
+                })
+            );
+        }
     }
 
     constructor(databaseInfo: DatabaseInfo) {
@@ -96,89 +101,57 @@ export class PostgresDB implements PersistenceAdapter {
     }
 
     public addItem(scheme: string, item: any) {
-        let keys = PostgresDB.resolveKeys(item);
-        let values = PostgresDB.resolveValues(item);
-        let query = PostgresDB.queryInsertItem(scheme, keys);
+        let query = PostgresDB.queryInsertItem(scheme, item);
         return this.query(
             query,
-            values,
             { sentItem: item }
         );
     }
 
     public updateItem(scheme: string, selectedItem: any, item: any) {
-        selectedItem = PostgresDB.resolveSelectedItem(selectedItem);
-        let keys = PostgresDB.resolveKeys(item);
-        let values = PostgresDB.resolveSelectedValues(item);
-        let selectedKeys = PostgresDB.resolveSelectedKeys(selectedItem);
-        let selectedValues = PostgresDB.resolveSelectedValues(selectedItem);
-        let allValues = values.concat(selectedValues);
-        let query = PostgresDB.queryUpdateItem(scheme, keys, selectedKeys);
+        let query = PostgresDB.queryUpdateItem(scheme, selectedItem, item);
         return this.query(
             query,
-            allValues,
             { selectedItem: selectedItem, sentItem: item }
         );
     }
 
     public readArray(scheme: string, selectedItem: any) {
-        selectedItem = PostgresDB.resolveSelectedItem(selectedItem);
-        let selectedKeys = PostgresDB.resolveSelectedKeys(selectedItem);
-        let selectedValues = (selectedKeys.length === 0) ?
-            undefined : Object.values(selectedItem);
-        let query = PostgresDB.querySelectArray(scheme, selectedKeys);
+        let query = PostgresDB.querySelectArray(scheme, selectedItem);
         return this.query(
             query,
-            selectedValues,
             { selectedItem: selectedItem }
         );
     }
 
     public readItem(scheme: string, selectedItem: any) {
-        selectedItem = PostgresDB.resolveSelectedItem(selectedItem);
-        let selectedKeys = PostgresDB.resolveSelectedKeys(selectedItem);
-        let selectedValues = (selectedKeys.length === 0) ?
-            undefined : Object.values(selectedItem);
-        let query = PostgresDB.querySelectItem(scheme, selectedKeys);
+        let query = PostgresDB.querySelectItem(scheme, selectedItem);
         return this.query(
             query,
-            selectedValues,
             { selectedItem: selectedItem }
         );
     }
 
     public readItemById(scheme: string, id: any) {
-        let selectedValues = [id];
-        let query = PostgresDB.querySelectItemById(scheme);
+        let query = PostgresDB.querySelectItem(scheme, { _id : id });
         return this.query(
             query,
-            selectedValues,
             { selectedItem: { _id: id } }
         );
     }
 
     public deleteItem(scheme: string, selectedItem: any) {
-        selectedItem = PostgresDB.resolveSelectedItem(selectedItem);
-        let selectedKeys = PostgresDB.resolveSelectedKeys(selectedItem);
-        let selectedValues = (selectedKeys.length === 0) ?
-            undefined : Object.values(selectedItem);
-        let query = PostgresDB.queryDeleteItem(scheme, selectedKeys);
+        let query = PostgresDB.queryDeleteItem(scheme, selectedItem);
         return this.query(
             query,
-            selectedValues,
             { selectedItem: selectedItem }
         );
     }
 
     public deleteArray(scheme: string, selectedItem: any) {
-        selectedItem = PostgresDB.resolveSelectedItem(selectedItem);
-        let selectedKeys = PostgresDB.resolveSelectedKeys(selectedItem);
-        let selectedValues = (selectedKeys.length === 0) ?
-            undefined : Object.values(selectedItem);
-        let query = PostgresDB.queryDeleteArray(scheme, selectedKeys);
+        let query = PostgresDB.queryDeleteArray(scheme, selectedItem);
         return this.query(
             query,
-            selectedValues,
             { selectedItem: selectedItem }
         );
     }
@@ -193,37 +166,26 @@ export class PostgresDB implements PersistenceAdapter {
 
     public close(): Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            this.pool.end((error) => {
-                if (error) {
-                    reject(new Error(error));
-                } else {
-                    resolve();
-                }
-            });
+            this.end(resolve, reject);
         });
     }
 
-    private query(query: string, values: Array<any>, toPromise: { selectedItem?, sentItem?}): Promise<PersistencePromise> {
-        console.log('query:', query);
-        console.log('values:', values);
-        console.log(`${query}`, values);
+    private end(resolve, reject){
+        this.pool.end((error) => {
+            if (error) {
+                reject(new Error(error));
+            } else {
+                resolve();
+            }
+        });
+    }
+
+    private query(query: string, toPromise: { selectedItem?, sentItem?}): Promise<PersistencePromise> {
         return new Promise<PersistencePromise>((resolve, reject) => {
             this.pool.query(
                 query,
-                values,
                 (error, results) => {
-                    if (error) {
-                        reject(new Error(error));
-                    } else {
-                        resolve(
-                            new PersistencePromise({
-                                receivedItem: (results === undefined) ? undefined : results.rows,
-                                selectedItem: toPromise.selectedItem,
-                                result: results,
-                                sentItem: toPromise.sentItem
-                            })
-                        );
-                    }
+                    PostgresDB.queryResults(error, results, resolve, reject, toPromise);
                 }
             );
         });

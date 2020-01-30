@@ -12,8 +12,6 @@ export class SelectedItemValue {
     public toString() {
         return this.value === undefined ?
             undefined :
-            `${this.relation.toString()} ${typeof this.value === 'number' ?
-                this.value :
-                '"' + this.value.toString() + '"'}`
+            `${this.relation.toString()} ${'\'' + this.value.toString() + '\''}`
     }
 }
