@@ -171,12 +171,8 @@ export class PostgresDB implements PersistenceAdapter {
     }
 
     private end(resolve, reject){
-        this.pool.end((error) => {
-            if (error) {
-                reject(new Error(error));
-            } else {
-                resolve();
-            }
+        this.pool.end(() => {
+            resolve();
         });
     }
 
