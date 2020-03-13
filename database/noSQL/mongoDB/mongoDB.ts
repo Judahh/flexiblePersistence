@@ -24,6 +24,7 @@ export class MongoDB implements PersistenceAdapter {
         // this.mongooseInstance =
         let uri = databaseInfo.uri ? databaseInfo.uri : 'mongodb://' + string +
         ':' + databaseInfo.port + '/' + databaseInfo.database;
+
         this.mongooseInstance.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
         this.genericSchema = new this.mongooseInstance.Schema({}, { strict: false });
     }

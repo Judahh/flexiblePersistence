@@ -1,11 +1,11 @@
-import { Handler } from '../handler/handler';
-import { DatabaseInfo } from '../database/databaseInfo';
-import { Operation } from '../event/operation';
-import { Event } from '../event/event';
-import { MongoDB } from '../database/noSQL/mongoDB/mongoDB';
-import { PostgresDB } from '../database/sQL/postgresDB/postgresDB';
-import { SelectedItemValue } from '../model/selectedItemValue'
-import { RelationValuePostgresDB } from '../database/sQL/postgresDB/relationValuePostgresDB';
+import { Handler } from '../../handler/handler';
+import { DatabaseInfo } from '../../database/databaseInfo';
+import { Operation } from '../../event/operation';
+import { Event } from '../../event/event';
+import { MongoDB } from '../../database/noSQL/mongoDB/mongoDB';
+import { PostgresDB } from '../../database/sQL/postgresDB/postgresDB';
+import { SelectedItemValue } from '../../model/selectedItemValue'
+import { RelationValuePostgresDB } from '../../database/sQL/postgresDB/relationValuePostgresDB';
 import * as fs from 'fs';
 
 let read;
@@ -57,7 +57,7 @@ test('add and read object', async (done) => {
         port:(+process.env.MONGO_PORT)
     }));
 
-    let handler = new Handler(read, write);
+    let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
     try {
@@ -73,6 +73,7 @@ test('add and read object', async (done) => {
     } catch (error) {
         await read.close();
         await write.close();
+        console.error(error);
         expect(error).toBe(null);
         done();
     }
@@ -93,7 +94,7 @@ test('add and read array and find object', async (done) => {
     let obj = new Object;
     obj['test'] = 'test';
     try {
-        let script = await fs.promises.readFile('./tests/test.sql', 'utf8');
+        let script = await fs.promises.readFile('./tests/integration/test.sql', 'utf8');
         await read.getPool().query(script);
 
 

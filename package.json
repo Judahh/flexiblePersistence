@@ -9,6 +9,7 @@
     "build": "tsc",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "jest --passWithNoTests --ci --verbose --forceExit --detectOpenHandles",
+    "integration": "jest -i -c integration.config.js --passWithNoTests  --ci --verbose --forceExit --detectOpenHandles",
     "prestart": "",
     "tsc": "tsc",
     "tsc:w": "tsc -w"

@@ -1,6 +1,8 @@
 typings
 *.js
 *.map
+!jest.config.js
+!integration.config.js
 node_modules
 !ngrok
 !node_modules/@types/declaration/*
