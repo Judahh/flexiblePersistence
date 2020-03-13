@@ -5,19 +5,21 @@ export class DatabaseInfo {
     public username: string;
     public user: string;
     public password: string;
+    public uri: string;
 
-    constructor(database: string, host?: string, port?: number, username?: string, password?: string) {
-        this.database = database;
-        this.username = username;
-        this.user = username;
-        this.password = password;
-        if (host) {
-            this.host = host;
+    constructor(info: {uri?:string, database?: string, host?: string, port?: number, username?: string, password?: string}) {
+        this.uri = info.uri;
+        this.database = info.database;
+        this.username = info.username;
+        this.user = info.username;
+        this.password = info.password;
+        if (info.host) {
+            this.host = info.host;
         } else {
             this.host = process.env.DB_HOST || 'localhost';
         }
-        if (port) {
-            this.port = port;
+        if (info.port) {
+            this.port = info.port;
         } else {
             this.port = (+process.env.DB_PORT) || 27017;
         }

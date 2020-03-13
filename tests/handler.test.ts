@@ -8,10 +8,18 @@ import { SelectedItemValue } from '../model/selectedItemValue'
 import { RelationValuePostgresDB } from '../database/sQL/postgresDB/relationValuePostgresDB';
 import * as fs from 'fs';
 
+let read;
+let write = new MongoDB(new DatabaseInfo({
+    database:'write',
+    host:process.env.MONGO_HOST || 'localhost',
+    port:(+process.env.MONGO_PORT)
+}));
 test('add and read array and find object', async (done) => {
-    let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
-    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
-
+    read = new MongoDB(new DatabaseInfo({
+        database:'read',
+        host:process.env.MONGO_HOST || 'localhost',
+        port:(+process.env.MONGO_PORT)
+    }));
     let handler = new Handler(write, read);
     let obj = new Object;
     obj['test'] = 'test';
@@ -43,8 +51,11 @@ test('add and read array and find object', async (done) => {
 });
 
 test('add and read object', async (done) => {
-    let read = new MongoDB(new DatabaseInfo('read', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
-    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
+    read = new MongoDB(new DatabaseInfo({
+        database:'read',
+        host:process.env.MONGO_HOST || 'localhost',
+        port:(+process.env.MONGO_PORT)
+    }));
 
     let handler = new Handler(read, write);
     let obj = new Object;
@@ -71,9 +82,12 @@ test('add and read object', async (done) => {
 });
 
 test('add and read array and find object', async (done) => {
-    let read = new PostgresDB(new DatabaseInfo('postgres', process.env.POSTGRES_HOST || 'localhost',
-        (+process.env.POSTGRES_PORT) || 5432, process.env.POSTGRES_USER));
-    let write = new MongoDB(new DatabaseInfo('write', process.env.MONGO_HOST || 'localhost', (+process.env.MONGO_PORT)));
+    read = new PostgresDB(new DatabaseInfo({
+        database:'postgres',
+        host: process.env.POSTGRES_HOST || 'localhost',
+        port: (+process.env.POSTGRES_PORT) || 5432,
+        username: process.env.POSTGRES_USER
+    }));
 
     let handler = new Handler(write, read);
     let obj = new Object;
