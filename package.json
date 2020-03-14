@@ -33,7 +33,7 @@
     "@types/jest": "^25.1.0",
     "@types/mongodb": "3.3.15",
     "@types/mongoose": "^5.7.0",
-    "@types/node": "^13.5.1",
+    "@types/node": "^13.9.1",
     "@types/reflect-metadata": "^0.1.0",
     "jest": "^25.1.0",
     "reflect-metadata": "^0.1.13",
