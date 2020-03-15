@@ -17,7 +17,7 @@ export class DatabaseInfo {
   }) {
     this.uri = info.uri;
     if (info.uri) {
-      info.uri = info.uri.split("postgres://", 2)[1];
+      info.uri = info.uri.split("://")[1];
       let a = info.uri.split(":");
       let b = a[1].split("@");
       this.user = a[0];
