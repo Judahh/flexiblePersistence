@@ -112,7 +112,8 @@ test("add and read array and find object", async done => {
     database: "postgres",
     host: process.env.POSTGRES_HOST || "localhost",
     port: +process.env.POSTGRES_PORT || 5432,
-    username: process.env.POSTGRES_USER || "postgres"
+    username: process.env.POSTGRES_USER || "postgres",
+    password: "evox2019"
   });
 
   read = new PostgresDB(info);
