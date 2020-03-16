@@ -7,7 +7,7 @@ export class DatabaseInfo {
   public uri: string;
   public options: string;
   public connectionType: string;
-  public ssl: string;
+  public ssl: unknown;
 
   constructor(info: {
     uri?: string;
@@ -18,7 +18,7 @@ export class DatabaseInfo {
     password?: string;
     options?: string;
     connectionType?: string;
-    ssl?: string;
+    ssl?: unknown;
   }) {
     this.uri = info.uri;
     if (info.uri) {
