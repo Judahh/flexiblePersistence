@@ -2,12 +2,11 @@ export class DatabaseInfo {
   public host: string;
   public port: number;
   public database: string;
-  public username: string;
   public user: string;
   public password: string;
   public uri: string;
   public options: string;
-  public connection: string;
+  public connectionType: string;
 
   constructor(info: {
     uri?: string;
@@ -17,7 +16,7 @@ export class DatabaseInfo {
     username?: string;
     password?: string;
     options?: string;
-    connection?: string;
+    connectionType?: string;
   }) {
     this.uri = info.uri;
     if (info.uri) {
@@ -25,7 +24,7 @@ export class DatabaseInfo {
 
       a = info.uri.split("://");
       this.host = a.length > 1 ? a[1] : a[0];
-      this.connection = a.length > 1 ? a[0] : undefined;
+      this.connectionType = a.length > 1 ? a[0] : undefined;
 
       a = this.host ? this.host.split("/") : undefined;
       if (a && a.length > 1) {
@@ -55,15 +54,12 @@ export class DatabaseInfo {
         this.host = a[0];
         this.port = isNaN(Number(a[1])) ? undefined : Number(a[1]);
       }
-
-      this.username = this.user;
     } else {
       this.database = info.database;
-      this.username = info.username;
       this.user = info.username;
       this.password = info.password;
       this.options = info.options;
-      this.connection = info.connection;
+      this.connectionType = info.connectionType;
       if (info.host) {
         this.host = info.host;
       } else {
@@ -75,9 +71,9 @@ export class DatabaseInfo {
         this.port = +process.env.DB_PORT || 27017;
       }
       this.uri =
-        (this.connection ? this.connection + "://" : "") +
+        (this.connectionType ? this.connectionType + "://" : "") +
         (this.user
-          ? this.username + (this.password ? ":" + this.password : "") + "@"
+          ? this.user + (this.password ? ":" + this.password : "") + "@"
           : "") +
         (this.host ? this.host : "") +
         (this.port ? ":" + this.port : "") +
