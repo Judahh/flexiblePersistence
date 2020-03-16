@@ -5,10 +5,9 @@ test("add and read array and find object", async done => {
     uri: "postgres://user:password@host:54321/database"
   });
   expect(info).toEqual({
-    connection: "postgres",
+    connectionType: "postgres",
     uri: "postgres://user:password@host:54321/database",
     user: "user",
-    username: "user",
     password: "password",
     host: "host",
     port: 54321,
@@ -24,7 +23,6 @@ test("add and read array and find object", async done => {
   expect(info).toEqual({
     uri: "user:password@host:54321/database",
     user: "user",
-    username: "user",
     password: "password",
     host: "host",
     port: 54321,
@@ -37,9 +35,8 @@ test("add and read array and find object", async done => {
   expect(info).toEqual({
     uri:
       "postgres://ibujvmgywggbqw:75e721b104549ea59dd29a076f50a6c77fc594e21e218663429bf657565f1a93@ec2-52-202-185-87.compute-1.amazonaws.com:5432/d581o8c7v3jv65",
-    connection: "postgres",
+    connectionType: "postgres",
     user: "ibujvmgywggbqw",
-    username: "ibujvmgywggbqw",
     password:
       "75e721b104549ea59dd29a076f50a6c77fc594e21e218663429bf657565f1a93",
     host: "ec2-52-202-185-87.compute-1.amazonaws.com",
@@ -53,9 +50,8 @@ test("add and read array and find object", async done => {
   expect(info).toEqual({
     uri:
       "mongodb+srv://mongo:47zzs4V00j9WJWZk@clusterwhaletest-4zkss.mongodb.net/test?retryWrites=true&w=majority",
-    connection: "mongodb+srv",
+    connectionType: "mongodb+srv",
     user: "mongo",
-    username: "mongo",
     password: "47zzs4V00j9WJWZk",
     host: "clusterwhaletest-4zkss.mongodb.net",
     database: "test",
@@ -68,7 +64,6 @@ test("add and read array and find object", async done => {
   expect(info).toEqual({
     uri: "user:password@host:54321/database",
     user: "user",
-    username: "user",
     password: "password",
     host: "host",
     port: 54321,
@@ -91,7 +86,6 @@ test("add and read array and find object", async done => {
   expect(info).toEqual({
     uri: "user:password@host/database",
     user: "user",
-    username: "user",
     password: "password",
     host: "host",
     database: "database"
@@ -103,7 +97,6 @@ test("add and read array and find object", async done => {
   expect(info).toEqual({
     uri: "user:password@host:54321",
     user: "user",
-    username: "user",
     password: "password",
     host: "host",
     port: 54321
@@ -115,7 +108,6 @@ test("add and read array and find object", async done => {
   expect(info).toEqual({
     uri: "user:password@host",
     user: "user",
-    username: "user",
     password: "password",
     host: "host"
   });
@@ -130,7 +122,7 @@ test("add and read array and find object", async done => {
   });
 
   info = new DatabaseInfo({
-    connection: "connection",
+    connectionType: "connection",
     options: "options",
     username: "user",
     password: "password",
@@ -140,9 +132,8 @@ test("add and read array and find object", async done => {
   });
   expect(info).toEqual({
     uri: "connection://user:password@host:54321/database?options",
-    connection: "connection",
+    connectionType: "connection",
     options: "options",
-    username: "user",
     password: "password",
     host: "host",
     port: 54321,
