@@ -21,6 +21,7 @@ export class DatabaseInfo {
     ssl?: unknown;
   }) {
     this.uri = info.uri;
+    this.ssl = info.ssl;
     if (info.uri) {
       let a;
 
@@ -62,7 +63,6 @@ export class DatabaseInfo {
       this.password = info.password;
       this.options = info.options;
       this.connectionType = info.connectionType;
-      this.ssl = info.ssl;
       if (info.host) {
         this.host = info.host;
       } else {
