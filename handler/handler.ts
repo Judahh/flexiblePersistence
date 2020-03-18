@@ -14,6 +14,10 @@ export class Handler {
         }
     }
 
+    public getWrite(){
+        return this.write;
+    }
+
     public addEvent(event: Event): Promise<PersistencePromise> {
         return new Promise<PersistencePromise>((resolve, reject) => {
             this.write.addEvent(event).then(resolve).catch(reject);

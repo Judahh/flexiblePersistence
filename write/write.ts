@@ -48,4 +48,10 @@ export class Write {
             this.eventDB.readItemById(scheme, id).then(resolve).catch(reject);
         });
     }
+
+    public clear(scheme: string): Promise<PersistencePromise> {
+        return new Promise<PersistencePromise>((resolve, reject) => {
+            this.eventDB.deleteArray(scheme, {}).then(resolve).catch(reject);
+        });
+    }
 }

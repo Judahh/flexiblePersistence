@@ -8,12 +8,22 @@ export class Event {
     private content: any;
     private selection: any;
 
-    constructor({ operation, name, selection, content }: { operation: Operation; name?: string; selection?: any; content?: any; }) {
-        this.timestamp = this.currentTimestamp();
-        this.operation = operation;
-        this.name = name || content.constructor.name;
-        this.content = content;
-        this.selection = selection;
+    constructor(event: {
+        operation: Operation;
+        name?: string;
+        selection?: any;
+        content?: any;
+        timestamp?: string;
+        _id?: any;
+        __v?: any;
+    }) {
+        this.timestamp = event.timestamp || this.currentTimestamp();
+        this.operation = event.operation;
+        this.name = event.name || event.content.constructor.name;
+        this.content = event.content;
+        this.selection = event.selection;
+        this.__v = event.__v;
+        this._id = event._id;
     }
 
     public getOperation() {
