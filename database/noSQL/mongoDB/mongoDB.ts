@@ -1,8 +1,8 @@
 // import { MongoClient, Db } from 'mongodb';
-import { Mongoose, Schema } from "mongoose";
-import { PersistenceAdapter } from "./../../../persistenceAdapter/persistenceAdapter";
-import { DatabaseInfo } from "../../databaseInfo";
-import { PersistencePromise } from "../../../persistenceAdapter/persistencePromise";
+import { Mongoose, Schema } from 'mongoose';
+import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
+import { DatabaseInfo } from '../../databaseInfo';
+import { PersistencePromise } from '../../../persistenceAdapter/persistencePromise';
 
 export class MongoDB implements PersistenceAdapter {
   private databaseInfo: DatabaseInfo;
@@ -16,7 +16,7 @@ export class MongoDB implements PersistenceAdapter {
     this.mongooseInstance = new Mongoose();
     // this.mongooseInstance =
     let uri =
-      (!databaseInfo.connectionType ? "mongodb://" : "") + databaseInfo.uri;
+      (!databaseInfo.connectionType ? 'mongodb://' : '') + databaseInfo.uri;
 
     this.mongooseInstance.connect(uri, {
       useNewUrlParser: true,
@@ -26,6 +26,26 @@ export class MongoDB implements PersistenceAdapter {
       {},
       { strict: false }
     );
+  }
+
+  updateArray(scheme: string, selectedItem: any, item: any): Promise<PersistencePromise> {
+    return new Promise<PersistencePromise>((resolve, reject) => {
+      let model = this.mongooseInstance.model(scheme, this.genericSchema);
+      model.update(selectedItem, item, (error, doc, result) => {
+        if (error) {
+          reject(new Error(error));
+        } else {
+          resolve(
+            new PersistencePromise({
+              receivedItem: doc === undefined ? undefined : (<any>doc)._doc,
+              result: result,
+              selectedItem: selectedItem,
+              sentItem: item
+            })
+          );
+        }
+      });
+    });
   }
 
   public updateItem(scheme: string, selectedItem: any, item: any) {
@@ -98,7 +118,7 @@ export class MongoDB implements PersistenceAdapter {
             new PersistencePromise({
               receivedItem: doc === undefined ? undefined : (<any>doc)._doc,
               result: result,
-              selectedItem: id
+              selectedItem: { _id: id }
             })
           );
         }

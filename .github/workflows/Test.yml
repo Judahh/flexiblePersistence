@@ -5,6 +5,9 @@ on:
     branches:
       - "*" # matches every branch
       - "*/*" # matches every branch containing a single '/'
+  push:
+    branches-ignore:
+      - master
 
 jobs:
   build:

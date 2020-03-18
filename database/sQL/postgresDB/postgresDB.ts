@@ -53,15 +53,23 @@ export class PostgresDB implements PersistenceAdapter {
     private static queryInsertItem(scheme: string, item: any) {
         return (`INSERT INTO ${scheme} (${PostgresDB.resolveKeys(item).join(', ')}) VALUES (${
             PostgresDB.getDBVariables(item)
-        })`);
+        }) RETURNING *`);
     }
 
-    private static queryUpdateItem(scheme: string, selectedItem: any, item: any) {
+    private static queryUpdate(scheme: string, selectedItem: any, item: any) {
         return (`UPDATE ${scheme} SET ${
             PostgresDB.getDBSetVariables(item).join(', ')
         } WHERE (${
             PostgresDB.getDBSetVariables(selectedItem).join(', ')
-        })`);
+        }) RETURNING *`);
+    }
+
+    private static queryUpdateArray(scheme: string, selectedItem: any, item: any) {
+        return (`${this.queryUpdate(scheme, selectedItem, item)}`);
+    }
+
+    private static queryUpdateItem(scheme: string, selectedItem: any, item: any) {
+        return (`${this.queryUpdate(scheme, selectedItem, item)}`);
     }
 
     private static queryDeleteItem(scheme: string, selectedItem: any) {
@@ -80,13 +88,13 @@ export class PostgresDB implements PersistenceAdapter {
         return (item) ? Object.values(item) : [];
     }
 
-    private static queryResults(error, results, resolve, reject, toPromise: { selectedItem?, sentItem?}){
+    private static queryResults(error, results, resolve, reject, toPromise: { selectedItem?, sentItem?}, isItem?: boolean) {
         if (error) {
             reject(new Error(error));
         } else {
             resolve(
                 new PersistencePromise({
-                    receivedItem: (results === undefined) ? undefined : results.rows,
+                    receivedItem: (results) ? (isItem ? results.rows[0] : results.rows) : results,
                     selectedItem: toPromise.selectedItem,
                     result: results,
                     sentItem: toPromise.sentItem
@@ -104,7 +112,8 @@ export class PostgresDB implements PersistenceAdapter {
         let query = PostgresDB.queryInsertItem(scheme, item);
         return this.query(
             query,
-            { sentItem: item }
+            { sentItem: item },
+            true
         );
     }
 
@@ -112,7 +121,17 @@ export class PostgresDB implements PersistenceAdapter {
         let query = PostgresDB.queryUpdateItem(scheme, selectedItem, item);
         return this.query(
             query,
-            { selectedItem: selectedItem, sentItem: item }
+            { selectedItem: selectedItem, sentItem: item },
+            true
+        );
+    }
+
+    public updateArray(scheme: string, selectedItem: any, item: any) {
+        let query = PostgresDB.queryUpdateArray(scheme, selectedItem, item);
+        return this.query(
+            query,
+            { selectedItem: selectedItem, sentItem: item },
+            true
         );
     }
 
@@ -128,7 +147,8 @@ export class PostgresDB implements PersistenceAdapter {
         let query = PostgresDB.querySelectItem(scheme, selectedItem);
         return this.query(
             query,
-            { selectedItem: selectedItem }
+            { selectedItem: selectedItem },
+            true
         );
     }
 
@@ -136,7 +156,8 @@ export class PostgresDB implements PersistenceAdapter {
         let query = PostgresDB.querySelectItem(scheme, { _id : id });
         return this.query(
             query,
-            { selectedItem: { _id: id } }
+            { selectedItem: { _id: id } },
+            true
         );
     }
 
@@ -144,7 +165,8 @@ export class PostgresDB implements PersistenceAdapter {
         let query = PostgresDB.queryDeleteItem(scheme, selectedItem);
         return this.query(
             query,
-            { selectedItem: selectedItem }
+            { selectedItem: selectedItem },
+            true
         );
     }
 
@@ -176,12 +198,12 @@ export class PostgresDB implements PersistenceAdapter {
         });
     }
 
-    private query(query: string, toPromise: { selectedItem?, sentItem?}): Promise<PersistencePromise> {
+    private async query(query: string, toPromise: { selectedItem?, sentItem?}, isItem?: boolean): Promise<PersistencePromise> {
         return new Promise<PersistencePromise>((resolve, reject) => {
             this.pool.query(
                 query,
                 (error, results) => {
-                    PostgresDB.queryResults(error, results, resolve, reject, toPromise);
+                    PostgresDB.queryResults(error, results, resolve, reject, toPromise, isItem);
                 }
             );
         });
