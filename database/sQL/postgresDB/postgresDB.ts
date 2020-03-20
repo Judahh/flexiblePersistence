@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PersistenceAdapter } from '../../../persistenceAdapter/persistenceAdapter';
 import { DatabaseInfo } from '../../databaseInfo';
 import { Pool } from 'pg';
@@ -10,33 +11,33 @@ export class PostgresDB implements PersistenceAdapter {
 
     private static inspectSelectedItemValue(element: any): SelectedItemValue {
         if (!(element instanceof SelectedItemValue)) {
-            element = new SelectedItemValue(<string> element, new RelationValuePostgresDB());
+            element = new SelectedItemValue(element, new RelationValuePostgresDB());
         }
         return element;
     }
 
-    private static getDBVariable(element: SelectedItemValue, index: number, array: string[]): string {
+    private static getDBVariable(element: SelectedItemValue): string {
         return ('' + element.toString() + '');
     }
 
-    private static getDBSetVariable(name, element: any, index: number, array: string[]): string {
-        return name + ' ' + PostgresDB.getDBVariable(PostgresDB.inspectSelectedItemValue(element), index, array);
+    private static getDBSetVariable(name, element: any): string {
+        return name + ' ' + PostgresDB.getDBVariable(PostgresDB.inspectSelectedItemValue(element));
     }
 
-    private static getDBSetVariables(item) {
-        let keys = PostgresDB.resolveKeys(item);
-        return keys.map((element, index, array) => {
-            return PostgresDB.getDBSetVariable(element, item[element], index, array)
+    private static getDBSetVariables(item): Array<string> {
+        const keys = PostgresDB.resolveKeys(item);
+        return keys.map((element) => {
+            return PostgresDB.getDBSetVariable(element, item[element])
         });
     }
 
-    private static getDBVariables(item) {
-        return PostgresDB.resolveValues(item).map((element, index, array) => {
-            return '\'' + PostgresDB.getDBVariable(element, index, array) + '\''
+    private static getDBVariables(item): string {
+        return PostgresDB.resolveValues(item).map((element) => {
+            return '\'' + PostgresDB.getDBVariable(element) + '\''
         }).join(', ');
     }
 
-    private static querySelectArray(scheme: string, selectedItem: any, selectVar?: string) {
+    private static querySelectArray(scheme: string, selectedItem: any, selectVar?: string): string {
         if (!selectVar) {
             selectVar = '*';
         }
@@ -46,17 +47,17 @@ export class PostgresDB implements PersistenceAdapter {
             }) ORDER BY _id ASC`;
     }
 
-    private static querySelectItem(scheme: string, selectedItem: any, selectVar?: string) {
+    private static querySelectItem(scheme: string, selectedItem: any, selectVar?: string): string {
         return PostgresDB.querySelectArray(scheme, selectedItem, selectVar) + ` LIMIT 1`;
     }
 
-    private static queryInsertItem(scheme: string, item: any) {
+    private static queryInsertItem(scheme: string, item: any): string {
         return (`INSERT INTO ${scheme} (${PostgresDB.resolveKeys(item).join(', ')}) VALUES (${
             PostgresDB.getDBVariables(item)
         }) RETURNING *`);
     }
 
-    private static queryUpdate(scheme: string, selectedItem: any, item: any) {
+    private static queryUpdate(scheme: string, selectedItem: any, item: any): string {
         return (`UPDATE ${scheme} SET ${
             PostgresDB.getDBSetVariables(item).join(', ')
         } WHERE (${
@@ -64,23 +65,23 @@ export class PostgresDB implements PersistenceAdapter {
         }) RETURNING *`);
     }
 
-    private static queryUpdateArray(scheme: string, selectedItem: any, item: any) {
+    private static queryUpdateArray(scheme: string, selectedItem: any, item: any): string {
         return (`${this.queryUpdate(scheme, selectedItem, item)}`);
     }
 
-    private static queryUpdateItem(scheme: string, selectedItem: any, item: any) {
+    private static queryUpdateItem(scheme: string, selectedItem: any, item: any): string {
         return (`${this.queryUpdate(scheme, selectedItem, item)}`);
     }
 
-    private static queryDeleteItem(scheme: string, selectedItem: any) {
+    private static queryDeleteItem(scheme: string, selectedItem: any): string {
         return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectItem(scheme, selectedItem, '_id')})`;
     }
 
-    private static queryDeleteArray(scheme: string, selectedItem: any) {
+    private static queryDeleteArray(scheme: string, selectedItem: any): string {
         return `DELETE FROM ${scheme} WHERE _id IN (${PostgresDB.querySelectArray(scheme, selectedItem, '_id')})`;
     }
 
-    private static resolveKeys(item: any) {
+    private static resolveKeys(item: any): Array<string> {
         return (item) ? Object.keys(item) : [];
     }
 
@@ -88,7 +89,7 @@ export class PostgresDB implements PersistenceAdapter {
         return (item) ? Object.values(item) : [];
     }
 
-    private static queryResults(error, results, resolve, reject, toPromise: { selectedItem?, sentItem?}, isItem?: boolean) {
+    private static queryResults(error, results, resolve, reject, toPromise: { selectedItem?; sentItem?}, isItem?: boolean): void {
         if (error) {
             reject(new Error(error));
         } else {
@@ -108,8 +109,8 @@ export class PostgresDB implements PersistenceAdapter {
         this.pool = new Pool(this.databaseInfo);
     }
 
-    public addItem(scheme: string, item: any) {
-        let query = PostgresDB.queryInsertItem(scheme, item);
+    public addItem(scheme: string, item: any): Promise<PersistencePromise> {
+        const query = PostgresDB.queryInsertItem(scheme, item);
         return this.query(
             query,
             { sentItem: item },
@@ -117,8 +118,8 @@ export class PostgresDB implements PersistenceAdapter {
         );
     }
 
-    public updateItem(scheme: string, selectedItem: any, item: any) {
-        let query = PostgresDB.queryUpdateItem(scheme, selectedItem, item);
+    public updateItem(scheme: string, selectedItem: any, item: any): Promise<PersistencePromise> {
+        const query = PostgresDB.queryUpdateItem(scheme, selectedItem, item);
         return this.query(
             query,
             { selectedItem: selectedItem, sentItem: item },
@@ -126,8 +127,8 @@ export class PostgresDB implements PersistenceAdapter {
         );
     }
 
-    public updateArray(scheme: string, selectedItem: any, item: any) {
-        let query = PostgresDB.queryUpdateArray(scheme, selectedItem, item);
+    public updateArray(scheme: string, selectedItem: any, item: any): Promise<PersistencePromise> {
+        const query = PostgresDB.queryUpdateArray(scheme, selectedItem, item);
         return this.query(
             query,
             { selectedItem: selectedItem, sentItem: item },
@@ -135,16 +136,16 @@ export class PostgresDB implements PersistenceAdapter {
         );
     }
 
-    public readArray(scheme: string, selectedItem: any) {
-        let query = PostgresDB.querySelectArray(scheme, selectedItem);
+    public readArray(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+        const query = PostgresDB.querySelectArray(scheme, selectedItem);
         return this.query(
             query,
             { selectedItem: selectedItem }
         );
     }
 
-    public readItem(scheme: string, selectedItem: any) {
-        let query = PostgresDB.querySelectItem(scheme, selectedItem);
+    public readItem(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+        const query = PostgresDB.querySelectItem(scheme, selectedItem);
         return this.query(
             query,
             { selectedItem: selectedItem },
@@ -152,8 +153,8 @@ export class PostgresDB implements PersistenceAdapter {
         );
     }
 
-    public readItemById(scheme: string, id: any) {
-        let query = PostgresDB.querySelectItem(scheme, { _id : id });
+    public readItemById(scheme: string, id: any): Promise<PersistencePromise> {
+        const query = PostgresDB.querySelectItem(scheme, { _id : id });
         return this.query(
             query,
             { selectedItem: { _id: id } },
@@ -161,8 +162,8 @@ export class PostgresDB implements PersistenceAdapter {
         );
     }
 
-    public deleteItem(scheme: string, selectedItem: any) {
-        let query = PostgresDB.queryDeleteItem(scheme, selectedItem);
+    public deleteItem(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+        const query = PostgresDB.queryDeleteItem(scheme, selectedItem);
         return this.query(
             query,
             { selectedItem: selectedItem },
@@ -170,35 +171,35 @@ export class PostgresDB implements PersistenceAdapter {
         );
     }
 
-    public deleteArray(scheme: string, selectedItem: any) {
-        let query = PostgresDB.queryDeleteArray(scheme, selectedItem);
+    public deleteArray(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+        const query = PostgresDB.queryDeleteArray(scheme, selectedItem);
         return this.query(
             query,
             { selectedItem: selectedItem }
         );
     }
 
-    public getDatabaseInfo() {
+    public getDatabaseInfo(): DatabaseInfo {
         return this.databaseInfo;
     }
 
-    public getPool() { // TODO: remove
+    public getPool(): Pool { // TODO: remove
         return this.pool;
     }
 
-    public close(): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
-            this.end(resolve, reject);
+    public close(): Promise<unknown> {
+        return new Promise<unknown>((resolve) => {
+            this.end(resolve);
         });
     }
 
-    private end(resolve, reject){
+    private end(resolve): void {
         this.pool.end(() => {
             resolve();
         });
     }
 
-    private async query(query: string, toPromise: { selectedItem?, sentItem?}, isItem?: boolean): Promise<PersistencePromise> {
+    private async query(query: string, toPromise: { selectedItem?; sentItem?}, isItem?: boolean): Promise<PersistencePromise> {
         return new Promise<PersistencePromise>((resolve, reject) => {
             this.pool.query(
                 query,

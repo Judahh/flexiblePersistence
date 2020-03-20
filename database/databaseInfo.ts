@@ -1,19 +1,19 @@
 export class DatabaseInfo {
   public host: string;
-  public port: number;
-  public database: string;
-  public user: string;
-  public password: string;
-  public uri: string;
-  public options: string;
-  public connectionType: string;
+  public port?: number;
+  public database?: string;
+  public user?: string;
+  public password?: string;
+  public uri?: string;
+  public options?: string;
+  public connectionType?: string;
   public ssl: unknown;
 
   constructor(info: {
     uri?: string;
     database?: string;
     host?: string;
-    port?: number;
+    port?: number | string;
     username?: string;
     password?: string;
     options?: string;
@@ -69,9 +69,9 @@ export class DatabaseInfo {
         this.host = process.env.DB_HOST || 'localhost';
       }
       if (info.port) {
-        this.port = info.port;
+        this.port = +info.port;
       } else {
-        this.port = +process.env.DB_PORT || 27017;
+        this.port = +(process.env.DB_PORT || 27017);
       }
       this.uri =
         (this.connectionType ? this.connectionType + '://' : '') +

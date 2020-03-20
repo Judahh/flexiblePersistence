@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Operation } from './operation';
 export class Event {
     private _id: any;
@@ -12,53 +13,53 @@ export class Event {
         operation: Operation;
         name?: string;
         selection?: any;
-        content?: any;
+        content?: any ;
         timestamp?: string;
         _id?: any;
         __v?: any;
     }) {
         this.timestamp = event.timestamp || this.currentTimestamp();
         this.operation = event.operation;
-        this.name = event.name || event.content.constructor.name;
+        this.name = event.name || event ? ( event.content ? (event.content.constructor ? event.content.constructor.name : 'any') : 'any') : 'any';
         this.content = event.content;
         this.selection = event.selection;
         this.__v = event.__v;
         this._id = event._id;
     }
 
-    public getOperation() {
+    public getOperation(): Operation {
         return this.operation;
     }
 
-    public getTimestamp() {
+    public getTimestamp(): string {
         return this.timestamp;
     }
 
-    public getName() {
+    public getName(): string {
         return this.name;
     }
 
-    public getContent() {
+    public getContent(): any{
         return this.content;
     }
 
-    public getSelection() {
+    public getSelection(): any {
         return this.selection;
     }
 
-    public getId() {
+    public getId(): any {
         return this._id;
     }
 
-    public getV() {
+    public getV(): any {
         return this.__v;
     }
 
-    private currentTimestamp() {
-        let date = new Date();
-        let dash = '-';
-        let colon = ':';
-        let dot = '.';
+    private currentTimestamp(): string {
+        const date = new Date();
+        const dash = '-';
+        const colon = ':';
+        const dot = '.';
         return date.getFullYear() + dash +
             this.pad(date.getMonth() + 1) + dash +
             this.pad(date.getDate()) + ' ' +
@@ -68,7 +69,7 @@ export class Event {
             this.pad(date.getMilliseconds());
     }
 
-    private pad(n) {
+    private pad(n: number): string | number {
         return n < 10 ? '0' + n : n
     }
 }

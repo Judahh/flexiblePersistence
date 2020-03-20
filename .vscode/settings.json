@@ -1,0 +1,55 @@
+{
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "window.zoomLevel": 1,
+  // Aumenta a fonte do terminal
+  "editor.fontSize": 14,
+  // Aplica linhas verticais para lembrar de quebrar a linha em códigos muito grandes
+  "editor.rulers": [
+    80,
+    120
+  ],
+  // Aplica um sinal visual na esquerda da linha selecionada
+  "editor.renderLineHighlight": "gutter",
+  "editor.tabSize": 2,
+  "terminal.integrated.fontSize": 14,
+  "editor.parameterHints.enabled": true,
+  "breadcrumbs.enabled": true,
+  "javascript.suggest.autoImports": false,
+  "explorer.confirmDragAndDrop": false,
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  "[javascriptreact]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    }
+  },
+  "eslint.alwaysShowStatus": true,
+  "eslint.format.enable": true,
+  "eslint.packageManager": "yarn",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.referencesCodeLens.enabled": true,
+  "typescript.implementationsCodeLens.enabled": true,
+  "javascript.referencesCodeLens.enabled": true,
+  "codemetrics.nodeconfiguration.CaseClause": 0,
+  "codemetrics.nodeconfiguration.BreakStatement": 0,
+  "editor.suggestSelection": "first",
+  "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+  "terminal.integrated.scrollback": 9999999999,
+  "typescript.suggest.completeFunctionCalls": true,
+  "codemetrics.nodeconfiguration.BinaryExpression": 0,
+  "C_Cpp.updateChannel": "Insiders",
+  "diffEditor.ignoreTrimWhitespace": false,
+  "[pgsql]": {
+    "IF": true
+  }
+}

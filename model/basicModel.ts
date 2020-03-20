@@ -1,7 +1,9 @@
-export abstract class BasicModel {
-    private _id: any;
+import { ObjectId } from "mongodb";
 
-    constructor(_id: any) {
+export abstract class BasicModel {
+    private _id?: string | RegExp | ObjectId;
+
+    constructor(_id: string | RegExp | ObjectId) {
         this._id = _id;
     }
 }
