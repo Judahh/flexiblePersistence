@@ -1,4 +1,5 @@
-export class DatabaseInfo {
+import { PoolConfig } from 'pg';
+export class DatabaseInfo implements PoolConfig {
   public host: string;
   public port?: number;
   public database?: string;
