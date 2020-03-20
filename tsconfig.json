@@ -3,7 +3,10 @@
     "target": "es2017",
     "module": "commonjs",
     "moduleResolution": "node",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "sourceMap": true,
+    "outDir": "./dist", /* Redirect output structure to the directory. */
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,

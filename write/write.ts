@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Event } from './../event/event';
 import { Read } from './../read/read';
 import { PersistenceAdapter } from '..';
 import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
 export class Write {
-    private read: Read;
+    private read?: Read;
     private eventDB: PersistenceAdapter;
 
     constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
@@ -13,11 +15,11 @@ export class Write {
         }
     }
 
-    public getRead(): Read {
+    public getRead(): Read | undefined {
         return this.read;
     }
 
-    public addEvent(event: Event, callback?): Promise<PersistencePromise> {
+    public addEvent(event: Event): Promise<PersistencePromise> {
         return new Promise<PersistencePromise>((resolve, reject) => {
             this.eventDB.addItem('events', event).then((persistencePromise: PersistencePromise) => {
                 event['_id'] = persistencePromise.receivedItem._id;

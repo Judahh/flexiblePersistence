@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PersistencePromise } from './persistencePromise';
 
 export interface PersistenceAdapter {

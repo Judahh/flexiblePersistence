@@ -1,0 +1,63 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Node: Nodemon Typescript Debug",
+      "type": "node",
+      "request": "attach",
+      "protocol": "inspector",
+      "restart": true,
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Jest Integration Tests",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--inspect-brk",
+        "${workspaceFolder}/node_modules/.bin/jest",
+        "--runInBand",
+        "--config",
+        "${workspaceFolder}/integration.config.js"
+      ],
+      "windows": {
+        "args": [
+          "--inspect-brk",
+          "${workspaceFolder}/node_modules/jest/bin/jest.js",
+          "--runInBand",
+          "--config",
+          "${workspaceFolder}/integration.config.js"
+        ],
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Jest Unity Tests",
+      "cwd": "${workspaceFolder}",
+      "args": [
+        "--inspect-brk",
+        "${workspaceFolder}/node_modules/.bin/jest",
+        "--runInBand",
+        "--config",
+        "${workspaceFolder}/jest.config.js"
+      ],
+      "windows": {
+        "args": [
+          "--inspect-brk",
+          "${workspaceFolder}/node_modules/jest/bin/jest.js",
+          "--runInBand",
+          "--config",
+          "${workspaceFolder}/jest.config.js"
+        ],
+      },
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

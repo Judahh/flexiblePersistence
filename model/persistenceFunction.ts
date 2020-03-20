@@ -4,10 +4,14 @@ export class PersistenceFunction {
 
     constructor(name: string, statements?: Array<string>) {
         this.name = name;
-        this.statements = statements;
+        if (statements) {
+            this.statements = statements;
+        } else {
+            this.statements = []
+        }
     }
 
-    public toString() {
+    public toString(): string {
         return `${this.name}(${this.statements.toString()})`
     }
 }

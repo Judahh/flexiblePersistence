@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Write } from './../write/write';
 import { Read } from './../read/read';
 import { Event } from './../event/event';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
 export class Handler {
-    private read: Read;
+    private read?: Read;
     private write: Write;
 
     constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
@@ -14,7 +15,7 @@ export class Handler {
         }
     }
 
-    public getWrite(){
+    public getWrite(): Write{
         return this.write;
     }
 

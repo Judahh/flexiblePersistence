@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Operation } from './operation';
 export class Event {
     private _id: any;
@@ -12,7 +13,7 @@ export class Event {
         operation: Operation;
         name?: string;
         selection?: any;
-        content?: any;
+        content?: any ;
         timestamp?: string;
         _id?: any;
         __v?: any;
@@ -26,39 +27,39 @@ export class Event {
         this._id = event._id;
     }
 
-    public getOperation() {
+    public getOperation(): Operation {
         return this.operation;
     }
 
-    public getTimestamp() {
+    public getTimestamp(): string {
         return this.timestamp;
     }
 
-    public getName() {
+    public getName(): string {
         return this.name;
     }
 
-    public getContent() {
+    public getContent(): any{
         return this.content;
     }
 
-    public getSelection() {
+    public getSelection(): any {
         return this.selection;
     }
 
-    public getId() {
+    public getId(): any {
         return this._id;
     }
 
-    public getV() {
+    public getV(): any {
         return this.__v;
     }
 
-    private currentTimestamp() {
-        let date = new Date();
-        let dash = '-';
-        let colon = ':';
-        let dot = '.';
+    private currentTimestamp(): string {
+        const date = new Date();
+        const dash = '-';
+        const colon = ':';
+        const dot = '.';
         return date.getFullYear() + dash +
             this.pad(date.getMonth() + 1) + dash +
             this.pad(date.getDate()) + ' ' +
@@ -68,7 +69,7 @@ export class Event {
             this.pad(date.getMilliseconds());
     }
 
-    private pad(n) {
+    private pad(n: number): string | number {
         return n < 10 ? '0' + n : n
     }
 }
