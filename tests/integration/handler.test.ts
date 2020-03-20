@@ -76,6 +76,7 @@ test('add and read array and find object', async done => {
       sentItem: undefined
     }));
   } catch (error) {
+    console.error(error);
     await read.close();
     await write.close();
     expect(error).toBe(null);

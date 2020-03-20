@@ -20,7 +20,7 @@ export class Event {
     }) {
         this.timestamp = event.timestamp || this.currentTimestamp();
         this.operation = event.operation;
-        this.name = event.name || event ? ( event.content ? (event.content.constructor ? event.content.constructor.name : 'any') : 'any') : 'any';
+        this.name = event.name || event.content.constructor.name;
         this.content = event.content;
         this.selection = event.selection;
         this.__v = event.__v;
