@@ -1,4 +1,6 @@
 import { PoolConfig } from 'pg';
+import { ConnectionOptions } from 'mongoose';
+import * as tls from 'tls';
 export class DatabaseInfo implements PoolConfig {
   public host: string;
   public port?: number;
@@ -8,7 +10,7 @@ export class DatabaseInfo implements PoolConfig {
   public uri?: string;
   public options?: string;
   public connectionType?: string;
-  public ssl: unknown;
+  public ssl: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
 
   constructor(info: {
     uri?: string;
@@ -19,7 +21,7 @@ export class DatabaseInfo implements PoolConfig {
     password?: string;
     options?: string;
     connectionType?: string;
-    ssl?: unknown;
+    ssl?: ConnectionOptions | tls.ConnectionOptions | boolean;
   }) {
     this.uri = info.uri;
     this.ssl = info.ssl;

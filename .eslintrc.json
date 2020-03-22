@@ -5,6 +5,7 @@
     "jest": true
   },
   "extends": [
+    "prettier",
     "plugin:@typescript-eslint/recommended"
   ],
   "globals": {
@@ -17,9 +18,18 @@
     "sourceType": "module"
   },
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "prettier",
+    "filenames"
   ],
   "rules": {
+    "filenames/match-regex": [
+      2,
+      "((^[a-z]+)(([A-Z])([a-z]*))*)"
+    ],
+    "filenames/match-exported": 0,
+    "filenames/no-index": 0,
+    "prettier/prettier": "error",
     "class-methods-use-this": "off",
     "no-param-reassign": "off",
     "no-unused-vars": [

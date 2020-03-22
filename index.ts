@@ -7,4 +7,14 @@ import { PersistenceAdapter } from './persistenceAdapter/persistenceAdapter';
 import { DatabaseInfo } from './database/databaseInfo';
 import { MongoDB } from './database/noSQL/mongoDB/mongoDB';
 import { PostgresDB } from './database/sQL/postgresDB/postgresDB';
-export { Handler, Event, Operation, Write, Read, PersistenceAdapter, DatabaseInfo, MongoDB, PostgresDB }
+export {
+  Handler,
+  Event,
+  Operation,
+  Write,
+  Read,
+  PersistenceAdapter,
+  DatabaseInfo,
+  MongoDB,
+  PostgresDB,
+};

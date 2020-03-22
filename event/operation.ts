@@ -1,9 +1,9 @@
 export enum Operation {
-    add,
-    read,
-    correct,
-    update,
-    nonexistent,
-    delete,
-    clear
+  add,
+  read,
+  correct,
+  update,
+  nonexistent,
+  delete,
+  clear,
 }

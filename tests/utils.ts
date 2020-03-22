@@ -1,18 +1,18 @@
-import * as fs from "fs";
+import * as fs from 'fs';
 
 export default class Utils {
   public static async init(pool): Promise<void> {
     const script = await fs.promises.readFile(
-      "./tests/integration/createTables.sql",
-      "utf8"
+      './tests/integration/createTables.sql',
+      'utf8'
     );
     await pool.query(script);
   }
 
   public static async dropTables(pool): Promise<void> {
     const dropTables = await fs.promises.readFile(
-      "./tests/integration/dropTables.sql",
-      "utf8"
+      './tests/integration/dropTables.sql',
+      'utf8'
     );
     await pool.query(dropTables);
   }

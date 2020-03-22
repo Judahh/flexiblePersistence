@@ -20,7 +20,7 @@ export class MongoDB implements PersistenceAdapter {
 
     this.mongooseInstance.connect(uri, {
       useNewUrlParser: true,
-      useUnifiedTopology: true
+      useUnifiedTopology: true,
     });
     this.genericSchema = new this.mongooseInstance.Schema(
       {},
@@ -28,7 +28,11 @@ export class MongoDB implements PersistenceAdapter {
     );
   }
 
-  updateArray(scheme: string, selectedItem: any, item: any): Promise<PersistencePromise> {
+  updateArray(
+    scheme: string,
+    selectedItem: any,
+    item: any
+  ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.update(selectedItem, item, (error, doc, result) => {
@@ -40,7 +44,7 @@ export class MongoDB implements PersistenceAdapter {
               receivedItem: doc ? doc._doc : undefined,
               result: result,
               selectedItem: selectedItem,
-              sentItem: item
+              sentItem: item,
             })
           );
         }
@@ -48,7 +52,11 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public updateItem(scheme: string, selectedItem: any, item: any): Promise<PersistencePromise> {
+  public updateItem(
+    scheme: string,
+    selectedItem: any,
+    item: any
+  ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findOneAndUpdate(selectedItem, item, (error, doc, result) => {
@@ -60,7 +68,7 @@ export class MongoDB implements PersistenceAdapter {
               receivedItem: doc ? (doc as any)._doc : undefined,
               result: result,
               selectedItem: selectedItem,
-              sentItem: item
+              sentItem: item,
             })
           );
         }
@@ -68,7 +76,10 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public readArray(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+  public readArray(
+    scheme: string,
+    selectedItem: any
+  ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.find(selectedItem, (error, doc: Array<any>, result) => {
@@ -80,7 +91,7 @@ export class MongoDB implements PersistenceAdapter {
               receivedItem:
                 doc === undefined ? undefined : doc.map(a => a._doc),
               result: result,
-              selectedItem: selectedItem
+              selectedItem: selectedItem,
             })
           );
         }
@@ -88,7 +99,10 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public readItem(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+  public readItem(
+    scheme: string,
+    selectedItem: any
+  ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findOne(selectedItem, (error, doc, result) => {
@@ -99,7 +113,7 @@ export class MongoDB implements PersistenceAdapter {
             new PersistencePromise({
               receivedItem: doc === undefined ? undefined : doc._doc,
               result: result,
-              selectedItem: selectedItem
+              selectedItem: selectedItem,
             })
           );
         }
@@ -118,7 +132,7 @@ export class MongoDB implements PersistenceAdapter {
             new PersistencePromise({
               receivedItem: doc === undefined ? undefined : doc._doc,
               result: result,
-              selectedItem: { _id: id }
+              selectedItem: { _id: id },
             })
           );
         }
@@ -126,7 +140,10 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public deleteArray(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+  public deleteArray(
+    scheme: string,
+    selectedItem: any
+  ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.deleteMany(selectedItem, error => {
@@ -135,7 +152,7 @@ export class MongoDB implements PersistenceAdapter {
         } else {
           resolve(
             new PersistencePromise({
-              selectedItem: selectedItem
+              selectedItem: selectedItem,
             })
           );
         }
@@ -143,7 +160,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public addItem(scheme: string, item: any): Promise<PersistencePromise>{
+  public addItem(scheme: string, item: any): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.create(item, (error, doc, result) => {
@@ -154,7 +171,7 @@ export class MongoDB implements PersistenceAdapter {
             new PersistencePromise({
               receivedItem: doc === undefined ? undefined : doc._doc,
               result: result,
-              sentItem: item
+              sentItem: item,
             })
           );
         }
@@ -162,7 +179,10 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public deleteItem(scheme: string, selectedItem: any): Promise<PersistencePromise> {
+  public deleteItem(
+    scheme: string,
+    selectedItem: any
+  ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findByIdAndDelete(selectedItem, (error, doc) => {
@@ -172,7 +192,7 @@ export class MongoDB implements PersistenceAdapter {
           resolve(
             new PersistencePromise({
               receivedItem: doc,
-              selectedItem: selectedItem
+              selectedItem: selectedItem,
             })
           );
         }
