@@ -10,11 +10,11 @@ export class MongoDB implements PersistenceAdapter {
   private genericSchema: Schema;
 
   constructor(databaseInfo: DatabaseInfo) {
+    console.log('MONGO');
+
     this.databaseInfo = databaseInfo;
 
-    // let mongoose = new Mongoose();
     this.mongooseInstance = new Mongoose();
-    // this.mongooseInstance =
     const uri =
       (!databaseInfo.connectionType ? 'mongodb://' : '') + databaseInfo.uri;
 
