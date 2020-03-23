@@ -1,8 +1,8 @@
-import * as fs from 'fs';
+import { promises } from 'fs';
 
 export default class Utils {
   public static async init(pool): Promise<void> {
-    const script = await fs.promises.readFile(
+    const script = await promises.readFile(
       './database/createTables.sql',
       'utf8'
     );
@@ -10,7 +10,7 @@ export default class Utils {
   }
 
   public static async dropTables(pool): Promise<void> {
-    const dropTables = await fs.promises.readFile(
+    const dropTables = await promises.readFile(
       './database/dropTables.sql',
       'utf8'
     );
