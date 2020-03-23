@@ -1,4 +1,4 @@
-import { DatabaseInfo } from '../../database/databaseInfo';
+import { DatabaseInfo } from '../../source/database/databaseInfo';
 
 test('add and read array and find object', async done => {
   let info = new DatabaseInfo({
