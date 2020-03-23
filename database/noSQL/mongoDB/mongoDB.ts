@@ -10,8 +10,6 @@ export class MongoDB implements PersistenceAdapter {
   private genericSchema: Schema;
 
   constructor(databaseInfo: DatabaseInfo) {
-    console.log('MONGO');
-
     this.databaseInfo = databaseInfo;
 
     this.mongooseInstance = new Mongoose();

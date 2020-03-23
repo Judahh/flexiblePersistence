@@ -27,6 +27,7 @@ test('add and read array and find object', async done => {
     })
   );
   const handler = new Handler(write, read);
+  await handler.getWrite().clear('events');
   const obj = new Object();
   obj['test'] = 'test';
   try {
@@ -109,6 +110,7 @@ test('add and read object', async done => {
     })
   );
   const handler = new Handler(write, read);
+  await handler.getWrite().clear('events');
   const obj = new Object();
   obj['test'] = 'test';
   try {
@@ -236,11 +238,11 @@ test('add and read array and find object', async done => {
     })
   );
   const handler = new Handler(write, read);
+  await handler.getWrite().clear('events');
+  await Utils.init(read.getPool());
   const obj = new Object();
   obj['test'] = 'test';
   try {
-    await Utils.init(read.getPool());
-
     const persistencePromise = await handler.addEvent(
       new Event({ operation: Operation.add, name: 'object', content: obj })
     );
@@ -328,7 +330,7 @@ test('add and read array and find object', async done => {
     const persistencePromise7 = await handler.readArray('object', {});
     expect(persistencePromise7.result.rowCount).toBe(0);
     await handler.getWrite().clear('events');
-    await read.close();
+    await Utils.dropTables(read.getPool());
     await write.close();
     console.error(error);
     expect(error).toBe(null);
@@ -338,7 +340,7 @@ test('add and read array and find object', async done => {
     new Event({ operation: Operation.clear, name: 'object' })
   );
   await handler.getWrite().clear('events');
-  await read.close();
+  await Utils.dropTables(read.getPool());
   await write.close();
   done();
 });
@@ -352,6 +354,8 @@ test('WRITE add and read array and find object', async done => {
     })
   );
   const handler = new Handler(write);
+  await handler.getWrite().clear('events');
+  await Utils.init(read.getPool());
   const obj = new Object();
   obj['test'] = 'test';
   try {
@@ -438,7 +442,7 @@ test('WRITE add and read array and find object', async done => {
       new Event({ operation: Operation.clear, name: 'object' })
     );
     await handler.getWrite().clear('events');
-    await read.close();
+    await Utils.end(read.getPool());
     await write.close();
     console.error(error);
     expect(error).toBe(null);
@@ -448,7 +452,7 @@ test('WRITE add and read array and find object', async done => {
     new Event({ operation: Operation.clear, name: 'object' })
   );
   await handler.getWrite().clear('events');
-  await read.close();
+  await Utils.end(read.getPool());
   await write.close();
   done();
 });

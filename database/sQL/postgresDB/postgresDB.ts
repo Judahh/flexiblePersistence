@@ -153,7 +153,6 @@ export class PostgresDB implements PersistenceAdapter {
   }
 
   constructor(databaseInfo: DatabaseInfo) {
-    console.log('Postgres');
     this.databaseInfo = databaseInfo;
     this.pool = new Pool(this.databaseInfo);
   }
