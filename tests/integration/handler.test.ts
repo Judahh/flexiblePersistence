@@ -1,13 +1,13 @@
-import { Handler } from '../../handler/handler';
-import { DatabaseInfo } from '../../database/databaseInfo';
-import { Operation } from '../../event/operation';
-import { Event } from '../../event/event';
-import { MongoDB } from '../../database/noSQL/mongoDB/mongoDB';
-import { PostgresDB } from '../../database/sQL/postgresDB/postgresDB';
+import { Handler } from '../../source/handler/handler';
+import { DatabaseInfo } from '../../source/database/databaseInfo';
+import { Operation } from '../../source/event/operation';
+import { Event } from '../../source/event/event';
+import { MongoDB } from '../../source/database/noSQL/mongoDB/mongoDB';
+import { PostgresDB } from '../../source/database/sQL/postgresDB/postgresDB';
 // import { SelectedItemValue } from '../../model/selectedItemValue';
 // import { RelationValuePostgresDB } from '../../database/sQL/postgresDB/relationValuePostgresDB';
-import Utils from '../utils';
-import { PersistencePromise } from '../../persistenceAdapter/persistencePromise';
+import Utils from '../../source/utils';
+import { PersistencePromise } from '../../source/persistenceAdapter/persistencePromise';
 
 let read;
 let write;

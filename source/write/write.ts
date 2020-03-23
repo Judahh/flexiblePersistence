@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Event } from './../event/event';
-import { Read } from './../read/read';
-import { PersistenceAdapter } from '..';
+import { Event } from '../event/event';
+import { Read } from '../read/read';
+import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
 export class Write {
   private read?: Read;

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Write } from './../write/write';
+import { Write } from '../write/write';
 import { Read } from './../read/read';
-import { Event } from './../event/event';
+import { Event } from '../event/event';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
 export class Handler {
