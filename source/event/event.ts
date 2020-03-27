@@ -8,11 +8,13 @@ export class Event {
   private name: string;
   private content: any;
   private selection: any;
+  private single: boolean;
 
   constructor(event: {
     operation: Operation;
     name?: string;
     selection?: any;
+    single?: boolean;
     content?: any;
     timestamp?: string;
     _id?: any;
@@ -23,6 +25,7 @@ export class Event {
     this.name = event.name || event.content.constructor.name;
     this.content = event.content;
     this.selection = event.selection;
+    this.single = event.single === undefined ? true : event.single;
     this.__v = event.__v;
     this._id = event._id;
   }
@@ -45,6 +48,10 @@ export class Event {
 
   public getSelection(): any {
     return this.selection;
+  }
+
+  public isSingle(): boolean {
+    return this.single;
   }
 
   public getId(): any {

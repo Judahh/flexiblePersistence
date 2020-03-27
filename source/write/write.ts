@@ -4,30 +4,31 @@ import { Event } from '../event/event';
 import { Read } from '../read/read';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
+import { PersistenceInputRead } from '../persistenceAdapter/persistenceInputRead';
 export class Write {
-  private read?: Read;
-  private eventDB: PersistenceAdapter;
+  private _read?: Read;
+  private _eventDB: PersistenceAdapter;
 
   constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
-    this.eventDB = event;
+    this._eventDB = event;
     if (read) {
-      this.read = new Read(read);
+      this._read = new Read(read);
     }
   }
 
   public getRead(): Read | undefined {
-    return this.read;
+    return this._read;
   }
 
   public addEvent(event: Event): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
-      this.eventDB
-        .addItem('events', event)
+      this._eventDB
+        .create({ scheme: 'events', item: event })
         .then((persistencePromise: PersistencePromise) => {
           event['_id'] = persistencePromise.receivedItem._id;
           event['__v'] = persistencePromise.receivedItem.__v;
-          if (this.read) {
-            this.read
+          if (this._read) {
+            this._read
               .newEvent(event)
               .then(resolve)
               .catch(reject);
@@ -39,34 +40,10 @@ export class Write {
     });
   }
 
-  public readArray(
-    scheme: string,
-    selectedItem: any
-  ): Promise<PersistencePromise> {
+  public read(input: PersistenceInputRead): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
-      this.eventDB
-        .readArray(scheme, selectedItem)
-        .then(resolve)
-        .catch(reject);
-    });
-  }
-
-  public readItem(
-    scheme: string,
-    selectedItem: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      this.eventDB
-        .readItem(scheme, selectedItem)
-        .then(resolve)
-        .catch(reject);
-    });
-  }
-
-  public readItemById(scheme: string, id): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      this.eventDB
-        .readItemById(scheme, id)
+      this._eventDB
+        .read(input)
         .then(resolve)
         .catch(reject);
     });
@@ -74,8 +51,8 @@ export class Write {
 
   public clear(scheme: string): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
-      this.eventDB
-        .deleteArray(scheme, {})
+      this._eventDB
+        .delete({ scheme, single: false })
         .then(resolve)
         .catch(reject);
     });
