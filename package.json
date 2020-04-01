@@ -2,7 +2,7 @@
   "name": "flexiblepersistence",
   "version": "1.0.53",
   "description": "",
-  "main": "source/index.ts",
+  "main": "dist/source/index.js",
   "scripts": {
     "postinstall": "",
     "prepublish": "",
