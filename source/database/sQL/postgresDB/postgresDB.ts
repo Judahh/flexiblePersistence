@@ -5,6 +5,10 @@ import { Pool } from 'pg';
 import { PersistencePromise } from '../../../persistenceAdapter/persistencePromise';
 import { RelationValuePostgresDB } from './relationValuePostgresDB';
 import { SelectedItemValue } from '../../../model/selectedItemValue';
+import { PersistenceInputCreate } from '../../../persistenceAdapter/persistenceInputCreate';
+import { PersistenceInputUpdate } from '../../../persistenceAdapter/persistenceInputUpdate';
+import { PersistenceInputRead } from '../../../persistenceAdapter/persistenceInputRead';
+import { PersistenceInputDelete } from '../../../persistenceAdapter/persistenceInputDelete';
 export class PostgresDB implements PersistenceAdapter {
   private databaseInfo: DatabaseInfo;
   private pool: Pool;
@@ -157,9 +161,59 @@ export class PostgresDB implements PersistenceAdapter {
     this.pool = new Pool(this.databaseInfo);
   }
 
-  public addItem(scheme: string, item: any): Promise<PersistencePromise> {
+  create(input: PersistenceInputCreate): Promise<PersistencePromise> {
+    if (input.item instanceof Array) {
+      return this.createArray(input.scheme, input.item);
+    } else {
+      return this.createItem(input.scheme, input.item);
+    }
+  }
+  update(input: PersistenceInputUpdate): Promise<PersistencePromise> {
+    if (input.single || input.id) {
+      return this.updateItem(input.scheme, input.selectedItem, input.item);
+    } else {
+      return this.updateArray(input.scheme, input.selectedItem, input.item);
+    }
+  }
+  read(input: PersistenceInputRead): Promise<PersistencePromise> {
+    if (input.single || input.id) {
+      if (input.id) return this.readItemById(input.scheme, input.id);
+      return this.readItem(input.scheme, input.selectedItem);
+    } else {
+      return this.readArray(input.scheme, input.selectedItem);
+    }
+  }
+  delete(input: PersistenceInputDelete): Promise<PersistencePromise> {
+    if (input.single || input.id) {
+      if (input.id) return this.deleteItem(input.scheme, input.id);
+      return this.deleteItem(input.scheme, input.selectedItem);
+    } else {
+      return this.deleteArray(input.scheme, input.selectedItem);
+    }
+  }
+
+  public createItem(scheme: string, item: any): Promise<PersistencePromise> {
     const query = PostgresDB.queryInsertItem(scheme, item);
     return this.query(query, { sentItem: item }, true);
+  }
+
+  public async createArray(
+    scheme: string,
+    items: Array<any>
+  ): Promise<PersistencePromise> {
+    const received = Array<PersistencePromise>();
+    for (const item of items) {
+      received.push(await this.createItem(scheme, item));
+    }
+    return new Promise<PersistencePromise>(resolve => {
+      resolve(
+        new PersistencePromise({
+          receivedItem: received.map(({ receivedItem }) => receivedItem),
+          result: received.map(({ result }) => result),
+          sentItem: received.map(({ sentItem }) => sentItem),
+        })
+      );
+    });
   }
 
   public updateItem(

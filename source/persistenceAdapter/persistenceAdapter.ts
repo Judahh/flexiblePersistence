@@ -1,23 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PersistencePromise } from './persistencePromise';
+import { PersistenceInputCreate } from './persistenceInputCreate';
+import { PersistenceInputUpdate } from './persistenceInputUpdate';
+import { PersistenceInputDelete } from './persistenceInputDelete';
+import { PersistenceInputRead } from './persistenceInputRead';
 
 export interface PersistenceAdapter {
-  addItem(scheme: string, item: any): Promise<PersistencePromise>;
-  updateArray(
-    scheme: string,
-    selectedItem: any,
-    item: any
-  ): Promise<PersistencePromise>;
-  updateItem(
-    scheme: string,
-    selectedItem: any,
-    item: any
-  ): Promise<PersistencePromise>;
-  readArray(scheme: string, selectedItem: any): Promise<PersistencePromise>;
-  readItem(scheme: string, selectedItem: any): Promise<PersistencePromise>;
-  readItemById(scheme: string, id: any): Promise<PersistencePromise>;
-  deleteArray(scheme: string, selectedItem: any): Promise<PersistencePromise>;
-  deleteItem(scheme: string, selectedItem: any): Promise<PersistencePromise>;
+  create(input: PersistenceInputCreate): Promise<PersistencePromise>;
+  update(input: PersistenceInputUpdate): Promise<PersistencePromise>;
+  read(input: PersistenceInputRead): Promise<PersistencePromise>;
+  delete(input: PersistenceInputDelete): Promise<PersistencePromise>;
   close(): Promise<any>;
   getDatabaseInfo();
 }

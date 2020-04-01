@@ -36,12 +36,12 @@ export class Handler {
       if (this.read) {
         this.read
           .getReadDB()
-          .readArray(scheme, selectedItem)
+          .read({ scheme, selectedItem, single: false })
           .then(resolve)
           .catch(reject);
       } else {
         this.write
-          .readArray(scheme, selectedItem)
+          .read({ scheme, selectedItem, single: false })
           .then(resolve)
           .catch(reject);
       }
@@ -56,12 +56,12 @@ export class Handler {
       if (this.read) {
         this.read
           .getReadDB()
-          .readItem(scheme, selectedItem)
+          .read({ scheme, selectedItem, single: true })
           .then(resolve)
           .catch(reject);
       } else {
         this.write
-          .readItem(scheme, selectedItem)
+          .read({ scheme, selectedItem, single: true })
           .then(resolve)
           .catch(reject);
       }
@@ -73,12 +73,12 @@ export class Handler {
       if (this.read) {
         this.read
           .getReadDB()
-          .readItemById(scheme, id)
+          .read({ scheme, id })
           .then(resolve)
           .catch(reject);
       } else {
         this.write
-          .readItemById(scheme, id)
+          .read({ scheme, id })
           .then(resolve)
           .catch(reject);
       }
