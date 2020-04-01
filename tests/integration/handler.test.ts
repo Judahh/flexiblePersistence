@@ -74,8 +74,6 @@ test('add and read array and find object', async done => {
       new Event({ operation: Operation.delete, name: 'object' })
     );
 
-    console.log(persistencePromise2.receivedItem);
-
     const expected = JSON.parse(
       JSON.stringify(
         new PersistencePromise({
@@ -213,15 +211,33 @@ test('add and read object', async done => {
     );
 
     const persistencePromise4 = await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
+      new Event({
+        operation: Operation.delete,
+        name: 'object',
+        single: false,
+      })
     );
+
     expect(persistencePromise4).toStrictEqual(
       new PersistencePromise({
-        receivedItem: {
-          __v: 0,
-          _id: persistencePromise4.receivedItem._id,
-          test: 'test',
-        },
+        receivedItem: undefined,
+        result: undefined,
+        selectedItem: undefined,
+        sentItem: undefined,
+      })
+    );
+
+    const persistencePromise5 = await handler.addEvent(
+      new Event({
+        operation: Operation.read,
+        name: 'object',
+        single: false,
+      })
+    );
+
+    expect(persistencePromise5).toStrictEqual(
+      new PersistencePromise({
+        receivedItem: [],
         result: undefined,
         selectedItem: undefined,
         sentItem: undefined,
@@ -229,7 +245,7 @@ test('add and read object', async done => {
     );
   } catch (error) {
     await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
+      new Event({ operation: Operation.delete, name: 'object', single: false })
     );
     await handler.getWrite().clear('events');
     await read.close();
@@ -345,14 +361,14 @@ test('add and read array and find object', async done => {
     expect(persistencePromise5.sentItem).toStrictEqual(undefined);
 
     const persistencePromise6 = await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
+      new Event({ operation: Operation.delete, name: 'object', single: false })
     );
     expect(persistencePromise6.receivedItem).toStrictEqual([]);
     expect(persistencePromise6.selectedItem).toStrictEqual(undefined);
     expect(persistencePromise6.sentItem).toStrictEqual(undefined);
   } catch (error) {
     await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
+      new Event({ operation: Operation.delete, name: 'object', single: false })
     );
     const persistencePromise7 = await handler.readArray('object', {});
     expect(persistencePromise7.result.rowCount).toBe(0);
@@ -597,7 +613,7 @@ test('WRITE add and read array and find object', async done => {
     );
   } catch (error) {
     await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
+      new Event({ operation: Operation.delete, name: 'object', single: false })
     );
     await handler.getWrite().clear('events');
     await Utils.end(read.getPool());

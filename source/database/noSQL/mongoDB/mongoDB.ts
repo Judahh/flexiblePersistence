@@ -37,14 +37,14 @@ export class MongoDB implements PersistenceAdapter {
     }
   }
   update(input: PersistenceInputUpdate): Promise<PersistencePromise> {
-    if (input.single) {
+    if (input.single || input.id) {
       return this.updateItem(input.scheme, input.selectedItem, input.item);
     } else {
       return this.updateArray(input.scheme, input.selectedItem, input.item);
     }
   }
   read(input: PersistenceInputRead): Promise<PersistencePromise> {
-    if (input.single) {
+    if (input.single || input.id) {
       if (input.id) return this.readItemById(input.scheme, input.id);
       return this.readItem(input.scheme, input.selectedItem);
     } else {
@@ -52,7 +52,7 @@ export class MongoDB implements PersistenceAdapter {
     }
   }
   delete(input: PersistenceInputDelete): Promise<PersistencePromise> {
-    if (input.single) {
+    if (input.single || input.id) {
       if (input.id) return this.deleteItem(input.scheme, input.id);
       return this.deleteItem(input.scheme, input.selectedItem);
     } else {
