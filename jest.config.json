@@ -1,16 +1,16 @@
 {
     "testEnvironment": "node",
     "roots": [
-        "<rootDir>/tests/unit"
+        "<rootDir>/test/unit"
     ],
     "testMatch": [
-        "**/__tests__/**/*.+(ts|tsx)",
+        "**/__test__/**/*.+(ts|tsx)",
         "**/?(*.)+(spec|test).+(ts|tsx)"
     ],
     "transform": {
         "^.+\\.(ts|tsx)$": "ts-jest"
     },
     "setupFilesAfterEnv": [
-        "./tests/unit/setup.ts"
+        "./test/unit/setup.ts"
     ]
 }
