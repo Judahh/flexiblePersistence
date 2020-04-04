@@ -10,6 +10,12 @@
     "transform": {
         "^.+\\.(ts|tsx)$": "ts-jest"
     },
+    "clearMocks": true,
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+        "source/**"
+    ],
+    "coverageDirectory": "test/unit/coverage",
     "setupFilesAfterEnv": [
         "./test/unit/setup.ts"
     ]
