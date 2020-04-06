@@ -14,10 +14,16 @@ npm-debug.log
 .test.ts
 temp.ts
 .yml
+test
+tests
 src
 source
 tsconfig.json
+typings.json
 tslint.json
 .editorconfig
 .eslintrc.json
 .prettierrc
+.config.json
+.vscode
+.github
