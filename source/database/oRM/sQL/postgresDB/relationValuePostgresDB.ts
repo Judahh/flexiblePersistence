@@ -1,4 +1,4 @@
-import { RelationValueAdapter } from '../../../model/relationValueAdapter';
+import { RelationValueAdapter } from '../../../../model/relationValueAdapter';
 
 export class RelationValuePostgresDB extends RelationValueAdapter {
   protected map = {

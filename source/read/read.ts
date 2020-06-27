@@ -6,17 +6,6 @@ import { PersistenceInput } from '../persistenceAdapter/persistenceInput';
 export class Read {
   private readDB: PersistenceAdapter;
 
-  protected operation: {
-    [operation: number]: string;
-  } = {
-    0: 'create',
-    1: 'read',
-    2: 'update',
-    3: 'update',
-    4: 'delete',
-    5: 'delete',
-  };
-
   constructor(readDB: PersistenceAdapter) {
     this.readDB = readDB;
   }
@@ -31,7 +20,7 @@ export class Read {
         selectedItem: event.getSelection(),
         item: event.getContent(),
       };
-      this.readDB[this.operation[event.getOperation()]](input)
+      this.readDB[Operation[event.getOperation()]](input)
         .then(resolve)
         .catch(reject);
     });

@@ -3,7 +3,7 @@ import { DatabaseInfo } from '../../source/database/databaseInfo';
 import { Operation } from '../../source/event/operation';
 import { Event } from '../../source/event/event';
 import { MongoDB } from '../../source/database/noSQL/mongoDB/mongoDB';
-import { PostgresDB } from '../../source/database/sQL/postgresDB/postgresDB';
+import { PostgresDB } from '../../source/database/oRM/sQL/postgresDB/postgresDB';
 // import { SelectedItemValue } from '../../model/selectedItemValue';
 // import { RelationValuePostgresDB } from '../../database/sQL/postgresDB/relationValuePostgresDB';
 import Utils from '../../source/utils';
@@ -11,7 +11,7 @@ import { PersistencePromise } from '../../source/persistenceAdapter/persistenceP
 
 let read;
 let write;
-test('add and read array and find object', async done => {
+test('add and read array and find object', async (done) => {
   read = new MongoDB(
     new DatabaseInfo({
       database: 'read',
@@ -115,7 +115,7 @@ test('add and read array and find object', async done => {
   done();
 });
 
-test('add and read object', async done => {
+test('add and read object', async (done) => {
   read = new MongoDB(
     new DatabaseInfo({
       database: 'read',
@@ -263,7 +263,7 @@ test('add and read object', async done => {
   done();
 });
 
-test('add and read array and find object', async done => {
+test('add and read array and find object', async (done) => {
   const info = new DatabaseInfo({
     database: 'postgres',
     host: process.env.POSTGRES_HOST || 'localhost',
@@ -515,7 +515,7 @@ test('add and read array and find object', async done => {
 //   done();
 // });
 
-test('WRITE add and read array and find object', async done => {
+test('WRITE add and read array and find object', async (done) => {
   write = new MongoDB(
     new DatabaseInfo({
       database: 'write',
