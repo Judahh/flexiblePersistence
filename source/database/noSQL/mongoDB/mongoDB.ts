@@ -29,6 +29,12 @@ export class MongoDB implements PersistenceAdapter {
       { strict: false }
     );
   }
+  correct(input: PersistenceInputUpdate): Promise<PersistencePromise> {
+    return this.update(input);
+  }
+  nonexistent(input: PersistenceInputDelete): Promise<PersistencePromise> {
+    return this.delete(input);
+  }
   create(input: PersistenceInputCreate): Promise<PersistencePromise> {
     if (input.item instanceof Array) {
       return this.createArray(input.scheme, input.item);

@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PersistenceAdapter } from '../../../persistenceAdapter/persistenceAdapter';
-import { DatabaseInfo } from '../../databaseInfo';
+import { PersistenceAdapter } from '../../../../persistenceAdapter/persistenceAdapter';
+import { DatabaseInfo } from '../../../databaseInfo';
 import { Pool } from 'pg';
-import { PersistencePromise } from '../../../persistenceAdapter/persistencePromise';
+import { PersistencePromise } from '../../../../persistenceAdapter/persistencePromise';
 import { RelationValuePostgresDB } from './relationValuePostgresDB';
-import { SelectedItemValue } from '../../../model/selectedItemValue';
-import { PersistenceInputCreate } from '../../../persistenceAdapter/persistenceInputCreate';
-import { PersistenceInputUpdate } from '../../../persistenceAdapter/persistenceInputUpdate';
-import { PersistenceInputRead } from '../../../persistenceAdapter/persistenceInputRead';
-import { PersistenceInputDelete } from '../../../persistenceAdapter/persistenceInputDelete';
+import { SelectedItemValue } from '../../../../model/selectedItemValue';
+import { PersistenceInputCreate } from '../../../../persistenceAdapter/persistenceInputCreate';
+import { PersistenceInputUpdate } from '../../../../persistenceAdapter/persistenceInputUpdate';
+import { PersistenceInputRead } from '../../../../persistenceAdapter/persistenceInputRead';
+import { PersistenceInputDelete } from '../../../../persistenceAdapter/persistenceInputDelete';
 export class PostgresDB implements PersistenceAdapter {
   private databaseInfo: DatabaseInfo;
   private pool: Pool;
@@ -58,8 +58,8 @@ export class PostgresDB implements PersistenceAdapter {
     return PostgresDB.resolveKeys(selectedItem).length === 0
       ? `SELECT ${selectVar} FROM ${scheme} ORDER BY _id ASC`
       : `SELECT ${selectVar} FROM ${scheme} WHERE (${PostgresDB.getDBSetVariables(
-          selectedItem
-        ).join(', ')}) ORDER BY _id ASC`;
+        selectedItem
+      ).join(', ')}) ORDER BY _id ASC`;
   }
 
   private static querySelectItem(
@@ -135,7 +135,7 @@ export class PostgresDB implements PersistenceAdapter {
     results,
     resolve,
     reject,
-    toPromise: { selectedItem?; sentItem? },
+    toPromise: { selectedItem?; sentItem?},
     isItem?: boolean
   ): void {
     if (error) {
@@ -159,6 +159,14 @@ export class PostgresDB implements PersistenceAdapter {
   constructor(databaseInfo: DatabaseInfo) {
     this.databaseInfo = databaseInfo;
     this.pool = new Pool(this.databaseInfo);
+  }
+
+  correct(input: PersistenceInputUpdate): Promise<PersistencePromise> {
+    return this.update(input);
+  }
+
+  nonexistent(input: PersistenceInputDelete): Promise<PersistencePromise> {
+    return this.delete(input);
   }
 
   create(input: PersistenceInputCreate): Promise<PersistencePromise> {
@@ -302,7 +310,7 @@ export class PostgresDB implements PersistenceAdapter {
 
   private async query(
     query: string,
-    toPromise: { selectedItem?; sentItem? },
+    toPromise: { selectedItem?; sentItem?},
     isItem?: boolean
   ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
