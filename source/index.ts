@@ -7,6 +7,7 @@ import { PersistenceAdapter } from './persistenceAdapter/persistenceAdapter';
 import { DatabaseInfo } from './database/databaseInfo';
 import { MongoDB } from './database/noSQL/mongoDB/mongoDB';
 import { PostgresDB } from './database/oRM/sQL/postgresDB/postgresDB';
+import Utils from './utils';
 export {
   Handler,
   Event,
@@ -17,4 +18,5 @@ export {
   DatabaseInfo,
   MongoDB,
   PostgresDB,
+  Utils,
 };
