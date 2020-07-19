@@ -10,6 +10,8 @@ export declare class MongoDB implements PersistenceAdapter {
     private mongooseInstance;
     private genericSchema;
     constructor(databaseInfo: DatabaseInfo);
+    correct(input: PersistenceInputUpdate): Promise<PersistencePromise>;
+    nonexistent(input: PersistenceInputDelete): Promise<PersistencePromise>;
     create(input: PersistenceInputCreate): Promise<PersistencePromise>;
     update(input: PersistenceInputUpdate): Promise<PersistencePromise>;
     read(input: PersistenceInputRead): Promise<PersistencePromise>;
