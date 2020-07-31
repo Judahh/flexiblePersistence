@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/Judahh/flexiblePersistence#readme",
   "dependencies": {
-    "mongodb": "3.5.9",
+    "mongodb": "3.6.0",
     "mongoose": "5.9.25",
     "pg": "8.3.0"
   },
