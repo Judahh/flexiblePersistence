@@ -1,8 +1,8 @@
 import { Event } from './../event/event';
 import { Operation } from './../event/operation';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
-import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
-import { PersistenceInput } from '../persistenceAdapter/persistenceInput';
+import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
+import { PersistenceInput } from '../persistenceAdapter/input/persistenceInput';
 export class Read {
   private readDB: PersistenceAdapter;
 
