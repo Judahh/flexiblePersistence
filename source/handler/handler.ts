@@ -3,7 +3,7 @@ import { Write } from '../write/write';
 import { Read } from './../read/read';
 import { Event } from '../event/event';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
-import { PersistencePromise } from '../persistenceAdapter/persistencePromise';
+import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
 export class Handler {
   private read?: Read;
   private write: Write;
@@ -21,10 +21,7 @@ export class Handler {
 
   public addEvent(event: Event): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
-      this.write
-        .addEvent(event)
-        .then(resolve)
-        .catch(reject);
+      this.write.addEvent(event).then(resolve).catch(reject);
     });
   }
 
@@ -71,16 +68,9 @@ export class Handler {
   public readItemById(scheme: string, id): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       if (this.read) {
-        this.read
-          .getReadDB()
-          .read({ scheme, id })
-          .then(resolve)
-          .catch(reject);
+        this.read.getReadDB().read({ scheme, id }).then(resolve).catch(reject);
       } else {
-        this.write
-          .read({ scheme, id })
-          .then(resolve)
-          .catch(reject);
+        this.write.read({ scheme, id }).then(resolve).catch(reject);
       }
     });
   }

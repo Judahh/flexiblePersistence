@@ -2,11 +2,11 @@
 import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { DatabaseInfo } from '../../databaseInfo';
-import { PersistencePromise } from '../../../persistenceAdapter/persistencePromise';
-import { PersistenceInputCreate } from '../../../persistenceAdapter/persistenceInputCreate';
-import { PersistenceInputUpdate } from '../../../persistenceAdapter/persistenceInputUpdate';
-import { PersistenceInputRead } from '../../../persistenceAdapter/persistenceInputRead';
-import { PersistenceInputDelete } from '../../../persistenceAdapter/persistenceInputDelete';
+import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
+import { PersistenceInputCreate } from '../../../persistenceAdapter/input/persistenceInputCreate';
+import { PersistenceInputUpdate } from '../../../persistenceAdapter/input/persistenceInputUpdate';
+import { PersistenceInputRead } from '../../../persistenceAdapter/input/persistenceInputRead';
+import { PersistenceInputDelete } from '../../../persistenceAdapter/input/persistenceInputDelete';
 
 export class MongoDB implements PersistenceAdapter {
   private databaseInfo: DatabaseInfo;
@@ -126,7 +126,7 @@ export class MongoDB implements PersistenceAdapter {
           resolve(
             new PersistencePromise({
               receivedItem:
-                doc === undefined ? undefined : doc.map(a => a._doc),
+                doc === undefined ? undefined : doc.map((a) => a._doc),
               result: result,
               selectedItem: selectedItem,
             })
@@ -183,7 +183,7 @@ export class MongoDB implements PersistenceAdapter {
   ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
-      model.deleteMany(selectedItem, error => {
+      model.deleteMany(selectedItem, (error) => {
         if (error) {
           reject(new Error(error));
         } else {
@@ -224,7 +224,7 @@ export class MongoDB implements PersistenceAdapter {
     for (const item of items) {
       received.push(await this.createItem(scheme, item));
     }
-    return new Promise<PersistencePromise>(resolve => {
+    return new Promise<PersistencePromise>((resolve) => {
       resolve(
         new PersistencePromise({
           receivedItem: received.map(({ receivedItem }) => receivedItem),
@@ -283,7 +283,7 @@ export class MongoDB implements PersistenceAdapter {
 
   public close(): Promise<unknown> {
     return new Promise<unknown>((resolve, reject) => {
-      this.mongooseInstance.connection.close(error => {
+      this.mongooseInstance.connection.close((error) => {
         if (error) {
           reject(new Error(error));
         } else {

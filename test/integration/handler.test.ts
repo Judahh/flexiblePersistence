@@ -7,7 +7,7 @@ import { PostgresDB } from '../../source/database/oRM/sQL/postgresDB/postgresDB'
 // import { SelectedItemValue } from '../../model/selectedItemValue';
 // import { RelationValuePostgresDB } from '../../database/sQL/postgresDB/relationValuePostgresDB';
 import Utils from '../../source/utils';
-import { PersistencePromise } from '../../source/persistenceAdapter/persistencePromise';
+import { PersistencePromise } from '../../source/persistenceAdapter/output/persistencePromise';
 
 let read;
 let write;
