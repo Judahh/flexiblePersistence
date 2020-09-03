@@ -16,7 +16,7 @@ export class Read {
       const input: PersistenceInput = {
         single: event.isSingle(),
         scheme: event.getName(),
-        id: event.getSelection() ? event.getSelection().id : undefined,
+        id: String(event.getSelection() ? event.getSelection().id : event.getId()),
         selectedItem: event.getSelection(),
         item: event.getContent(),
       };
