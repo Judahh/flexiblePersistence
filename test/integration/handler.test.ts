@@ -83,7 +83,7 @@ test('add and read array and find object', async (done) => {
             test: 'test',
           },
           result: undefined,
-          selectedItem: undefined,
+          // selectedItem: undefined,
           sentItem: undefined,
         })
       )
@@ -214,13 +214,17 @@ test('add and read object', async (done) => {
       new Event({
         operation: Operation.delete,
         name: 'object',
-        single: false,
+        // single: false,
       })
     );
 
     expect(persistencePromise4).toStrictEqual(
       new PersistencePromise({
-        receivedItem: undefined,
+        receivedItem: {
+          __v: persistencePromise1.receivedItem.__v,
+          _id: persistencePromise1.receivedItem._id,
+          test: 'test',
+        },
         result: undefined,
         selectedItem: undefined,
         sentItem: undefined,
@@ -388,6 +392,7 @@ test('add and read array and find object', async (done) => {
   done();
 });
 
+//! TODO: Improve complex Objects management
 // test('add complex object and read array and find object', async done => {
 //   const info = new DatabaseInfo({
 //     database: 'postgres',
@@ -414,7 +419,7 @@ test('add and read array and find object', async (done) => {
 //       new Event({ operation: Operation.create, name: 'object2', content: obj })
 //     );
 
-//     console.log(persistencePromise.receivedItem.test2);
+//     // console.log(persistencePromise.receivedItem.test2);
 
 //     expect(persistencePromise.receivedItem).toStrictEqual({
 //       _id: persistencePromise.receivedItem._id,
@@ -541,7 +546,7 @@ test('WRITE add and read array and find object', async (done) => {
       },
       single: true,
       name: 'object',
-      operation: 0,
+      operation: Operation.create,
       timestamp: persistencePromise.receivedItem.timestamp,
     });
 
@@ -555,7 +560,7 @@ test('WRITE add and read array and find object', async (done) => {
         },
         single: true,
         name: 'object',
-        operation: 0,
+        operation: Operation.create,
         timestamp: persistencePromise.receivedItem.timestamp,
       },
     ]);
@@ -578,7 +583,7 @@ test('WRITE add and read array and find object', async (done) => {
       },
       single: true,
       name: 'object',
-      operation: 5,
+      operation: Operation.delete,
       timestamp: persistencePromise2.receivedItem.timestamp,
     });
     expect(persistencePromise2.selectedItem).toStrictEqual(undefined);

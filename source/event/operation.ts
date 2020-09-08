@@ -1,4 +1,6 @@
 export enum Operation {
+
+  existent,
   create,
   read,
   correct,
