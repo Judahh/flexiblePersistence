@@ -13,13 +13,20 @@ export class Read {
   public newEvent(event: Event): Promise<PersistencePromise> {
     Operation.create.valueOf();
     return new Promise<PersistencePromise>((resolve, reject) => {
+      const id = event.getSelection() ? event.getSelection().id :
+            event.isSingle() && (event.getOperation() == Operation.create
+            || event.getOperation() == Operation.existent) ? event.getId() :
+            undefined
       const input: PersistenceInput = {
         single: event.isSingle(),
         scheme: event.getName(),
-        id: event.getSelection() ? event.getSelection().id : undefined,
+        id: id ? String(id) : undefined,
         selectedItem: event.getSelection(),
         item: event.getContent(),
       };
+      // console.log('Operation: ', Operation[event.getOperation()]);
+      // console.log('event: ', event);
+      // console.log('input: ', input);
       this.readDB[Operation[event.getOperation()]](input)
         .then(resolve)
         .catch(reject);

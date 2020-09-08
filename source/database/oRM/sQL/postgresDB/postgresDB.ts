@@ -176,6 +176,13 @@ export class PostgresDB implements PersistenceAdapter {
       return this.createItem(input.scheme, input.item);
     }
   }
+  existent(input: PersistenceInputCreate): Promise<PersistencePromise> {
+    if (input.item instanceof Array) {
+      return this.createArray(input.scheme, input.item);
+    } else {
+      return this.createItem(input.scheme, input.item);
+    }
+  }
   update(input: PersistenceInputUpdate): Promise<PersistencePromise> {
     if (input.single || input.id) {
       return this.updateItem(input.scheme, input.selectedItem, input.item);
@@ -276,6 +283,7 @@ export class PostgresDB implements PersistenceAdapter {
     selectedItem: any
   ): Promise<PersistencePromise> {
     const query = PostgresDB.queryDeleteItem(scheme, selectedItem);
+    // console.log('selectedItem :', selectedItem);
     return this.query(query, { selectedItem: selectedItem }, true);
   }
 
@@ -284,6 +292,7 @@ export class PostgresDB implements PersistenceAdapter {
     selectedItem: any
   ): Promise<PersistencePromise> {
     const query = PostgresDB.queryDeleteArray(scheme, selectedItem);
+    // console.log('selectedArray: ', selectedItem);
     return this.query(query, { selectedItem: selectedItem });
   }
 

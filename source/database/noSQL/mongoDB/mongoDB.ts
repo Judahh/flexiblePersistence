@@ -42,6 +42,13 @@ export class MongoDB implements PersistenceAdapter {
       return this.createItem(input.scheme, input.item);
     }
   }
+  existent(input: PersistenceInputCreate): Promise<PersistencePromise> {
+    if (input.item instanceof Array) {
+      return this.createArray(input.scheme, input.item);
+    } else {
+      return this.createItem(input.scheme, input.item);
+    }
+  }
   update(input: PersistenceInputUpdate): Promise<PersistencePromise> {
     if (input.single || input.id) {
       return this.updateItem(input.scheme, input.selectedItem, input.item);
@@ -187,6 +194,7 @@ export class MongoDB implements PersistenceAdapter {
         if (error) {
           reject(new Error(error));
         } else {
+          // console.log('selectedArray :', selectedItem);
           resolve(
             new PersistencePromise({
               selectedItem: selectedItem,
@@ -245,9 +253,11 @@ export class MongoDB implements PersistenceAdapter {
         if (error) {
           reject(new Error(error));
         } else {
+          // console.log('selectedItem :', selectedItem);
+          // console.log('doc :', doc);
           resolve(
             new PersistencePromise({
-              receivedItem: doc,
+              receivedItem: doc ? doc['_doc'] : undefined,
               selectedItem: selectedItem,
             })
           );
@@ -266,6 +276,8 @@ export class MongoDB implements PersistenceAdapter {
         if (error) {
           reject(new Error(error));
         } else {
+          console.log('selectedItem :', selectedItem);
+          console.log('doc :', doc);
           resolve(
             new PersistencePromise({
               receivedItem: doc,
