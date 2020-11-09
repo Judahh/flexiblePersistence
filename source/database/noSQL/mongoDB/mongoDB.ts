@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
-import { DatabaseInfo } from '../../databaseInfo';
+import { PersistenceInfo } from '../../persistenceInfo';
 import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
 import { PersistenceInputCreate } from '../../../persistenceAdapter/input/persistenceInputCreate';
 import { PersistenceInputUpdate } from '../../../persistenceAdapter/input/persistenceInputUpdate';
@@ -9,16 +9,17 @@ import { PersistenceInputRead } from '../../../persistenceAdapter/input/persiste
 import { PersistenceInputDelete } from '../../../persistenceAdapter/input/persistenceInputDelete';
 
 export class MongoDB implements PersistenceAdapter {
-  private databaseInfo: DatabaseInfo;
+  private persistenceInfo: PersistenceInfo;
   private mongooseInstance: Mongoose;
   private genericSchema: Schema;
 
-  constructor(databaseInfo: DatabaseInfo) {
-    this.databaseInfo = databaseInfo;
+  constructor(persistenceInfo: PersistenceInfo) {
+    this.persistenceInfo = persistenceInfo;
 
     this.mongooseInstance = new Mongoose();
     const uri =
-      (!databaseInfo.connectionType ? 'mongodb://' : '') + databaseInfo.uri;
+      (!persistenceInfo.connectionType ? 'mongodb://' : '') +
+      persistenceInfo.uri;
 
     this.mongooseInstance.connect(uri, {
       useNewUrlParser: true,
@@ -289,8 +290,8 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public getDatabaseInfo(): DatabaseInfo {
-    return this.databaseInfo;
+  public getPersistenceInfo(): PersistenceInfo {
+    return this.persistenceInfo;
   }
 
   public close(): Promise<unknown> {

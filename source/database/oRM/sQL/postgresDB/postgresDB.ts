@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PersistenceAdapter } from '../../../../persistenceAdapter/persistenceAdapter';
-import { DatabaseInfo } from '../../../databaseInfo';
+import { PersistenceInfo } from '../../../persistenceInfo';
 import { Pool } from 'pg';
 import { PersistencePromise } from '../../../../persistenceAdapter/output/persistencePromise';
 import { RelationValuePostgresDB } from './relationValuePostgresDB';
@@ -10,7 +10,7 @@ import { PersistenceInputUpdate } from '../../../../persistenceAdapter/input/per
 import { PersistenceInputRead } from '../../../../persistenceAdapter/input/persistenceInputRead';
 import { PersistenceInputDelete } from '../../../../persistenceAdapter/input/persistenceInputDelete';
 export class PostgresDB implements PersistenceAdapter {
-  private databaseInfo: DatabaseInfo;
+  private persistenceInfo: PersistenceInfo;
   private pool: Pool;
 
   private static inspectSelectedItemValue(element: any): SelectedItemValue {
@@ -156,9 +156,9 @@ export class PostgresDB implements PersistenceAdapter {
     }
   }
 
-  constructor(databaseInfo: DatabaseInfo) {
-    this.databaseInfo = databaseInfo;
-    this.pool = new Pool(this.databaseInfo);
+  constructor(persistenceInfo: PersistenceInfo) {
+    this.persistenceInfo = persistenceInfo;
+    this.pool = new Pool(this.persistenceInfo);
   }
 
   correct(input: PersistenceInputUpdate): Promise<PersistencePromise> {
@@ -296,8 +296,8 @@ export class PostgresDB implements PersistenceAdapter {
     return this.query(query, { selectedItem: selectedItem });
   }
 
-  public getDatabaseInfo(): DatabaseInfo {
-    return this.databaseInfo;
+  public getPersistenceInfo(): PersistenceInfo {
+    return this.persistenceInfo;
   }
 
   public getPool(): Pool {

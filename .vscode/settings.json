@@ -2,9 +2,6 @@
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
   "git.autofetch": true,
-  "window.zoomLevel": 1,
-  // Aumenta a fonte do terminal
-  "editor.fontSize": 14,
   // Aplica linhas verticais para lembrar de quebrar a linha em códigos muito grandes
   "editor.rulers": [
     80,
