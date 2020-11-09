@@ -16,7 +16,8 @@ import { PersistenceInputCreate } from './persistenceAdapter/input/persistenceIn
 import { PersistenceInputUpdate } from './persistenceAdapter/input/persistenceInputUpdate';
 import { PersistenceInputRead } from './persistenceAdapter/input/persistenceInputRead';
 import { PersistenceInputDelete } from './persistenceAdapter/input/persistenceInputDelete';
-import { DatabaseInfo } from './database/databaseInfo';
+import { PersistenceInfo } from './database/persistenceInfo';
+import { Info } from './database/info';
 import { MongoDB } from './database/noSQL/mongoDB/mongoDB';
 import { PostgresDB } from './database/oRM/sQL/postgresDB/postgresDB';
 import { RelationValuePostgresDB } from './database/oRM/sQL/postgresDB/relationValuePostgresDB';
@@ -47,7 +48,8 @@ export {
   PersistenceInputRead,
   PersistenceInputDelete,
   RelationValuePostgresDB,
-  DatabaseInfo,
+  PersistenceInfo,
+  Info,
   MongoDB,
   PostgresDB,
   BasicModel,

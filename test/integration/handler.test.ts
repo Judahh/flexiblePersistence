@@ -1,5 +1,5 @@
 import { Handler } from '../../source/handler/handler';
-import { DatabaseInfo } from '../../source/database/databaseInfo';
+import { PersistenceInfo } from '../../source/database/persistenceInfo';
 import { Operation } from '../../source/event/operation';
 import { Event } from '../../source/event/event';
 import { MongoDB } from '../../source/database/noSQL/mongoDB/mongoDB';
@@ -8,23 +8,31 @@ import { PostgresDB } from '../../source/database/oRM/sQL/postgresDB/postgresDB'
 // import { RelationValuePostgresDB } from '../../database/sQL/postgresDB/relationValuePostgresDB';
 import Utils from '../../source/utils';
 import { PersistencePromise } from '../../source/persistenceAdapter/output/persistencePromise';
+import { Journaly } from 'journaly';
 
 let read;
 let write;
 test('add and read array and find object', async (done) => {
+  const journaly = new Journaly();
   read = new MongoDB(
-    new DatabaseInfo({
-      database: 'read',
-      host: process.env.MONGO_HOST || 'localhost',
-      port: process.env.MONGO_PORT,
-    })
+    new PersistenceInfo(
+      {
+        database: 'read',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
   );
   write = new MongoDB(
-    new DatabaseInfo({
-      database: 'write',
-      host: process.env.MONGO_HOST || 'localhost',
-      port: process.env.MONGO_PORT,
-    })
+    new PersistenceInfo(
+      {
+        database: 'write',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
   );
   const handler = new Handler(write, read);
   await handler.getWrite().clear('events');
@@ -116,19 +124,26 @@ test('add and read array and find object', async (done) => {
 });
 
 test('add and read object', async (done) => {
+  const journaly = new Journaly();
   read = new MongoDB(
-    new DatabaseInfo({
-      database: 'read',
-      host: process.env.MONGO_HOST || 'localhost',
-      port: process.env.MONGO_PORT,
-    })
+    new PersistenceInfo(
+      {
+        database: 'read',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
   );
   write = new MongoDB(
-    new DatabaseInfo({
-      database: 'write',
-      host: process.env.MONGO_HOST || 'localhost',
-      port: process.env.MONGO_PORT,
-    })
+    new PersistenceInfo(
+      {
+        database: 'write',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
   );
   const handler = new Handler(write, read);
   await handler.getWrite().clear('events');
@@ -268,21 +283,28 @@ test('add and read object', async (done) => {
 });
 
 test('add and read array and find object', async (done) => {
-  const info = new DatabaseInfo({
-    database: 'postgres',
-    host: process.env.POSTGRES_HOST || 'localhost',
-    port: process.env.POSTGRES_PORT || 5432,
-    username: process.env.POSTGRES_USER || 'postgres',
-    password: process.env.POSTGRES_PASSWORD || 'evox2019',
-  });
+  const journaly = new Journaly();
+  const info = new PersistenceInfo(
+    {
+      database: 'postgres',
+      host: process.env.POSTGRES_HOST || 'localhost',
+      port: process.env.POSTGRES_PORT || 5432,
+      username: process.env.POSTGRES_USER || 'postgres',
+      password: process.env.POSTGRES_PASSWORD || 'evox2019',
+    },
+    journaly
+  );
 
   read = new PostgresDB(info);
   write = new MongoDB(
-    new DatabaseInfo({
-      database: 'write',
-      host: process.env.MONGO_HOST || 'localhost',
-      port: process.env.MONGO_PORT,
-    })
+    new PersistenceInfo(
+      {
+        database: 'write',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
   );
   const handler = new Handler(write, read);
   await handler.getWrite().clear('events');
@@ -394,7 +416,7 @@ test('add and read array and find object', async (done) => {
 
 //! TODO: Improve complex Objects management
 // test('add complex object and read array and find object', async done => {
-//   const info = new DatabaseInfo({
+//   const info = new PersistenceInfo({
 //     database: 'postgres',
 //     host: process.env.POSTGRES_HOST || 'localhost',
 //     port: process.env.POSTGRES_PORT || 5432,
@@ -404,7 +426,7 @@ test('add and read array and find object', async (done) => {
 
 //   read = new PostgresDB(info);
 //   write = new MongoDB(
-//     new DatabaseInfo({
+//     new PersistenceInfo({
 //       database: 'write',
 //       host: process.env.MONGO_HOST || 'localhost',
 //       port: process.env.MONGO_PORT,
@@ -521,12 +543,16 @@ test('add and read array and find object', async (done) => {
 // });
 
 test('WRITE add and read array and find object', async (done) => {
+  const journaly = new Journaly();
   write = new MongoDB(
-    new DatabaseInfo({
-      database: 'write',
-      host: process.env.MONGO_HOST || 'localhost',
-      port: process.env.MONGO_PORT,
-    })
+    new PersistenceInfo(
+      {
+        database: 'write',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
   );
   const handler = new Handler(write);
   await handler.getWrite().clear('events');

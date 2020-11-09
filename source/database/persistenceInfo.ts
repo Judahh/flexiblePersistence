@@ -1,28 +1,14 @@
 import { PoolConfig } from 'pg';
-import { ConnectionOptions } from 'mongoose';
-import * as tls from 'tls';
-export class DatabaseInfo implements PoolConfig {
+import { Info } from './info';
+import { Journaly } from 'journaly';
+export class PersistenceInfo extends Info implements PoolConfig {
   public host: string;
-  public port?: number;
-  public database?: string;
   public user?: string;
-  public password?: string;
-  public uri?: string;
-  public options?: string;
-  public connectionType?: string;
-  public ssl: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
+  public journaly: Journaly<any>;
 
-  constructor(info: {
-    uri?: string;
-    database?: string;
-    host?: string;
-    port?: number | string;
-    username?: string;
-    password?: string;
-    options?: string;
-    connectionType?: string;
-    ssl?: ConnectionOptions | tls.ConnectionOptions | boolean;
-  }) {
+  constructor(info: Info, journaly: Journaly<any>) {
+    super();
+    this.journaly = journaly;
     this.uri = info.uri;
     this.ssl = info.ssl;
     if (info.uri) {
