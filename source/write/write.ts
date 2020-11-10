@@ -38,17 +38,10 @@ export class Write {
   }
 
   public read(input: PersistenceInputRead): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      this._eventDB.read(input).then(resolve).catch(reject);
-    });
+    return this._eventDB.read(input);
   }
 
   public clear(scheme: string): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      this._eventDB
-        .delete({ scheme, single: false })
-        .then(resolve)
-        .catch(reject);
-    });
+    return this._eventDB.delete({ scheme, single: false });
   }
 }

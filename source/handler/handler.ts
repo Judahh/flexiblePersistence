@@ -4,6 +4,7 @@ import { Read } from './../read/read';
 import { Event } from '../event/event';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
+import { PersistenceInputRead } from '../persistenceAdapter/input/persistenceInputRead';
 export class Handler {
   private read?: Read;
   private write: Write;
@@ -19,59 +20,31 @@ export class Handler {
     return this.write;
   }
 
+  private doRead(input: PersistenceInputRead): Promise<PersistencePromise> {
+    return this.read
+      ? this.read.getReadDB().read(input)
+      : this.write.read(input);
+  }
+
   public addEvent(event: Event): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      this.write.addEvent(event).then(resolve).catch(reject);
-    });
+    return this.write.addEvent(event);
   }
 
   public readArray(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      if (this.read) {
-        this.read
-          .getReadDB()
-          .read({ scheme, selectedItem, single: false })
-          .then(resolve)
-          .catch(reject);
-      } else {
-        this.write
-          .read({ scheme, selectedItem, single: false })
-          .then(resolve)
-          .catch(reject);
-      }
-    });
+    return this.doRead({ scheme, selectedItem, single: false });
   }
 
   public readItem(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      if (this.read) {
-        this.read
-          .getReadDB()
-          .read({ scheme, selectedItem, single: true })
-          .then(resolve)
-          .catch(reject);
-      } else {
-        this.write
-          .read({ scheme, selectedItem, single: true })
-          .then(resolve)
-          .catch(reject);
-      }
-    });
+    return this.doRead({ scheme, selectedItem, single: true });
   }
 
   public readItemById(scheme: string, id): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
-      if (this.read) {
-        this.read.getReadDB().read({ scheme, id }).then(resolve).catch(reject);
-      } else {
-        this.write.read({ scheme, id }).then(resolve).catch(reject);
-      }
-    });
+    return this.doRead({ scheme, id });
   }
 }
