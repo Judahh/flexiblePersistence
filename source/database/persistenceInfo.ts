@@ -3,6 +3,7 @@ import { Info } from './info';
 import { Journaly } from 'journaly';
 export class PersistenceInfo extends Info implements PoolConfig {
   public host: string;
+  public port?: number;
   public user?: string;
   public journaly: Journaly<any>;
 
