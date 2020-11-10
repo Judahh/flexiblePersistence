@@ -2,9 +2,9 @@ import { PoolConfig } from 'pg';
 import { Info } from './info';
 import { Journaly } from 'journaly';
 export class PersistenceInfo extends Info implements PoolConfig {
-  public host: string;
-  public port?: number;
-  public user?: string;
+  host: string;
+  port?: number;
+  user?: string;
   public journaly: Journaly<any>;
 
   constructor(info: Info, journaly: Journaly<any>) {
