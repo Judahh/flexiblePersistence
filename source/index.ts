@@ -19,15 +19,6 @@ import { PersistenceInputDelete } from './persistenceAdapter/input/persistenceIn
 import { PersistenceInfo } from './database/persistenceInfo';
 import { Info } from './database/info';
 import { MongoDB } from './database/noSQL/mongoDB/mongoDB';
-import { PostgresDB } from './database/oRM/sQL/postgresDB/postgresDB';
-import { RelationValuePostgresDB } from './database/oRM/sQL/postgresDB/relationValuePostgresDB';
-import { BasicModel } from './model/basicModel';
-import { PersistenceFunction } from './model/persistenceFunction';
-import { PersistenceModel } from './model/persistenceModel';
-import { Relation } from './model/relation';
-import { RelationValueAdapter } from './model/relationValueAdapter';
-import { VolatileModel } from './model/volatileModel';
-import Utils from './utils';
 export {
   Handler,
   Event,
@@ -47,16 +38,7 @@ export {
   PersistenceInputUpdate,
   PersistenceInputRead,
   PersistenceInputDelete,
-  RelationValuePostgresDB,
   PersistenceInfo,
   Info,
   MongoDB,
-  PostgresDB,
-  BasicModel,
-  PersistenceFunction,
-  PersistenceModel,
-  Relation,
-  RelationValueAdapter,
-  VolatileModel,
-  Utils,
 };
