@@ -31,30 +31,30 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [13.x]
+        node-version: [14.x]
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@main
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://registry.npmjs.org
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@main
       - name: Install
-        uses: borales/actions-yarn@v2.0.0
+        uses: borales/actions-yarn@master
         with:
           cmd: install # will run `yarn install` command
       - name: Build
-        uses: borales/actions-yarn@v2.0.0
+        uses: borales/actions-yarn@master
         with:
           cmd: build # will run `yarn build` command
       - name: Test
-        uses: borales/actions-yarn@v2.0.0
+        uses: borales/actions-yarn@master
         with:
           cmd: test # will run `yarn test` command
       - name: Test Integration
-        uses: borales/actions-yarn@v2.0.0
+        uses: borales/actions-yarn@master
         with:
           cmd: integration # will run `yarn test` command
         env:
@@ -66,7 +66,7 @@ jobs:
           MONGO_HOST: mongo
           MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
       - name: Publish
-        if: contains(matrix.node-version, '13.x')
+        if: contains(matrix.node-version, '14.x')
         run: |
           npm publish --access public
         env:
