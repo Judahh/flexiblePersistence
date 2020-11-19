@@ -44,11 +44,7 @@ export class MongoDB implements PersistenceAdapter {
     }
   }
   existent(input: PersistenceInputCreate): Promise<PersistencePromise> {
-    if (input.item instanceof Array) {
-      return this.createArray(input.scheme, input.item);
-    } else {
-      return this.createItem(input.scheme, input.item);
-    }
+    return this.create(input);
   }
   update(input: PersistenceInputUpdate): Promise<PersistencePromise> {
     if (input.single || input.id) {
@@ -67,7 +63,7 @@ export class MongoDB implements PersistenceAdapter {
   }
   delete(input: PersistenceInputDelete): Promise<PersistencePromise> {
     if (input.single || input.id) {
-      if (input.id) return this.deleteItem(input.scheme, input.id);
+      if (input.id) return this.deleteItemById(input.scheme, input.id);
       return this.deleteItem(input.scheme, input.selectedItem);
     } else {
       return this.deleteArray(input.scheme, input.selectedItem);
@@ -80,13 +76,13 @@ export class MongoDB implements PersistenceAdapter {
   ): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
-      model.update(selectedItem, item, (error, doc, result) => {
+      model.updateMany(selectedItem, item, (error, doc, result) => {
         if (error) {
           reject(new Error(error));
         } else {
           resolve(
             new PersistencePromise({
-              receivedItem: doc ? doc._doc : undefined,
+              receivedItem: doc ? (doc._doc ? doc._doc : doc) : undefined,
               result: result,
               selectedItem: selectedItem,
               sentItem: item,
@@ -277,8 +273,8 @@ export class MongoDB implements PersistenceAdapter {
         if (error) {
           reject(new Error(error));
         } else {
-          console.log('selectedItem :', selectedItem);
-          console.log('doc :', doc);
+          // console.log('selectedItem :', selectedItem);
+          // console.log('doc :', doc);
           resolve(
             new PersistencePromise({
               receivedItem: doc,

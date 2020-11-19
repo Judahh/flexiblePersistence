@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.0.68",
+  "version": "1.1.1",
   "description": "",
   "main": "dist/source/index.js",
   "scripts": {
@@ -25,11 +25,11 @@
   "homepage": "https://github.com/Judahh/flexiblePersistence#readme",
   "dependencies": {
     "journaly": "latest",
-    "mongodb": "latest",
     "mongoose": "latest",
     "pg": "latest"
   },
   "devDependencies": {
+    "mongodb": "latest",
     "@types/jest": "latest",
     "@types/mongodb": "latest",
     "@types/mongoose": "latest",
