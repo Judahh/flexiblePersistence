@@ -1,3 +1,4 @@
+// file deepcode ignore no-any: any needed
 import { Handler } from '../../source/handler/handler';
 import { PersistenceInfo } from '../../source/database/persistenceInfo';
 import { Operation } from '../../source/event/operation';
@@ -32,7 +33,7 @@ test('add and read array and find object', async (done) => {
   );
   const handler = new Handler(write, read);
   await handler.getWrite().clear('events');
-  const obj = new Object();
+  const obj = {};
   obj['test'] = 'test';
   try {
     await handler.addEvent(
@@ -151,9 +152,9 @@ test('add an array and read array and find object', async (done) => {
   );
   const handler = new Handler(write, read);
   await handler.getWrite().clear('events');
-  const obj = new Object();
+  const obj = {};
   obj['test'] = 'test';
-  const obj2 = new Object();
+  const obj2 = {};
   obj2['test'] = 'test2';
 
   const objArray = [obj, obj2];
@@ -373,7 +374,7 @@ test('add and read object', async (done) => {
   );
   const handler = new Handler(write, read);
   await handler.getWrite().clear('events');
-  const obj = new Object();
+  const obj = {};
   obj['test'] = 'test';
   try {
     await handler.addEvent(
@@ -522,7 +523,7 @@ test('WRITE add and read array and find object', async (done) => {
   );
   const handler = new Handler(write);
   await handler.getWrite().clear('events');
-  const obj = new Object();
+  const obj = {};
   obj['test'] = 'test';
   try {
     const persistencePromise = await handler.addEvent(

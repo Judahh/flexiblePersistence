@@ -1,3 +1,4 @@
+// file deepcode ignore no-any: any needed
 import { PersistenceInfo } from '../../source/database/persistenceInfo';
 import { Journaly, SubjectObserver } from 'journaly';
 
