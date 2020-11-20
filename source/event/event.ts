@@ -7,6 +7,7 @@ export class Event {
   private operation: Operation;
   private name: string;
   private content: unknown | unknown[];
+  private receivedContent: unknown | unknown[];
   private selection: unknown;
   private single: boolean;
 
@@ -17,6 +18,8 @@ export class Event {
     single?: boolean;
     //  deepcode ignore no-any: any needed
     content?: any | any[];
+    //  deepcode ignore no-any: any needed
+    receivedContent?: any | any[];
     timestamp?: string;
     _id?: unknown;
     __v?: unknown;
@@ -33,41 +36,51 @@ export class Event {
         : undefined;
     this.name = event.name || tempName;
     this.content = event.content;
+    this.receivedContent = event.receivedContent;
     this.selection = event.selection;
     this.single = event.single === undefined ? true : event.single;
     this.__v = event.__v;
     this._id = event._id;
   }
 
-  public getOperation(): Operation {
+  //  deepcode ignore no-any: any needed
+  setReceivedContent(receivedContent?: any | any[]): void {
+    this.receivedContent = receivedContent;
+  }
+
+  getOperation(): Operation {
     return this.operation;
   }
 
-  public getTimestamp(): string {
+  getTimestamp(): string {
     return this.timestamp;
   }
 
-  public getName(): string {
+  getName(): string {
     return this.name;
   }
 
-  public getContent(): unknown {
+  getContent(): unknown | unknown[] {
     return this.content;
   }
 
-  public getSelection(): unknown {
+  getReceivedContent(): unknown | unknown[] {
+    return this.receivedContent;
+  }
+
+  getSelection(): unknown {
     return this.selection;
   }
 
-  public isSingle(): boolean {
+  isSingle(): boolean {
     return this.single;
   }
 
-  public getId(): unknown {
+  getId(): unknown {
     return this._id;
   }
 
-  public getV(): unknown {
+  getV(): unknown {
     return this.__v;
   }
 
