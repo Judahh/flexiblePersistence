@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Event } from './../event/event';
 import { Operation } from './../event/operation';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
@@ -13,7 +14,8 @@ export class Read {
   public newEvent(event: Event): Promise<PersistencePromise> {
     Operation.create.valueOf();
     const id = event.getSelection()
-      ? event.getSelection().id
+      ? //  deepcode ignore no-any: any needed
+        (event.getSelection() as any).id
       : event.isSingle() &&
         (event.getOperation() == Operation.create ||
           event.getOperation() == Operation.existent)

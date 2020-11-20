@@ -1,28 +1,37 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Operation } from './operation';
 export class Event {
-  private _id: any;
-  private __v: any;
+  private _id: unknown;
+  private __v: unknown;
   private timestamp: string;
   private operation: Operation;
   private name: string;
-  private content: any;
-  private selection: any;
+  private content: unknown | unknown[];
+  private selection: unknown;
   private single: boolean;
 
   constructor(event: {
     operation: Operation;
     name?: string;
-    selection?: any;
+    selection?: unknown;
     single?: boolean;
-    content?: any;
+    //  deepcode ignore no-any: any needed
+    content?: any | any[];
     timestamp?: string;
-    _id?: any;
-    __v?: any;
+    _id?: unknown;
+    __v?: unknown;
   }) {
     this.timestamp = event.timestamp || this.currentTimestamp();
     this.operation = event.operation;
-    this.name = event.name || event.content.constructor.name;
+    const tempName =
+      event && event.content
+        ? Array.isArray(event.content)
+          ? event.content[0]
+            ? event.content[0].constructor.name
+            : undefined
+          : event.content.constructor.name
+        : undefined;
+    this.name = event.name || tempName;
     this.content = event.content;
     this.selection = event.selection;
     this.single = event.single === undefined ? true : event.single;
@@ -42,11 +51,11 @@ export class Event {
     return this.name;
   }
 
-  public getContent(): any {
+  public getContent(): unknown {
     return this.content;
   }
 
-  public getSelection(): any {
+  public getSelection(): unknown {
     return this.selection;
   }
 
@@ -54,11 +63,11 @@ export class Event {
     return this.single;
   }
 
-  public getId(): any {
+  public getId(): unknown {
     return this._id;
   }
 
-  public getV(): any {
+  public getV(): unknown {
     return this.__v;
   }
 

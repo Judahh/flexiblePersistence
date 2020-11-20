@@ -22,18 +22,38 @@ export class Write {
 
   public addEvent(event: Event): Promise<PersistencePromise> {
     return new Promise<PersistencePromise>((resolve, reject) => {
-      this._eventDB
-        .create({ scheme: 'events', item: event })
-        .then((persistencePromise: PersistencePromise) => {
-          event['_id'] = persistencePromise.receivedItem._id;
-          event['__v'] = persistencePromise.receivedItem.__v;
-          if (this._read) {
-            this._read.newEvent(event).then(resolve).catch(reject);
-          } else {
-            resolve(persistencePromise);
-          }
-        })
-        .catch(reject);
+      if (Array.isArray(event.getContent()))
+        this._eventDB
+          .create({ scheme: 'events', item: event })
+          .then((persistencePromise: PersistencePromise) => {
+            event['_id'] = persistencePromise.receivedItem._id
+              ? persistencePromise.receivedItem._id
+              : persistencePromise.receivedItem[0]._id;
+
+            event['__v'] = persistencePromise.receivedItem.__v
+              ? persistencePromise.receivedItem.__v
+              : persistencePromise.receivedItem[0].__v;
+
+            if (this._read) {
+              this._read.newEvent(event).then(resolve).catch(reject);
+            } else {
+              resolve(persistencePromise);
+            }
+          })
+          .catch(reject);
+      else
+        this._eventDB
+          .create({ scheme: 'events', item: event })
+          .then((persistencePromise: PersistencePromise) => {
+            event['_id'] = persistencePromise.receivedItem._id;
+            event['__v'] = persistencePromise.receivedItem.__v;
+            if (this._read) {
+              this._read.newEvent(event).then(resolve).catch(reject);
+            } else {
+              resolve(persistencePromise);
+            }
+          })
+          .catch(reject);
     });
   }
 
