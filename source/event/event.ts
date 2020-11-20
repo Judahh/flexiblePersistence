@@ -7,6 +7,7 @@ export class Event {
   private operation: Operation;
   private name: string;
   private content: unknown | unknown[];
+  private receivedContent: unknown | unknown[];
   private selection: unknown;
   private single: boolean;
 
@@ -17,6 +18,7 @@ export class Event {
     single?: boolean;
     //  deepcode ignore no-any: any needed
     content?: any | any[];
+    receivedContent?: any | any[];
     timestamp?: string;
     _id?: unknown;
     __v?: unknown;
@@ -33,10 +35,15 @@ export class Event {
         : undefined;
     this.name = event.name || tempName;
     this.content = event.content;
+    this.receivedContent = event.receivedContent;
     this.selection = event.selection;
     this.single = event.single === undefined ? true : event.single;
     this.__v = event.__v;
     this._id = event._id;
+  }
+
+  public setReceivedContent(receivedContent?: any | any[]): void {
+    this.receivedContent = receivedContent;
   }
 
   public getOperation(): Operation {
@@ -51,8 +58,12 @@ export class Event {
     return this.name;
   }
 
-  public getContent(): unknown {
+  public getContent(): unknown | unknown[] {
     return this.content;
+  }
+
+  public getReceivedContent(): unknown | unknown[] {
+    return this.receivedContent;
   }
 
   public getSelection(): unknown {

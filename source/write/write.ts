@@ -5,6 +5,7 @@ import { Read } from '../read/read';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
 import { PersistenceInputRead } from '../persistenceAdapter/input/persistenceInputRead';
+import { Operation } from '..';
 export class Write {
   private _read?: Read;
   private _eventDB: PersistenceAdapter;
@@ -34,6 +35,12 @@ export class Write {
               ? persistencePromise.receivedItem.__v
               : persistencePromise.receivedItem[0].__v;
 
+            if (
+              event.getOperation() === Operation.create ||
+              event.getOperation() === Operation.existent
+            )
+              event.setReceivedContent(persistencePromise.receivedItem);
+
             if (this._read) {
               this._read.newEvent(event).then(resolve).catch(reject);
             } else {
@@ -47,6 +54,11 @@ export class Write {
           .then((persistencePromise: PersistencePromise) => {
             event['_id'] = persistencePromise.receivedItem._id;
             event['__v'] = persistencePromise.receivedItem.__v;
+            if (
+              event.getOperation() === Operation.create ||
+              event.getOperation() === Operation.existent
+            )
+              event.setReceivedContent(persistencePromise.receivedItem);
             if (this._read) {
               this._read.newEvent(event).then(resolve).catch(reject);
             } else {
