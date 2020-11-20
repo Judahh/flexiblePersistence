@@ -299,13 +299,13 @@ export class MongoDB implements PersistenceAdapter {
     return this.persistenceInfo;
   }
 
-  public close(): Promise<unknown> {
-    return new Promise<unknown>((resolve, reject) => {
+  public close(): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
       this.mongooseInstance.connection.close((error) => {
         if (error) {
           reject(new Error(error));
         } else {
-          resolve();
+          resolve(true);
         }
       });
     });
