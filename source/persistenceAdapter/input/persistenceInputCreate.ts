@@ -2,4 +2,5 @@
 export interface PersistenceInputCreate {
   scheme: string;
   item: any | Array<any>;
+  receivedItem?: any | Array<any>;
 }

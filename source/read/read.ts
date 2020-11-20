@@ -27,6 +27,7 @@ export class Read {
       id: id ? String(id) : undefined,
       selectedItem: event.getSelection(),
       item: event.getContent(),
+      receivedItem: event.getReceivedContent(),
     };
     return this.readDB[Operation[event.getOperation()]](input);
   }

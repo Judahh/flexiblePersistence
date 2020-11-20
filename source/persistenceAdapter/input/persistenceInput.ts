@@ -5,4 +5,5 @@ export interface PersistenceInput {
   selectedItem: any;
   id: any;
   item: any;
+  receivedItem?: any | Array<any>;
 }
