@@ -24,6 +24,7 @@ export class MongoDB implements PersistenceAdapter {
     this.mongooseInstance.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useFindAndModify: false,
     });
     this.genericSchema = new this.mongooseInstance.Schema(
       {},
@@ -36,15 +37,17 @@ export class MongoDB implements PersistenceAdapter {
   nonexistent(input: PersistenceInputDelete): Promise<PersistencePromise> {
     return this.delete(input);
   }
+  existent(input: PersistenceInputCreate): Promise<PersistencePromise> {
+    return this.create(input);
+  }
   create(input: PersistenceInputCreate): Promise<PersistencePromise> {
-    if (input.item instanceof Array) {
+    if (Array.isArray(input.item)) {
+      return this.createArray(input.scheme, input.item, true);
+    } else if (Array.isArray(input.item.content)) {
       return this.createArray(input.scheme, input.item);
     } else {
       return this.createItem(input.scheme, input.item);
     }
-  }
-  existent(input: PersistenceInputCreate): Promise<PersistencePromise> {
-    return this.create(input);
   }
   update(input: PersistenceInputUpdate): Promise<PersistencePromise> {
     if (input.single || input.id) {
@@ -223,20 +226,26 @@ export class MongoDB implements PersistenceAdapter {
 
   public async createArray(
     scheme: string,
-    items: Array<any>
+    item: any,
+    regular?: boolean
   ): Promise<PersistencePromise> {
-    const received = Array<PersistencePromise>();
-    for (const item of items) {
-      received.push(await this.createItem(scheme, item));
-    }
-    return new Promise<PersistencePromise>((resolve) => {
-      resolve(
-        new PersistencePromise({
-          receivedItem: received.map(({ receivedItem }) => receivedItem),
-          result: received.map(({ result }) => result),
-          sentItem: received.map(({ sentItem }) => sentItem),
-        })
-      );
+    let items: unknown[] = [];
+    if (regular) items = item;
+    else items = item.content.map((itemC) => ({ ...item, content: itemC }));
+    return new Promise<PersistencePromise>((resolve, reject) => {
+      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      model.insertMany(items, (error, docs) => {
+        if (error) {
+          reject(new Error(error));
+        } else {
+          resolve(
+            new PersistencePromise({
+              receivedItem: docs,
+              sentItem: items,
+            })
+          );
+        }
+      });
     });
   }
 

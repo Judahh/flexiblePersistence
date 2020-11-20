@@ -6,7 +6,7 @@ export class Event {
   private timestamp: string;
   private operation: Operation;
   private name: string;
-  private content: any;
+  private content: any | any[];
   private selection: any;
   private single: boolean;
 
@@ -15,7 +15,7 @@ export class Event {
     name?: string;
     selection?: any;
     single?: boolean;
-    content?: any;
+    content?: any | any[];
     timestamp?: string;
     _id?: any;
     __v?: any;
