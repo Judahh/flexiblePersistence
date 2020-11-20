@@ -23,10 +23,15 @@ export class Event {
   }) {
     this.timestamp = event.timestamp || this.currentTimestamp();
     this.operation = event.operation;
-    this.name =
-      event.name || Array.isArray(event.content)
-        ? event.content[0].constructor.name
-        : event.content.constructor.name;
+    const tempName =
+      event && event.content
+        ? Array.isArray(event.content)
+          ? event.content[0]
+            ? event.content[0].constructor.name
+            : undefined
+          : event.content.constructor.name
+        : undefined;
+    this.name = event.name || tempName;
     this.content = event.content;
     this.selection = event.selection;
     this.single = event.single === undefined ? true : event.single;
