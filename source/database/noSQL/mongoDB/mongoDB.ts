@@ -7,11 +7,16 @@ import { PersistenceInputCreate } from '../../../persistenceAdapter/input/persis
 import { PersistenceInputUpdate } from '../../../persistenceAdapter/input/persistenceInputUpdate';
 import { PersistenceInputRead } from '../../../persistenceAdapter/input/persistenceInputRead';
 import { PersistenceInputDelete } from '../../../persistenceAdapter/input/persistenceInputDelete';
+import { Default } from 'default-initializer';
 
 export class MongoDB implements PersistenceAdapter {
   private persistenceInfo: PersistenceInfo;
   private mongooseInstance: Mongoose;
   private genericSchema: Schema;
+
+  element: {
+    [name: string]: Default;
+  } = {};
 
   constructor(persistenceInfo: PersistenceInfo) {
     this.persistenceInfo = persistenceInfo;
