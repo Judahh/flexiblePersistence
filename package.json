@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "",
   "main": "dist/source/index.js",
   "scripts": {
@@ -24,12 +24,12 @@
   },
   "homepage": "https://github.com/Judahh/flexiblePersistence#readme",
   "dependencies": {
+    "default-initializer": "latest",
     "journaly": "latest",
     "mongoose": "latest",
     "pg": "latest"
   },
   "devDependencies": {
-    "mongodb": "latest",
     "@types/jest": "latest",
     "@types/mongodb": "latest",
     "@types/mongoose": "latest",
@@ -42,6 +42,7 @@
     "eslint-plugin-import": "latest",
     "eslint-plugin-prettier": "latest",
     "jest": "latest",
+    "mongodb": "latest",
     "prettier": "latest",
     "reflect-metadata": "latest",
     "ts-jest": "latest",
