@@ -48,7 +48,7 @@ test('add and read array and find object', async (done) => {
         receivedItem: {
           __v: persistencePromise.receivedItem.__v,
           _id: persistencePromise.receivedItem._id,
-          test: 'test',
+          ...obj,
         },
         result: undefined,
         selectedItem: undefined,

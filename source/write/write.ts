@@ -4,7 +4,7 @@ import { Event } from '../event/event';
 import { Read } from '../read/read';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
 import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
-import { PersistenceInputRead } from '../persistenceAdapter/input/persistenceInputRead';
+import { PersistenceInputRead } from '../persistenceAdapter/input/read/persistenceInputRead';
 import { Operation } from '..';
 export class Write {
   private _read?: Read;

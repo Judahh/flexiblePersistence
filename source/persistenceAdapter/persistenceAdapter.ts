@@ -1,10 +1,9 @@
 import { Default } from 'default-initializer';
-import { PersistenceModifyAdapter } from './persistenceModifyAdapter';
-import { PersistenceReadAdapter } from './persistenceReadAdapter';
-
+import { SRARAdapter } from './sRAR/sRARAdapter';
+import { PersistenceBaseAdapter } from './persistenceBaseAdapter';
 export interface PersistenceAdapter
-  extends PersistenceModifyAdapter,
-    PersistenceReadAdapter {
+  extends SRARAdapter,
+    PersistenceBaseAdapter {
   element: {
     [name: string]: Default;
   };
