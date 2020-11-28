@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// file deepcode ignore no-any: any needed
 import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { PersistenceInfo } from '../../persistenceInfo';

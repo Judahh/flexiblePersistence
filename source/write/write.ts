@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
+// file deepcode ignore no-any: any needed
 import { Event } from '../event/event';
 import { Read } from '../read/read';
 import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';

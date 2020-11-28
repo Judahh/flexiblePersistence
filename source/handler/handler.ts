@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// file deepcode ignore no-any: any needed
 import { Write } from '../write/write';
 import { Read } from './../read/read';
 import { Event } from '../event/event';
