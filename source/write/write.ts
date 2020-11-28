@@ -21,12 +21,12 @@ export class Write {
     return this._read;
   }
 
-  public addEvent(event: Event): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  public addEvent(event: Event): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       if (Array.isArray(event.getContent()))
         this._eventDB
           .create({ scheme: 'events', item: event })
-          .then((persistencePromise: PersistencePromise) => {
+          .then((persistencePromise: PersistencePromise<any>) => {
             event['_id'] = persistencePromise.receivedItem._id
               ? persistencePromise.receivedItem._id
               : persistencePromise.receivedItem[0]._id;
@@ -51,7 +51,7 @@ export class Write {
       else
         this._eventDB
           .create({ scheme: 'events', item: event })
-          .then((persistencePromise: PersistencePromise) => {
+          .then((persistencePromise: PersistencePromise<any>) => {
             event['_id'] = persistencePromise.receivedItem._id;
             event['__v'] = persistencePromise.receivedItem.__v;
             if (
@@ -69,11 +69,11 @@ export class Write {
     });
   }
 
-  public read(input: PersistenceInputRead): Promise<PersistencePromise> {
+  public read(input: PersistenceInputRead): Promise<PersistencePromise<any>> {
     return this._eventDB.read(input);
   }
 
-  public clear(scheme: string): Promise<PersistencePromise> {
+  public clear(scheme: string): Promise<PersistencePromise<any>> {
     return this._eventDB.delete({ scheme, single: false });
   }
 }

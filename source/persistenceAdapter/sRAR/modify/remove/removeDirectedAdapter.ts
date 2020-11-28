@@ -1,9 +1,11 @@
 import { PersistencePromise } from '../../../output/persistencePromise';
 import { PersistenceInputDirectedDelete } from '../../../input/delete/persistenceInputDirectedDelete';
 
-export interface RemoveDirectedAdapter {
+export interface RemoveDirectedAdapter<Output> {
   nonexistent(
     input: PersistenceInputDirectedDelete
-  ): Promise<PersistencePromise>;
-  delete(input: PersistenceInputDirectedDelete): Promise<PersistencePromise>;
+  ): Promise<PersistencePromise<Output>>;
+  delete(
+    input: PersistenceInputDirectedDelete
+  ): Promise<PersistencePromise<Output>>;
 }

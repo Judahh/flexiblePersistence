@@ -10,8 +10,8 @@ export class Read {
   constructor(readDB: PersistenceAdapter) {
     this.readDB = readDB;
   }
-
-  public newEvent(event: Event): Promise<PersistencePromise> {
+  //  deepcode ignore no-any: any needed
+  public newEvent(event: Event): Promise<PersistencePromise<any>> {
     Operation.create.valueOf();
     const id = event.getSelection()
       ? //  deepcode ignore no-any: any needed
@@ -21,7 +21,8 @@ export class Read {
           event.getOperation() == Operation.existent)
       ? event.getId()
       : undefined;
-    const input: PersistenceInput = {
+    //  deepcode ignore no-any: any needed
+    const input: PersistenceInput<any> = {
       single: event.isSingle(),
       scheme: event.getName(),
       id: id ? String(id) : undefined,

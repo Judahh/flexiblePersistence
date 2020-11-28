@@ -36,16 +36,20 @@ export class MongoDB implements PersistenceAdapter {
       { strict: false }
     );
   }
-  correct(input: PersistenceInputUpdate): Promise<PersistencePromise> {
+  correct(
+    input: PersistenceInputUpdate<any>
+  ): Promise<PersistencePromise<any>> {
     return this.update(input);
   }
-  nonexistent(input: PersistenceInputDelete): Promise<PersistencePromise> {
+  nonexistent(input: PersistenceInputDelete): Promise<PersistencePromise<any>> {
     return this.delete(input);
   }
-  existent(input: PersistenceInputCreate): Promise<PersistencePromise> {
+  existent(
+    input: PersistenceInputCreate<any>
+  ): Promise<PersistencePromise<any>> {
     return this.create(input);
   }
-  create(input: PersistenceInputCreate): Promise<PersistencePromise> {
+  create(input: PersistenceInputCreate<any>): Promise<PersistencePromise<any>> {
     if (Array.isArray(input.item)) {
       return this.createArray(input.scheme, input.item, true);
     } else if (Array.isArray(input.item.content)) {
@@ -54,14 +58,14 @@ export class MongoDB implements PersistenceAdapter {
       return this.createItem(input.scheme, input.item);
     }
   }
-  update(input: PersistenceInputUpdate): Promise<PersistencePromise> {
+  update(input: PersistenceInputUpdate<any>): Promise<PersistencePromise<any>> {
     if (input.single || input.id) {
       return this.updateItem(input.scheme, input.selectedItem, input.item);
     } else {
       return this.updateArray(input.scheme, input.selectedItem, input.item);
     }
   }
-  read(input: PersistenceInputRead): Promise<PersistencePromise> {
+  read(input: PersistenceInputRead): Promise<PersistencePromise<any>> {
     if (input.single || input.id) {
       if (input.id) return this.readItemById(input.scheme, input.id);
       return this.readItem(input.scheme, input.selectedItem);
@@ -69,7 +73,7 @@ export class MongoDB implements PersistenceAdapter {
       return this.readArray(input.scheme, input.selectedItem);
     }
   }
-  delete(input: PersistenceInputDelete): Promise<PersistencePromise> {
+  delete(input: PersistenceInputDelete): Promise<PersistencePromise<any>> {
     if (input.single || input.id) {
       if (input.id) return this.deleteItemById(input.scheme, input.id);
       return this.deleteItem(input.scheme, input.selectedItem);
@@ -81,8 +85,8 @@ export class MongoDB implements PersistenceAdapter {
     scheme: string,
     selectedItem: any,
     item: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.updateMany(selectedItem, item, (error, doc, result) => {
         if (error) {
@@ -105,8 +109,8 @@ export class MongoDB implements PersistenceAdapter {
     scheme: string,
     selectedItem: any,
     item: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findOneAndUpdate(selectedItem, item, (error, doc, result) => {
         if (error) {
@@ -128,8 +132,8 @@ export class MongoDB implements PersistenceAdapter {
   public readArray(
     scheme: string,
     selectedItem: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.find(selectedItem, (error, doc: Array<any>, result) => {
         if (error) {
@@ -151,8 +155,8 @@ export class MongoDB implements PersistenceAdapter {
   public readItem(
     scheme: string,
     selectedItem: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findOne(selectedItem, (error, doc, result) => {
         if (error) {
@@ -170,8 +174,8 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public readItemById(scheme: string, id): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  public readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findById(id, (error, doc, result) => {
         if (error) {
@@ -192,8 +196,8 @@ export class MongoDB implements PersistenceAdapter {
   public deleteArray(
     scheme: string,
     selectedItem: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.deleteMany(selectedItem, (error) => {
         if (error) {
@@ -210,8 +214,11 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public createItem(scheme: string, item: any): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  public createItem(
+    scheme: string,
+    item: any
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.create(item, (error, doc, result) => {
         if (error) {
@@ -233,11 +240,11 @@ export class MongoDB implements PersistenceAdapter {
     scheme: string,
     item: any,
     regular?: boolean
-  ): Promise<PersistencePromise> {
+  ): Promise<PersistencePromise<any>> {
     let items: unknown[] = [];
     if (regular) items = item;
     else items = item.content.map((itemC) => ({ ...item, content: itemC }));
-    return new Promise<PersistencePromise>((resolve, reject) => {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.insertMany(items, (error, docs) => {
         if (error) {
@@ -257,8 +264,8 @@ export class MongoDB implements PersistenceAdapter {
   public deleteItem(
     scheme: string,
     selectedItem: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findOneAndDelete(selectedItem, (error, doc) => {
         if (error) {
@@ -280,8 +287,8 @@ export class MongoDB implements PersistenceAdapter {
   public deleteItemById(
     scheme: string,
     selectedItem: any
-  ): Promise<PersistencePromise> {
-    return new Promise<PersistencePromise>((resolve, reject) => {
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findByIdAndDelete(selectedItem, (error, doc) => {
         if (error) {

@@ -4,6 +4,6 @@ import { RegularInput } from '../regularInput';
 import { PersistenceInputDirectedUpdate } from './persistenceInputDirectedUpdate';
 
 // file deepcode ignore no-any: any needed
-export interface PersistenceInputUpdate
-  extends PersistenceInputDirectedUpdate,
+export interface PersistenceInputUpdate<Item>
+  extends PersistenceInputDirectedUpdate<Item>,
     RegularInput {}

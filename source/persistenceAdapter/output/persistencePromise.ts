@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export class PersistencePromise {
-  receivedItem: any;
+export class PersistencePromise<Output> {
+  receivedItem: Output;
   result: any;
   selectedItem: any;
   sentItem: any;

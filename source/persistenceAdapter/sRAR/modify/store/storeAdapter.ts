@@ -1,6 +1,10 @@
 import { PersistencePromise } from '../../../output/persistencePromise';
 import { PersistenceInputCreate } from '../../../input/create/persistenceInputCreate';
-export interface StoreAdapter {
-  create(input: PersistenceInputCreate): Promise<PersistencePromise>;
-  existent(input: PersistenceInputCreate): Promise<PersistencePromise>;
+export interface StoreAdapter<Input, Output> {
+  create(
+    input: PersistenceInputCreate<Input>
+  ): Promise<PersistencePromise<Output>>;
+  existent(
+    input: PersistenceInputCreate<Input>
+  ): Promise<PersistencePromise<Output>>;
 }
