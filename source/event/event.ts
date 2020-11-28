@@ -35,7 +35,7 @@ export class Event extends DirectedEvent {
     return this.name;
   }
 
-  getReceivedContent(): unknown | unknown[] {
+  getReceivedContent(): undefined | BasicEvent | BasicEvent[] {
     return this.receivedContent;
   }
 }
