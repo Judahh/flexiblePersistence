@@ -3,10 +3,10 @@ import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { PersistenceInfo } from '../../persistenceInfo';
 import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
-import { PersistenceInputCreate } from '../../../persistenceAdapter/input/persistenceInputCreate';
-import { PersistenceInputUpdate } from '../../../persistenceAdapter/input/persistenceInputUpdate';
-import { PersistenceInputRead } from '../../../persistenceAdapter/input/persistenceInputRead';
-import { PersistenceInputDelete } from '../../../persistenceAdapter/input/persistenceInputDelete';
+import { PersistenceInputCreate } from '../../../persistenceAdapter/input/create/persistenceInputCreate';
+import { PersistenceInputUpdate } from '../../../persistenceAdapter/input/update/persistenceInputUpdate';
+import { PersistenceInputRead } from '../../../persistenceAdapter/input/read/persistenceInputRead';
+import { PersistenceInputDelete } from '../../../persistenceAdapter/input/delete/persistenceInputDelete';
 import { Default } from 'default-initializer';
 
 export class MongoDB implements PersistenceAdapter {
