@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Default } from 'default-initializer';
 import { SRARAdapter } from './sRAR/sRARAdapter';
 import { PersistenceBaseAdapter } from './persistenceBaseAdapter';
 export interface PersistenceAdapter
-  extends SRARAdapter,
+  //  deepcode ignore no-any: any needed
+  extends SRARAdapter<any, any>,
     PersistenceBaseAdapter {
   element: {
     [name: string]: Default;

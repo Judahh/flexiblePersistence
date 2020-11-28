@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // file deepcode ignore no-any: any needed
-export interface PersistenceInputDirectedUpdate {
+export interface PersistenceInputDirectedUpdate<Item> {
   single?: boolean;
   selectedItem?: any;
   id?: any;
-  item: any;
+  item: Item;
 }

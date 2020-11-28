@@ -43,7 +43,7 @@ test('add and read array and find object', async (done) => {
     const persistencePromise = await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     );
-    console.log(persistencePromise);
+    // console.log(persistencePromise);
 
     expect(persistencePromise).toStrictEqual(
       new PersistencePromise({

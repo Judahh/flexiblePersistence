@@ -1,7 +1,11 @@
 import { PersistencePromise } from '../../../output/persistencePromise';
 import { PersistenceInputDirectedUpdate } from '../../../input/update/persistenceInputDirectedUpdate';
 
-export interface AlterDirectedAdapter {
-  correct(input: PersistenceInputDirectedUpdate): Promise<PersistencePromise>;
-  update(input: PersistenceInputDirectedUpdate): Promise<PersistencePromise>;
+export interface AlterDirectedAdapter<Input, Output> {
+  correct(
+    input: PersistenceInputDirectedUpdate<Input>
+  ): Promise<PersistencePromise<Output>>;
+  update(
+    input: PersistenceInputDirectedUpdate<Input>
+  ): Promise<PersistencePromise<Output>>;
 }

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+// file deepcode ignore no-any: any needed
 import { Write } from '../write/write';
 import { Read } from './../read/read';
 import { Event } from '../event/event';
@@ -20,31 +21,33 @@ export class Handler {
     return this.write;
   }
 
-  private doRead(input: PersistenceInputRead): Promise<PersistencePromise> {
+  private doRead(
+    input: PersistenceInputRead
+  ): Promise<PersistencePromise<any>> {
     return this.read
       ? this.read.getReadDB().read(input)
       : this.write.read(input);
   }
 
-  public addEvent(event: Event): Promise<PersistencePromise> {
+  public addEvent(event: Event): Promise<PersistencePromise<any>> {
     return this.write.addEvent(event);
   }
 
   public readArray(
     scheme: string,
     selectedItem: any
-  ): Promise<PersistencePromise> {
+  ): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, selectedItem, single: false });
   }
 
   public readItem(
     scheme: string,
     selectedItem: any
-  ): Promise<PersistencePromise> {
+  ): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, selectedItem, single: true });
   }
 
-  public readItemById(scheme: string, id): Promise<PersistencePromise> {
+  public readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, id });
   }
 }
