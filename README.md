@@ -8,7 +8,7 @@ A CQRS and Event Sourcing platform
 
 ```js
 // Init Journaly as a observer platform for using as a message broker
-const flexiblepersistence = Journaly.newJournaly() as SubjectObserver<any>;
+const journaly = Journaly.newJournaly() as SubjectObserver<any>;
 
 // config read database
 read = new MongoDB(
@@ -18,7 +18,7 @@ read = new MongoDB(
       host: process.env.MONGO_HOST || 'localhost',
       port: process.env.MONGO_PORT,
     },
-    flexiblepersistence
+    journaly
   )
 );
 
@@ -30,7 +30,7 @@ write = new MongoDB(
       host: process.env.MONGO_HOST || 'localhost',
       port: process.env.MONGO_PORT,
     },
-    flexiblepersistence
+    journaly
   )
 );
 
@@ -170,8 +170,8 @@ delete,
 //Use it to delete an element
 ```
 
-It's not obligatory to use existent, correct and nonexistent.
-It's possible to use just CRUD operations.
+It's not obligatory to use existent, correct and nonexistent. It's possible to
+use just CRUD operations.
 
 ## Persistence Promise
 
@@ -197,8 +197,8 @@ Other implementations:
 
 ## Tests
 
-To run the test suite, first install Docker and dependencies,
-then run `docker-compose up -d` and `npm test`:
+To run the test suite, first install Docker and dependencies, then run
+`docker-compose up -d` and `npm test`:
 
 ```bash
 $ docker-compose up -d
