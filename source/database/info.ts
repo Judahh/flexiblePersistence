@@ -1,3 +1,4 @@
+// import { ConnectOptions as ConnectionOptions } from 'mongoose';
 import { ConnectionOptions } from 'mongoose';
 import * as tls from 'tls';
 export class Info {
