@@ -112,6 +112,7 @@ ssl?: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
 ```
 
 ## Handler
+
 ```js
 // use it to add event to databases
 public addEvent(event: Event): Promise<PersistencePromise<any>>;
@@ -169,7 +170,8 @@ delete,
 //Use it to delete an element
 ```
 
-It's not obligatory to use existent, correct and nonexistent. It's possible to use just CRUD operations.
+It's not obligatory to use existent, correct and nonexistent. It's possible to
+use just CRUD operations.
 
 ## Persistence Promise
 
@@ -188,6 +190,7 @@ It's possible to use diferent databases or services implementing
 PersistenceAdapter interface, like MongoDB does.
 
 Other implementations:
+
 - [DAO](https://github.com/Judahh/dAOPersistence)
 - [Sequelize](https://github.com/Judahh/sequelizePersistence)
 - [Service](https://github.com/Judahh/servicePersistence)
