@@ -38,13 +38,13 @@
   "dependencies": {
     "default-initializer": "latest",
     "journaly": "latest",
-    "mongoose": "latest",
+    "mongoose": "5.10.17",
     "pg": "latest"
   },
   "devDependencies": {
     "@types/jest": "latest",
     "@types/mongodb": "latest",
-    "@types/mongoose": "latest",
+    "@types/mongoose": "5.10.1",
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",

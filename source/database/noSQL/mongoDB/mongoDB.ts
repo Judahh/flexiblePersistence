@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// file deepcode ignore no-any: any
 import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { PersistenceInfo } from '../../persistenceInfo';
 import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
-import { PersistenceInputCreate } from '../../../persistenceAdapter/input/create/persistenceInputCreate';
-import { PersistenceInputUpdate } from '../../../persistenceAdapter/input/update/persistenceInputUpdate';
-import { PersistenceInputRead } from '../../../persistenceAdapter/input/read/persistenceInputRead';
-import { PersistenceInputDelete } from '../../../persistenceAdapter/input/delete/persistenceInputDelete';
 import { Default } from 'default-initializer';
+import {
+  PersistenceInputUpdate,
+  PersistenceInputDelete,
+  PersistenceInputCreate,
+  PersistenceInputRead,
+} from '../../..';
 
 export class MongoDB implements PersistenceAdapter {
   private persistenceInfo: PersistenceInfo;
@@ -37,6 +38,7 @@ export class MongoDB implements PersistenceAdapter {
       { strict: false }
     );
   }
+
   correct(
     input: PersistenceInputUpdate<any>
   ): Promise<PersistencePromise<any>> {
