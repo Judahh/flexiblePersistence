@@ -63,6 +63,8 @@ console.log(persistencePromise);
 }
 ```
 
+![Overview](./doc/overview.svg)
+
 ## Installation
 
 This is a [Node.js](https://nodejs.org/en/) module available through the
