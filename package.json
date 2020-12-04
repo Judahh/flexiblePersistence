@@ -44,7 +44,7 @@
   "devDependencies": {
     "@types/jest": "latest",
     "@types/mongodb": "latest",
-    "@types/mongoose": "5.10.1",
+    "@types/mongoose": "5.10.2",
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
