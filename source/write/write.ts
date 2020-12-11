@@ -18,11 +18,11 @@ export class Write {
     }
   }
 
-  public getRead(): Read | undefined {
+  getRead(): Read | undefined {
     return this._read;
   }
 
-  public addIds(objects) {
+  addIds(objects) {
     if (Array.isArray(objects)) {
       for (const object of objects) {
         this.addId(object);
@@ -31,7 +31,7 @@ export class Write {
     this.addId(objects);
   }
 
-  public addId(object) {
+  addId(object) {
     if (
       object !== null &&
       typeof object === 'object' &&
@@ -52,7 +52,7 @@ export class Write {
     }
   }
 
-  public addEvent(event: Event): Promise<PersistencePromise<any>> {
+  addEvent(event: Event): Promise<PersistencePromise<any>> {
     event.setId(new mongo.ObjectId());
     if (
       event.getOperation() === Operation.create ||
@@ -87,11 +87,11 @@ export class Write {
     });
   }
 
-  public read(input: PersistenceInputRead): Promise<PersistencePromise<any>> {
+  read(input: PersistenceInputRead): Promise<PersistencePromise<any>> {
     return this._eventDB.read(input);
   }
 
-  public clear(scheme: string): Promise<PersistencePromise<any>> {
+  clear(scheme: string): Promise<PersistencePromise<any>> {
     return this._eventDB.delete({ scheme, single: false });
   }
 }

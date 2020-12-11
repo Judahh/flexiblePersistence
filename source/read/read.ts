@@ -11,7 +11,7 @@ export class Read {
     this.readDB = readDB;
   }
   //  deepcode ignore no-any: any needed
-  public newEvent(event: Event): Promise<PersistencePromise<any>> {
+  newEvent(event: Event): Promise<PersistencePromise<any>> {
     Operation.create.valueOf();
     const id = event.getSelection()
       ? //  deepcode ignore no-any: any needed
@@ -33,7 +33,7 @@ export class Read {
     return this.readDB[Operation[event.getOperation()]](input);
   }
 
-  public getReadDB(): PersistenceAdapter {
+  getReadDB(): PersistenceAdapter {
     return this.readDB;
   }
 }

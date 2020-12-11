@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // file deepcode ignore no-any: any needed
+// file deepcode ignore object-literal-shorthand: argh
 import { Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { PersistenceInfo } from '../../persistenceInfo';
@@ -124,7 +125,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public updateItem(
+  updateItem(
     scheme: string,
     selectedItem: any,
     item: any
@@ -150,7 +151,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public readArray(
+  readArray(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
@@ -175,7 +176,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public readItem(
+  readItem(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
@@ -199,7 +200,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
+  readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findById(id, (error, doc, result) => {
@@ -218,7 +219,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public deleteArray(
+  deleteArray(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
@@ -285,10 +286,7 @@ export class MongoDB implements PersistenceAdapter {
     return receivedItem;
   }
 
-  public createItem(
-    scheme: string,
-    item: any
-  ): Promise<PersistencePromise<any>> {
+  createItem(scheme: string, item: any): Promise<PersistencePromise<any>> {
     // console.log('NEW:', item);
 
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
@@ -310,7 +308,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public async createArray(
+  async createArray(
     scheme: string,
     item: any,
     regular?: boolean
@@ -337,7 +335,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public deleteItem(
+  deleteItem(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
@@ -361,10 +359,7 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public deleteItemById(
-    scheme: string,
-    id: any
-  ): Promise<PersistencePromise<any>> {
+  deleteItemById(scheme: string, id: any): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       model.findByIdAndDelete(id, (error, doc) => {
@@ -384,11 +379,11 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  public getPersistenceInfo(): PersistenceInfo {
+  getPersistenceInfo(): PersistenceInfo {
     return this.persistenceInfo;
   }
 
-  public close(): Promise<boolean> {
+  close(): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       this.mongooseInstance.connection.close((error) => {
         if (error) {

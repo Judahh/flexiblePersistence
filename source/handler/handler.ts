@@ -17,7 +17,7 @@ export class Handler {
     }
   }
 
-  public getWrite(): Write {
+  getWrite(): Write {
     return this.write;
   }
 
@@ -29,25 +29,25 @@ export class Handler {
       : this.write.read(input);
   }
 
-  public addEvent(event: Event): Promise<PersistencePromise<any>> {
+  addEvent(event: Event): Promise<PersistencePromise<any>> {
     return this.write.addEvent(event);
   }
 
-  public readArray(
+  readArray(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, selectedItem, single: false });
   }
 
-  public readItem(
+  readItem(
     scheme: string,
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, selectedItem, single: true });
   }
 
-  public readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
+  readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, id });
   }
 }
