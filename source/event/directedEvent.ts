@@ -2,8 +2,7 @@ import { BasicDirectedEvent } from './basicDirectedEvent';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export class DirectedEvent {
-  protected _id: unknown;
-  protected __v: unknown;
+  protected id: unknown;
   protected timestamp: string;
   protected content:
     | BasicDirectedEvent
@@ -18,8 +17,7 @@ export class DirectedEvent {
     this.content = event.content;
     this.selection = event.selection;
     this.single = event.single === undefined ? true : event.single;
-    this.__v = event.__v;
-    this._id = event._id;
+    this.id = event.id;
   }
 
   //  deepcode ignore no-any: any needed
@@ -45,11 +43,11 @@ export class DirectedEvent {
   }
 
   getId(): unknown {
-    return this._id;
+    return this.id;
   }
 
-  getV(): unknown {
-    return this.__v;
+  setId(id: unknown): void {
+    this.id = id;
   }
 
   protected currentTimestamp(): string {

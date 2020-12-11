@@ -52,7 +52,7 @@ console.log(persistencePromise);
 {
   receivedItem: {
     __v: generated,
-    _id: generated,
+    id: generated,
     test: 'test',
   },
   result: undefined,

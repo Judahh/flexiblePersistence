@@ -8,6 +8,5 @@ export interface BasicDirectedEvent {
   //  deepcode ignore no-any: any needed
   content?: any | any[];
   timestamp?: string;
-  _id?: unknown;
-  __v?: unknown;
+  id?: unknown;
 }
