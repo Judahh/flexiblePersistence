@@ -50,7 +50,7 @@ export class Handler {
   readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, id });
   }
-  public migrate(): Promise<boolean> {
+  migrate(): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
         const events = await this.getWrite().read({

@@ -69,7 +69,7 @@ export class MongoDB implements PersistenceAdapter {
   }
   clear(): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
-      const responses: Promise<boolean>[] = [];
+      const responses: Array<Promise<boolean>> = [];
       for (const key in this.mongooseInstance.models) {
         if (
           Object.prototype.hasOwnProperty.call(
@@ -195,7 +195,7 @@ export class MongoDB implements PersistenceAdapter {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      model.find(newSelectedItem, (error, docs: Array<any>, result) => {
+      model.find(newSelectedItem, (error, docs: any[], result) => {
         if (error) {
           reject(new Error(error));
         } else {
