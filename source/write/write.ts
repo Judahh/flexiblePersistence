@@ -53,11 +53,10 @@ export class Write {
   }
 
   addEvent(event: Event): Promise<PersistencePromise<any>> {
-    event.setId(new mongo.ObjectId());
-    if (
-      event.getOperation() === Operation.create ||
-      event.getOperation() === Operation.existent
-    ) {
+    if (!(event instanceof Event)) event = new Event(event);
+    if (!event['id']) event.setId(new mongo.ObjectId());
+    const operation = event['operation'];
+    if (operation === Operation.create || operation === Operation.existent) {
       this.addIds(event);
     }
     // console.log(event);
@@ -91,7 +90,7 @@ export class Write {
     return this._eventDB.read(input);
   }
 
-  clear(scheme: string): Promise<PersistencePromise<any>> {
-    return this._eventDB.delete({ scheme, single: false });
+  clear(): Promise<PersistencePromise<any>> {
+    return this._eventDB.delete({ scheme: 'events', single: false });
   }
 }

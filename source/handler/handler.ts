@@ -35,19 +35,41 @@ export class Handler {
 
   readArray(
     scheme: string,
-    selectedItem: any
+    selectedItem?: any
   ): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, selectedItem, single: false });
   }
 
   readItem(
     scheme: string,
-    selectedItem: any
+    selectedItem?: any
   ): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, selectedItem, single: true });
   }
 
   readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, id });
+  }
+  migrate(): Promise<boolean> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const events = await this.getWrite().read({
+          scheme: 'events',
+          single: false,
+        });
+
+        await this.getWrite().getRead()?.getReadDB().clear();
+        await this.getWrite().clear();
+        const rEvents: any[] = [];
+        for (const event of events.receivedItem) {
+          rEvents.push(await this.addEvent(event));
+        }
+      } catch (error) {
+        console.error(error);
+
+        reject(error);
+      }
+      resolve(true);
+    });
   }
 }

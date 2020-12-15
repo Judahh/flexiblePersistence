@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // file deepcode ignore no-any: any needed
 // file deepcode ignore object-literal-shorthand: argh
-import { Mongoose, Schema } from 'mongoose';
+import { Model, Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { PersistenceInfo } from '../../persistenceInfo';
 import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
@@ -54,6 +54,43 @@ export class MongoDB implements PersistenceAdapter {
       },
       { strict: false, id: true, versionKey: false }
     );
+  }
+  private clearModel(model: Model<any, unknown>): Promise<boolean> {
+    return new Promise<boolean>((resolve, reject) => {
+      model.deleteMany({}, (error) => {
+        if (error) {
+          reject(new Error(error));
+        } else {
+          // console.log('selectedArray :', selectedItem);
+          resolve(true);
+        }
+      });
+    });
+  }
+  clear(): Promise<boolean> {
+    return new Promise<boolean>(async (resolve, reject) => {
+      const responses: Array<Promise<boolean>> = [];
+      for (const key in this.mongooseInstance.models) {
+        if (
+          Object.prototype.hasOwnProperty.call(
+            this.mongooseInstance.models,
+            key
+          )
+        ) {
+          const model = this.mongooseInstance.models[key];
+          responses.push(this.clearModel(model));
+        }
+      }
+      const response = await Promise.all(responses);
+
+      for (const element of response) {
+        if (!element) {
+          reject(response);
+          return;
+        }
+      }
+      resolve(true);
+    });
   }
 
   correct(
@@ -158,7 +195,7 @@ export class MongoDB implements PersistenceAdapter {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.genericSchema);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      model.find(newSelectedItem, (error, docs: Array<any>, result) => {
+      model.find(newSelectedItem, (error, docs: any[], result) => {
         if (error) {
           reject(new Error(error));
         } else {
