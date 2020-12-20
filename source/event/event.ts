@@ -6,7 +6,11 @@ export class Event extends DirectedEvent {
   protected operation: Operation;
   protected name!: string;
   private receivedContent?: BasicEvent | BasicEvent[];
-
+  private getConstructorName(object) {
+    let name = object.constructor.name;
+    if (name.includes('_')) name = name.split('_')[1];
+    return name;
+  }
   constructor(event: BasicEvent) {
     super(event);
     this.operation = event.operation;
@@ -14,9 +18,9 @@ export class Event extends DirectedEvent {
       event && event.content
         ? Array.isArray(event.content)
           ? event.content[0]
-            ? event.content[0].constructor.name
+            ? this.getConstructorName(event.content[0])
             : undefined
-          : event.content.constructor.name
+          : this.getConstructorName(event.content)
         : undefined;
     if (tempName) this.name = tempName;
     if (event.name) this.name = event.name;

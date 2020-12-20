@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Default } from 'default-initializer';
+import { Default } from '@flexiblepersistence/default-initializer';
 import { SRARAdapter } from './sRAR/sRARAdapter';
 import { PersistenceBaseAdapter } from './persistenceBaseAdapter';
 export interface PersistenceAdapter

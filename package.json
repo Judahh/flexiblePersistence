@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A CQRS and Event Sourcing platform",
   "main": "dist/source/index.js",
   "keywords": [
@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/Judahh/flexiblePersistence#readme",
   "dependencies": {
-    "default-initializer": "latest",
+    "@flexiblepersistence/default-initializer": "latest",
     "journaly": "latest",
     "mongoose": "5.10.17",
     "pg": "latest"
@@ -54,7 +54,6 @@
     "eslint-plugin-import": "latest",
     "eslint-plugin-prettier": "latest",
     "jest": "latest",
-    "mongodb": "latest",
     "prettier": "latest",
     "reflect-metadata": "latest",
     "ts-jest": "latest",

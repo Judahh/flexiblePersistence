@@ -5,7 +5,7 @@ import { Model, Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { PersistenceInfo } from '../../persistenceInfo';
 import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
-import { Default } from 'default-initializer';
+import { Default } from '@flexiblepersistence/default-initializer';
 import {
   PersistenceInputUpdate,
   PersistenceInputDelete,
