@@ -38,7 +38,7 @@
   "dependencies": {
     "@flexiblepersistence/default-initializer": "latest",
     "journaly": "latest",
-    "mongoose": "5.10.17",
+    "mongoose": "5.11.8",
     "pg": "latest"
   },
   "devDependencies": {
