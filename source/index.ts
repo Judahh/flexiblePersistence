@@ -42,7 +42,10 @@ import { PersistenceInputDirectedDelete } from './persistenceAdapter/input/delet
 import { PersistenceInfo } from './database/persistenceInfo';
 import { Info } from './database/info';
 import { MongoDB } from './database/noSQL/mongoDB/mongoDB';
-import { Default, DefaultInitializer } from 'default-initializer';
+import {
+  Default,
+  DefaultInitializer,
+} from '@flexiblepersistence/default-initializer';
 
 export {
   Default,
