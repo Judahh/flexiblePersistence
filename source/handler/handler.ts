@@ -50,6 +50,16 @@ export class Handler {
   readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
     return this.doRead({ scheme, id });
   }
+
+  getReadDB(): PersistenceAdapter {
+    const write = this.getWrite();
+    if (write) {
+      const read = write.getRead();
+      if (read) if (read.getReadDB()) return read.getReadDB();
+    }
+    throw new Error('DatabaseHandler must have a ReadDB.');
+  }
+
   migrate(): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
@@ -57,8 +67,7 @@ export class Handler {
           scheme: 'events',
           single: false,
         });
-
-        await this.getWrite().getRead()?.getReadDB().clear();
+        await this.getReadDB().clear();
         await this.getWrite().clear();
         const rEvents: any[] = [];
         for (const event of events.receivedItem) {
