@@ -53,16 +53,9 @@ export class PersistenceInfo extends Info implements PoolConfig {
       this.password = info.password;
       this.options = info.options;
       this.connectionType = info.connectionType;
-      if (info.host) {
-        this.host = info.host;
-      } else {
-        this.host = process.env.DB_HOST || 'localhost';
-      }
-      if (info.port) {
-        this.port = +info.port;
-      } else {
-        this.port = +(process.env.DB_PORT || 27017);
-      }
+      if (info.host) this.host = info.host;
+      else this.host = 'localhost';
+      if (info.port) this.port = +info.port;
       this.uri =
         (this.connectionType ? this.connectionType + '://' : '') +
         (this.user
