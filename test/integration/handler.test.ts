@@ -6,6 +6,7 @@ import { Event } from '../../source/event/event';
 import { MongoDB } from '../../source/database/noSQL/mongoDB/mongoDB';
 import { PersistencePromise } from '../../source/persistenceAdapter/output/persistencePromise';
 import { Journaly, SubjectObserver } from 'journaly';
+import ObjectSchema from './objectSchema';
 
 let read;
 let write;
@@ -19,7 +20,8 @@ test('add and read array and find object', async (done) => {
         port: process.env.MONGO_PORT,
       },
       journaly
-    )
+    ),
+    { object: new ObjectSchema() }
   );
   write = new MongoDB(
     new PersistenceInfo(

@@ -5,24 +5,33 @@ import { Model, Mongoose, Schema } from 'mongoose';
 import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
 import { PersistenceInfo } from '../../persistenceInfo';
 import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
-import { Default } from '@flexiblepersistence/default-initializer';
+// import { Default } from '@flexiblepersistence/default-initializer';
 import {
   PersistenceInputUpdate,
   PersistenceInputDelete,
   PersistenceInputCreate,
   PersistenceInputRead,
 } from '../../..';
+import BaseSchemaDefault from './baseSchemaDefault';
 
 export class MongoDB implements PersistenceAdapter {
   private persistenceInfo: PersistenceInfo;
   private mongooseInstance: Mongoose;
-  private genericSchema: Schema;
 
   element: {
-    [name: string]: Default;
+    [name: string]: BaseSchemaDefault;
   } = {};
 
-  constructor(persistenceInfo: PersistenceInfo) {
+  schema: {
+    [name: string]: Schema;
+  } = {};
+
+  constructor(
+    persistenceInfo: PersistenceInfo,
+    element?: {
+      [name: string]: BaseSchemaDefault;
+    }
+  ) {
     this.persistenceInfo = persistenceInfo;
 
     this.mongooseInstance = new Mongoose();
@@ -44,7 +53,9 @@ export class MongoDB implements PersistenceAdapter {
       autoIndex: false,
     });
 
-    this.genericSchema = new this.mongooseInstance.Schema(
+    if (element) this.setElement(element);
+
+    this.schema['generic'] = new this.mongooseInstance.Schema(
       {
         id: {
           type: Schema.Types.ObjectId,
@@ -54,6 +65,31 @@ export class MongoDB implements PersistenceAdapter {
       },
       { strict: false, id: true, versionKey: false }
     );
+  }
+
+  protected initElement() {
+    for (const key in this.element) {
+      if (Object.prototype.hasOwnProperty.call(this.element, key)) {
+        const element = this.element[key];
+        if (!this.schema) this.schema = {};
+        this.schema[element.getName()] = new this.mongooseInstance.Schema(
+          element.getAttributes(),
+          element.getOptions()
+        );
+        if (element.getIndexOptions())
+          this.schema[element.getName()].index(element.getIndexOptions());
+      }
+    }
+  }
+
+  setElement(element: { [name: string]: BaseSchemaDefault }) {
+    this.element = element;
+    this.initElement();
+  }
+
+  getSchema(name: string): Schema {
+    if (this.schema[name]) return this.schema[name];
+    return this.schema['generic'];
   }
   private clearModel(model: Model<any>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
@@ -144,7 +180,7 @@ export class MongoDB implements PersistenceAdapter {
     item: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newItem = this.generateNewItem(item);
       model.updateMany(selectedItem, newItem, undefined, (error, doc) => {
         if (error) {
@@ -168,7 +204,7 @@ export class MongoDB implements PersistenceAdapter {
     item: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newItem = this.generateNewItem(item);
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.findOneAndUpdate(
@@ -198,7 +234,7 @@ export class MongoDB implements PersistenceAdapter {
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.find(newSelectedItem, (error, docs: any[], result) => {
         if (error) {
@@ -223,7 +259,7 @@ export class MongoDB implements PersistenceAdapter {
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
       // console.log(newSelectedItem);
       model.findOne(newSelectedItem, (error, doc, result) => {
@@ -244,7 +280,7 @@ export class MongoDB implements PersistenceAdapter {
 
   readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       model.findById(id, (error, doc, result) => {
         if (error) {
           reject(new Error(error));
@@ -266,7 +302,7 @@ export class MongoDB implements PersistenceAdapter {
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.deleteMany(newSelectedItem, undefined, (error) => {
         if (error) {
@@ -332,7 +368,7 @@ export class MongoDB implements PersistenceAdapter {
     // console.log('NEW:', item);
 
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newItem = this.generateNewItem(item);
       model.create(newItem, (error, doc) => {
         if (error) {
@@ -357,7 +393,7 @@ export class MongoDB implements PersistenceAdapter {
     const items = this.generateNewArray(item, regular);
 
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       model.insertMany(items, undefined, (error, docs) => {
         if (error) {
           reject(error);
@@ -381,7 +417,7 @@ export class MongoDB implements PersistenceAdapter {
     selectedItem: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.findOneAndDelete(newSelectedItem, undefined, (error, doc) => {
         if (error) {
@@ -402,7 +438,7 @@ export class MongoDB implements PersistenceAdapter {
 
   deleteItemById(scheme: string, id: any): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.genericSchema);
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       model.findByIdAndDelete(id, undefined, (error, doc) => {
         if (error) {
           reject(error);

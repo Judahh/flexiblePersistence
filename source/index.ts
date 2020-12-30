@@ -46,6 +46,7 @@ import {
   Default,
   DefaultInitializer,
 } from '@flexiblepersistence/default-initializer';
+import BaseSchemaDefault from './database/noSQL/mongoDB/baseSchemaDefault';
 
 export {
   Default,
@@ -86,4 +87,5 @@ export {
   PersistenceInfo,
   Info,
   MongoDB,
+  BaseSchemaDefault,
 };
