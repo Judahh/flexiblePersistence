@@ -10,6 +10,7 @@ export class DirectedEvent {
     | unknown
     | unknown[];
   protected selection: unknown;
+  protected headers?: unknown;
   protected single: boolean;
 
   constructor(event: BasicDirectedEvent) {
@@ -18,6 +19,7 @@ export class DirectedEvent {
     this.selection = event.selection;
     this.single = event.single === undefined ? true : event.single;
     this.id = event.id;
+    this.headers = event.headers;
   }
 
   //  deepcode ignore no-any: any needed
