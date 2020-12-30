@@ -10,7 +10,7 @@ settings.initFunction = 'init';
 export default class BaseSchemaDefault extends Default {
   protected attributes: SchemaDefinition = {};
   protected options: SchemaOptions = {};
-  protected indexOptions?: any | boolean | string;
+  protected indexOptions?: unknown | boolean | string;
 
   getAttributes(): SchemaDefinition {
     return this.attributes;
@@ -20,7 +20,7 @@ export default class BaseSchemaDefault extends Default {
     return this.options;
   }
 
-  getIndexOptions(): any | boolean | string {
+  getIndexOptions(): unknown | boolean | string {
     return this.indexOptions;
   }
   constructor(initDefault?: DefaultInitializer) {
