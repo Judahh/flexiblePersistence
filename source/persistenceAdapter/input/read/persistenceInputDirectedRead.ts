@@ -3,5 +3,7 @@
 export interface PersistenceInputDirectedRead {
   single?: boolean;
   selectedItem?: any;
+  options?: any;
+  additionalOptions?: any;
   id?: any;
 }

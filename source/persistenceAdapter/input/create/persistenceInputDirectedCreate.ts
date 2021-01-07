@@ -3,4 +3,6 @@
 export interface PersistenceInputDirectedCreate<Item> {
   single?: boolean;
   item: Item | Item[];
+  options?: any;
+  additionalOptions?: any;
 }

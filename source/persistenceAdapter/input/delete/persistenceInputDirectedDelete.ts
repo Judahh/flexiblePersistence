@@ -3,5 +3,7 @@
 export interface PersistenceInputDirectedDelete {
   single?: boolean;
   selectedItem?: any;
+  options?: any;
+  additionalOptions?: any;
   id?: any;
 }
