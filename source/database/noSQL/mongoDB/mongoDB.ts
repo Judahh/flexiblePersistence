@@ -144,45 +144,73 @@ export class MongoDB implements PersistenceAdapter {
   }
   create(input: PersistenceInputCreate<any>): Promise<PersistencePromise<any>> {
     if (Array.isArray(input.item)) {
-      return this.createArray(input.scheme, input.item, true);
+      return this.createArray(input.scheme, input.item, true, input.options);
     } else if (Array.isArray(input.item.content)) {
-      return this.createArray(input.scheme, input.item);
+      return this.createArray(input.scheme, input.item, false, input.options);
     } else {
       return this.createItem(input.scheme, input.item);
     }
   }
   update(input: PersistenceInputUpdate<any>): Promise<PersistencePromise<any>> {
     if (input.single || input.id) {
-      return this.updateItem(input.scheme, input.selectedItem, input.item);
+      return this.updateItem(
+        input.scheme,
+        input.selectedItem,
+        input.item,
+        input.options
+      );
     } else {
-      return this.updateArray(input.scheme, input.selectedItem, input.item);
+      return this.updateArray(
+        input.scheme,
+        input.selectedItem,
+        input.item,
+        input.options
+      );
     }
   }
   read(input: PersistenceInputRead): Promise<PersistencePromise<any>> {
     if (input.single || input.id) {
-      if (input.id) return this.readItemById(input.scheme, input.id);
-      return this.readItem(input.scheme, input.selectedItem);
+      if (input.id)
+        return this.readItemById(
+          input.scheme,
+          input.id,
+          input.options,
+          input.additionalOptions
+        );
+      return this.readItem(
+        input.scheme,
+        input.selectedItem,
+        input.options,
+        input.additionalOptions
+      );
     } else {
-      return this.readArray(input.scheme, input.selectedItem);
+      return this.readArray(
+        input.scheme,
+        input.selectedItem,
+        input.options,
+        input.additionalOptions
+      );
     }
   }
   delete(input: PersistenceInputDelete): Promise<PersistencePromise<any>> {
     if (input.single || input.id) {
-      if (input.id) return this.deleteItemById(input.scheme, input.id);
-      return this.deleteItem(input.scheme, input.selectedItem);
+      if (input.id)
+        return this.deleteItemById(input.scheme, input.id, input.options);
+      return this.deleteItem(input.scheme, input.selectedItem, input.options);
     } else {
-      return this.deleteArray(input.scheme, input.selectedItem);
+      return this.deleteArray(input.scheme, input.selectedItem, input.options);
     }
   }
   updateArray(
     scheme: string,
     selectedItem: any,
-    item: any
+    item: any,
+    options: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newItem = this.generateNewItem(item);
-      model.updateMany(selectedItem, newItem, undefined, (error, doc) => {
+      model.updateMany(selectedItem, newItem, options, (error, doc) => {
         if (error) {
           reject(error);
         } else {
@@ -201,7 +229,8 @@ export class MongoDB implements PersistenceAdapter {
   updateItem(
     scheme: string,
     selectedItem: any,
-    item: any
+    item: any,
+    options: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -210,15 +239,14 @@ export class MongoDB implements PersistenceAdapter {
       model.findOneAndUpdate(
         newSelectedItem,
         newItem,
-        undefined,
-        (error, doc, result) => {
+        options,
+        (error, doc) => {
           if (error) {
             reject(error);
           } else {
             resolve(
               new PersistencePromise({
                 receivedItem: this.generateReceivedItem(doc),
-                result: result,
                 selectedItem: selectedItem,
                 sentItem: item,
               })
@@ -231,64 +259,80 @@ export class MongoDB implements PersistenceAdapter {
 
   readArray(
     scheme: string,
-    selectedItem: any
+    selectedItem: any,
+    options: any,
+    additionalOptions: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
-      model.find(newSelectedItem, (error, docs: any[], result) => {
-        if (error) {
-          reject(new Error(error));
-        } else {
-          const receivedItem = this.generateReceivedArray(docs);
-          // console.log(receivedItem);
-          resolve(
-            new PersistencePromise({
-              receivedItem: receivedItem,
-              result: result,
-              selectedItem: selectedItem,
-            })
-          );
+      model.find(
+        newSelectedItem,
+        additionalOptions,
+        options,
+        (error, docs: any[]) => {
+          if (error) {
+            reject(new Error(error));
+          } else {
+            const receivedItem = this.generateReceivedArray(docs);
+            // console.log(receivedItem);
+            resolve(
+              new PersistencePromise({
+                receivedItem: receivedItem,
+                selectedItem: selectedItem,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
   readItem(
     scheme: string,
-    selectedItem: any
+    selectedItem: any,
+    options: any,
+    additionalOptions: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
       // console.log(newSelectedItem);
-      model.findOne(newSelectedItem, (error, doc, result) => {
-        if (error) {
-          reject(new Error(error));
-        } else {
-          resolve(
-            new PersistencePromise({
-              receivedItem: this.generateReceivedItem(doc),
-              result: result,
-              selectedItem: selectedItem,
-            })
-          );
+      model.findOne(
+        newSelectedItem,
+        additionalOptions,
+        options,
+        (error, doc) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(
+              new PersistencePromise({
+                receivedItem: this.generateReceivedItem(doc),
+                selectedItem: selectedItem,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
-  readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
+  readItemById(
+    scheme: string,
+    id,
+    options: any,
+    additionalOptions: any
+  ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
-      model.findById(id, (error, doc, result) => {
+      model.findById(id, additionalOptions, options, (error, doc) => {
         if (error) {
-          reject(new Error(error));
+          reject(error);
         } else {
           resolve(
             new PersistencePromise({
               receivedItem: this.generateReceivedItem(doc),
-              result: result,
               selectedItem: { id: id },
             })
           );
@@ -299,12 +343,13 @@ export class MongoDB implements PersistenceAdapter {
 
   deleteArray(
     scheme: string,
-    selectedItem: any
+    selectedItem: any,
+    options: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
-      model.deleteMany(newSelectedItem, undefined, (error) => {
+      model.deleteMany(newSelectedItem, options, (error) => {
         if (error) {
           reject(error);
         } else {
@@ -388,13 +433,14 @@ export class MongoDB implements PersistenceAdapter {
   async createArray(
     scheme: string,
     item: any,
-    regular?: boolean
+    regular: boolean,
+    options: any
   ): Promise<PersistencePromise<any>> {
     const items = this.generateNewArray(item, regular);
 
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
-      model.insertMany(items, undefined, (error, docs) => {
+      model.insertMany(items, options, (error, docs) => {
         if (error) {
           reject(error);
         } else {
@@ -414,12 +460,13 @@ export class MongoDB implements PersistenceAdapter {
 
   deleteItem(
     scheme: string,
-    selectedItem: any
+    selectedItem: any,
+    options: any
   ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
-      model.findOneAndDelete(newSelectedItem, undefined, (error, doc) => {
+      model.findOneAndDelete(newSelectedItem, options, (error, doc) => {
         if (error) {
           reject(new Error(error));
         } else {
@@ -436,10 +483,14 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
-  deleteItemById(scheme: string, id: any): Promise<PersistencePromise<any>> {
+  deleteItemById(
+    scheme: string,
+    id: any,
+    options: any
+  ): Promise<PersistencePromise<any>> {
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
-      model.findByIdAndDelete(id, undefined, (error, doc) => {
+      model.findByIdAndDelete(id, options, (error, doc) => {
         if (error) {
           reject(error);
         } else {
