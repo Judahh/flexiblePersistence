@@ -56,6 +56,10 @@ export class DirectedEvent {
     this.id = id;
   }
 
+  setOptions(options: unknown): void {
+    this.options = options;
+  }
+
   protected currentTimestamp(): string {
     const date = new Date();
     const dash = '-';
