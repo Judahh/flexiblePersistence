@@ -415,7 +415,7 @@ export class MongoDB implements PersistenceAdapter {
         ? doc['value']
         : doc;
     if (receivedItem && receivedItem._id) {
-      receivedItem.id = receivedItem._id;
+      if (!receivedItem.id) receivedItem.id = receivedItem._id;
       delete receivedItem._id;
     }
     return receivedItem;
