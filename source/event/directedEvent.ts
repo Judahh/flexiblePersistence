@@ -40,6 +40,10 @@ export class DirectedEvent {
     return this.selection;
   }
 
+  getOptions(): unknown {
+    return this.options;
+  }
+
   isSingle(): boolean {
     return this.single;
   }

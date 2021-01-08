@@ -5,5 +5,6 @@ export interface PersistenceInputDirectedRead {
   selectedItem?: any;
   options?: any;
   additionalOptions?: any;
+  eventOptions?: any;
   id?: any;
 }

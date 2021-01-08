@@ -5,6 +5,7 @@ export interface PersistenceInputDirectedUpdate<Item> {
   selectedItem?: any;
   options?: any;
   additionalOptions?: any;
+  eventOptions?: any;
   id?: any;
   item: Item;
 }
