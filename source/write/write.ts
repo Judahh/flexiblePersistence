@@ -63,7 +63,7 @@ export class Write {
     // console.log(event);
 
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const promises: Promise<PersistencePromise<any>>[] = [];
+      const promises: Array<Promise<PersistencePromise<any>>> = [];
       promises.push(this._eventDB.create({ scheme: 'events', item: event }));
       if (this._read) promises.push(this._read.newEvent(event));
       Promise.all(promises)
