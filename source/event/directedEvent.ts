@@ -40,6 +40,10 @@ export class DirectedEvent {
     return this.selection;
   }
 
+  getOptions(): unknown {
+    return this.options;
+  }
+
   isSingle(): boolean {
     return this.single;
   }
@@ -50,6 +54,10 @@ export class DirectedEvent {
 
   setId(id: unknown): void {
     this.id = id;
+  }
+
+  setOptions(options: unknown): void {
+    this.options = options;
   }
 
   protected currentTimestamp(): string {

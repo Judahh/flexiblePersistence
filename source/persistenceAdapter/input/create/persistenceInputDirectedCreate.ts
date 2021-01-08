@@ -5,4 +5,5 @@ export interface PersistenceInputDirectedCreate<Item> {
   item: Item | Item[];
   options?: any;
   additionalOptions?: any;
+  eventOptions?: any;
 }
