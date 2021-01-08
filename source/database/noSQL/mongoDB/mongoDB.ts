@@ -216,7 +216,8 @@ export class MongoDB implements PersistenceAdapter {
         } else {
           resolve(
             new PersistencePromise({
-              result: doc ? (doc._doc ? doc._doc : doc) : undefined,
+              receivedItem: this.generateReceivedItem(doc),
+              result: doc,
               selectedItem: selectedItem,
               sentItem: item,
             })
@@ -240,13 +241,14 @@ export class MongoDB implements PersistenceAdapter {
         newSelectedItem,
         newItem,
         options,
-        (error, doc) => {
+        (error, doc, result) => {
           if (error) {
             reject(error);
           } else {
             resolve(
               new PersistencePromise({
                 receivedItem: this.generateReceivedItem(doc),
+                result: result ? { doc, result } : doc,
                 selectedItem: selectedItem,
                 sentItem: item,
               })
@@ -279,6 +281,7 @@ export class MongoDB implements PersistenceAdapter {
             resolve(
               new PersistencePromise({
                 receivedItem: receivedItem,
+                result: docs,
                 selectedItem: selectedItem,
               })
             );
@@ -309,6 +312,7 @@ export class MongoDB implements PersistenceAdapter {
             resolve(
               new PersistencePromise({
                 receivedItem: this.generateReceivedItem(doc),
+                result: doc,
                 selectedItem: selectedItem,
               })
             );
@@ -333,6 +337,7 @@ export class MongoDB implements PersistenceAdapter {
           resolve(
             new PersistencePromise({
               receivedItem: this.generateReceivedItem(doc),
+              result: doc,
               selectedItem: { id: id },
             })
           );
@@ -391,7 +396,8 @@ export class MongoDB implements PersistenceAdapter {
     if (item && item.id) {
       const newItem = JSON.parse(JSON.stringify(item));
       newItem._id = newItem.id;
-      delete newItem.id;
+      // console.log('generateNewItem:', newItem.id);
+      // delete newItem.id;
       // console.log('generateNewItem:', newItem);
       return newItem;
     }
@@ -401,8 +407,14 @@ export class MongoDB implements PersistenceAdapter {
 
   private generateReceivedItem(doc) {
     const receivedItem =
-      doc === undefined || doc === null ? undefined : doc['_doc'];
-    if (receivedItem) {
+      doc === undefined || doc === null
+        ? undefined
+        : doc['_doc']
+        ? doc['_doc']
+        : doc['value']
+        ? doc['value']
+        : doc;
+    if (receivedItem && receivedItem._id) {
       receivedItem.id = receivedItem._id;
       delete receivedItem._id;
     }
@@ -422,6 +434,7 @@ export class MongoDB implements PersistenceAdapter {
           resolve(
             new PersistencePromise({
               receivedItem: this.generateReceivedItem(doc),
+              result: doc,
               sentItem: item,
             })
           );
@@ -450,6 +463,7 @@ export class MongoDB implements PersistenceAdapter {
           resolve(
             new PersistencePromise({
               receivedItem: receivedItem,
+              result: docs,
               sentItem: item,
             })
           );
@@ -475,6 +489,7 @@ export class MongoDB implements PersistenceAdapter {
           resolve(
             new PersistencePromise({
               receivedItem: this.generateReceivedItem(doc),
+              result: doc,
               selectedItem: selectedItem,
             })
           );
@@ -499,6 +514,7 @@ export class MongoDB implements PersistenceAdapter {
           resolve(
             new PersistencePromise({
               receivedItem: this.generateReceivedItem(doc),
+              result: doc,
               selectedItem: { id: id },
             })
           );

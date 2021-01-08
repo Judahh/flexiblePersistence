@@ -9,5 +9,5 @@ export interface BasicDirectedEvent {
   content?: any | any[];
   timestamp?: string;
   id?: unknown;
-  headers?: unknown;
+  options?: unknown;
 }
