@@ -5,7 +5,6 @@ import { Operation } from './operation';
 export class Event extends DirectedEvent {
   protected operation: Operation;
   protected name!: string;
-  private receivedContent?: BasicEvent | BasicEvent[];
   private getConstructorName(object) {
     let name = object.constructor.name;
     if (name.includes('_')) name = name.split('_')[1];
@@ -24,11 +23,6 @@ export class Event extends DirectedEvent {
         : undefined;
     if (tempName) this.name = tempName;
     if (event.name) this.name = event.name;
-    this.receivedContent = event.receivedContent;
-  }
-
-  setReceivedContent(receivedContent?: BasicEvent | BasicEvent[]): void {
-    this.receivedContent = receivedContent;
   }
 
   getOperation(): Operation {
@@ -37,9 +31,5 @@ export class Event extends DirectedEvent {
 
   getName(): string {
     return this.name;
-  }
-
-  getReceivedContent(): undefined | BasicEvent | BasicEvent[] {
-    return this.receivedContent;
   }
 }

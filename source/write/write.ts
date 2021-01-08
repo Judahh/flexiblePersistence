@@ -55,6 +55,7 @@ export class Write {
   addEvent(event: Event): Promise<PersistencePromise<any>> {
     if (!(event instanceof Event)) event = new Event(event);
     if (!event['id']) event.setId(new mongo.ObjectId());
+    // console.log(event.getId());
     const operation = event['operation'];
     if (operation === Operation.create || operation === Operation.existent) {
       this.addIds(event);
@@ -62,26 +63,11 @@ export class Write {
     // console.log(event);
 
     return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      // console.log('event:', event);
-      this._eventDB
-        .create({ scheme: 'events', item: event })
-        .then((persistencePromise: PersistencePromise<any>) => {
-          // console.log('persistencePromise:', persistencePromise);
-
-          if (
-            event.getOperation() === Operation.create ||
-            event.getOperation() === Operation.existent
-          )
-            event.setReceivedContent(persistencePromise.receivedItem);
-
-          // console.log('new event:', event);
-
-          if (this._read) {
-            this._read.newEvent(event).then(resolve).catch(reject);
-          } else {
-            resolve(persistencePromise);
-          }
-        })
+      const promises: Array<Promise<PersistencePromise<any>>> = [];
+      promises.push(this._eventDB.create({ scheme: 'events', item: event }));
+      if (this._read) promises.push(this._read.newEvent(event));
+      Promise.all(promises)
+        .then((value) => resolve(value[value.length - 1]))
         .catch(reject);
     });
   }
