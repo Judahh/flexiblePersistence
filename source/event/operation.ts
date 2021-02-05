@@ -7,4 +7,5 @@ export enum Operation {
   update,
   nonexistent,
   delete,
+  other,
 }

@@ -129,6 +129,15 @@ export class MongoDB implements PersistenceAdapter {
     });
   }
 
+  other(input: PersistenceInputUpdate<any>): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>((resolve) => {
+      resolve(
+        new PersistencePromise({
+          receivedItem: input,
+        })
+      );
+    });
+  }
   correct(
     input: PersistenceInputUpdate<any>
   ): Promise<PersistencePromise<any>> {
