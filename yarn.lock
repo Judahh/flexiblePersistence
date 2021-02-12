@@ -295,9 +295,9 @@
     strip-json-comments "^3.1.1"
 
 "@flexiblepersistence/default-initializer@latest":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@flexiblepersistence/default-initializer/-/default-initializer-0.1.3.tgz#745e2cd5822bc0be2800aa08e2792534172cbdeb"
-  integrity sha512-qAi5Um2yKvHwKmU2tUPdb69CGrBhqhOBPF+aGBUasYDJQLWu9koajhMYQ0+AYAtJqD/ogyggtExjaKcmSilC2Q==
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@flexiblepersistence/default-initializer/-/default-initializer-0.1.4.tgz#189edee6a4f8aefb0307723ea13ade6a7045b584"
+  integrity sha512-MWcJVobkYIZDe6g58QOmZhLxo6Ur5WuODlhPqMUhQpaU0HCGYPg7igtReL+s6QtdYftOL3UOAUpqByGtOO5rng==
   dependencies:
     journaly latest
     ts-mixer latest
