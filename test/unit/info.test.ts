@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // file deepcode ignore no-any: any needed
 import { PersistenceInfo } from '../../source/database/persistenceInfo';
-import { Journaly, SubjectObserver } from 'journaly';
+import { Journaly, SenderReceiver } from 'journaly';
 
 test('add and read array and find object', async (done) => {
-  const journaly = Journaly.newJournaly() as SubjectObserver<any>;
+  const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   let info = new PersistenceInfo(
     {
       uri: 'postgres://user:password@host:54321/database',
