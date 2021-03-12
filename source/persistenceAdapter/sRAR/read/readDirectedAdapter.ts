@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { PersistenceInputDirectedRead } from '../../input/read/persistenceInputDirectedRead';
 import { PersistencePromise } from '../../output/persistencePromise';
 

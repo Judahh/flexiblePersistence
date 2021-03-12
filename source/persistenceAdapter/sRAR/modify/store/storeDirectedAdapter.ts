@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { PersistencePromise } from '../../../output/persistencePromise';
 import { PersistenceInputDirectedCreate } from '../../../input/create/persistenceInputDirectedCreate';
 export interface StoreDirectedAdapter<Input, Output> {
