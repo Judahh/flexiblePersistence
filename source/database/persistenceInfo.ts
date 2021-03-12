@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PoolConfig } from 'pg';
 import { Info } from './info';
 import { SenderReceiver } from 'journaly';
@@ -45,7 +46,7 @@ export class PersistenceInfo extends Info implements PoolConfig {
       a = this.host ? this.host.split(':') : undefined;
       if (a && a.length > 1) {
         this.host = a[0];
-        this.port = isNaN(Number(a[1])) ? undefined : Number(a[1]);
+        this.port = Number.isNaN(Number(a[1])) ? undefined : Number(a[1]);
       }
     } else {
       this.database = info.database;

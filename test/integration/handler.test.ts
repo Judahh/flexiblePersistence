@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // file deepcode ignore no-any: any needed
 import { Handler } from '../../source/handler/handler';
 import { PersistenceInfo } from '../../source/database/persistenceInfo';
