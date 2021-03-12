@@ -1,13 +1,13 @@
 import { PoolConfig } from 'pg';
 import { Info } from './info';
-import { SubjectObserver } from 'journaly';
+import { SenderReceiver } from 'journaly';
 export class PersistenceInfo extends Info implements PoolConfig {
   host: string;
   port?: number;
   user?: string;
-  public journaly: SubjectObserver<any>;
+  public journaly: SenderReceiver<any>;
 
-  constructor(info: Info, journaly: SubjectObserver<any>) {
+  constructor(info: Info, journaly: SenderReceiver<any>) {
     super();
     this.journaly = journaly;
     this.uri = info.uri;

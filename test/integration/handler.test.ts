@@ -5,13 +5,13 @@ import { Operation } from '../../source/event/operation';
 import { Event } from '../../source/event/event';
 import { MongoDB } from '../../source/database/noSQL/mongoDB/mongoDB';
 import { PersistencePromise } from '../../source/persistenceAdapter/output/persistencePromise';
-import { Journaly, SubjectObserver } from 'journaly';
+import { Journaly, SenderReceiver } from 'journaly';
 import ObjectSchema from './objectSchema';
 
 let read;
 let write;
 test('add and read array and find object', async (done) => {
-  const journaly = Journaly.newJournaly() as SubjectObserver<any>;
+  const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   read = new MongoDB(
     new PersistenceInfo(
       {
@@ -113,7 +113,7 @@ test('add and read array and find object', async (done) => {
 });
 
 test('add an array and read array and find object', async (done) => {
-  const journaly = Journaly.newJournaly() as SubjectObserver<any>;
+  const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   read = new MongoDB(
     new PersistenceInfo(
       {
@@ -315,7 +315,7 @@ test('add an array and read array and find object', async (done) => {
 });
 
 test('add and read object', async (done) => {
-  const journaly = Journaly.newJournaly() as SubjectObserver<any>;
+  const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   read = new MongoDB(
     new PersistenceInfo(
       {
@@ -418,7 +418,7 @@ test('add and read object', async (done) => {
 });
 
 test('WRITE add and read array and find object', async (done) => {
-  const journaly = Journaly.newJournaly() as SubjectObserver<any>;
+  const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   write = new MongoDB(
     new PersistenceInfo(
       {

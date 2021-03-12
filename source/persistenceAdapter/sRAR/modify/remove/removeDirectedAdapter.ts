@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { PersistencePromise } from '../../../output/persistencePromise';
 import { PersistenceInputDirectedDelete } from '../../../input/delete/persistenceInputDirectedDelete';
 

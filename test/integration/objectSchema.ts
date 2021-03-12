@@ -1,11 +1,11 @@
-import { Schema } from 'mongoose';
+import { Schema, SchemaDefinition } from 'mongoose';
 import { BaseSchemaDefault } from '../../source';
 
 export default class ObjectSchema extends BaseSchemaDefault {
   generateName(): void {
     this.setName('object');
   }
-  protected attributes = {
+  protected attributes: SchemaDefinition = {
     // Model attributes are defined here
     id: {
       type: Schema.Types.ObjectId,

@@ -438,7 +438,7 @@ export class MongoDB implements PersistenceAdapter {
       const newItem = this.generateNewItem(item);
       model.create(newItem, (error, doc) => {
         if (error) {
-          reject(new Error(error));
+          reject(error);
         } else {
           resolve(
             new PersistencePromise({
