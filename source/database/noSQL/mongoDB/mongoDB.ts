@@ -283,7 +283,7 @@ export class MongoDB implements PersistenceAdapter {
         options,
         (error, docs: any[]) => {
           if (error) {
-            reject(new Error(error));
+            reject(error);
           } else {
             const receivedItem = this.generateReceivedArray(docs);
             // console.log(receivedItem);
@@ -491,7 +491,7 @@ export class MongoDB implements PersistenceAdapter {
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.findOneAndDelete(newSelectedItem, options, (error, doc) => {
         if (error) {
-          reject(new Error(error));
+          reject(error);
         } else {
           // console.log('selectedItem :', selectedItem);
           // console.log('doc :', doc);

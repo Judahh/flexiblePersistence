@@ -8,7 +8,10 @@ export class Info {
   port?: number | string;
   username?: string;
   password?: string;
-  options?: string;
+  pool?: {max: number, min: number, idleTimeoutMillis: number};
+  options?: string | {
+    encrypt: boolean, trustServerCertificate: boolean
+  };
   connectionType?: string;
   ssl?: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
 }

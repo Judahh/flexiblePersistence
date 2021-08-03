@@ -4,6 +4,7 @@ import { Info } from './info';
 import { SenderReceiver } from 'journaly';
 export class PersistenceInfo extends Info implements PoolConfig {
   host: string;
+  server: string;
   port?: number;
   user?: string;
   public journaly: SenderReceiver<any>;
@@ -13,6 +14,7 @@ export class PersistenceInfo extends Info implements PoolConfig {
     this.journaly = journaly;
     this.uri = info.uri;
     this.ssl = info.ssl;
+    this.pool = info.pool;
     if (info.uri) {
       let a;
 
@@ -67,5 +69,6 @@ export class PersistenceInfo extends Info implements PoolConfig {
         (this.database ? '/' + this.database : '') +
         (this.options ? '?' + this.options : '');
     }
+    this.server = this.host;
   }
 }
