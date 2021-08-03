@@ -152,6 +152,7 @@ test('add and read array and find object', async (done) => {
   expect(info).toMatchObject({
     uri: 'host:54321',
     host: 'host',
+    server: 'host',
     port: 54321,
   });
 
