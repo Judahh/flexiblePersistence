@@ -173,14 +173,18 @@ test('add an array and read array and find object', async (done) => {
     expect(persistencePromise0).toStrictEqual(
       new PersistencePromise({
         receivedItem: {
-          n: 2,
-          nModified: 2,
-          ok: 1,
+          acknowledged: true,
+          matchedCount: 2,
+          modifiedCount: 2,
+          upsertedCount: 0,
+          upsertedId: null,
         },
         result: {
-          n: 2,
-          nModified: 2,
-          ok: 1,
+          acknowledged: true,
+          matchedCount: 2,
+          modifiedCount: 2,
+          upsertedCount: 0,
+          upsertedId: null,
         },
         selectedItem: {},
         sentItem: { test: 'object' },

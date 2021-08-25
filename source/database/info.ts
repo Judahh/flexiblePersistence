@@ -1,5 +1,5 @@
 // import { ConnectOptions as ConnectionOptions } from 'mongoose';
-import { ConnectionOptions } from 'mongoose';
+import { ConnectionOptions } from 'mongodb';
 import * as tls from 'tls';
 export class Info {
   uri?: string;
@@ -8,10 +8,13 @@ export class Info {
   port?: number | string;
   username?: string;
   password?: string;
-  pool?: {max: number, min: number, idleTimeoutMillis: number};
-  options?: string | {
-    encrypt: boolean, trustServerCertificate: boolean
-  };
+  pool?: { max: number; min: number; idleTimeoutMillis: number };
+  options?:
+    | string
+    | {
+      encrypt: boolean;
+      trustServerCertificate: boolean;
+    };
   connectionType?: string;
   ssl?: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
 }
