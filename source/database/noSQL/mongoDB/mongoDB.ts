@@ -47,9 +47,6 @@ export class MongoDB implements PersistenceAdapter {
     });
 
     this.mongooseInstance.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      useFindAndModify: false,
       autoIndex: false,
     });
 
@@ -77,7 +74,9 @@ export class MongoDB implements PersistenceAdapter {
           element.getOptions()
         );
         if (element.getIndexOptions())
-          this.schema[element.getName()].index(element.getIndexOptions());
+          this.schema[element.getName()].index(
+            element.getIndexOptions() as any
+          );
       }
     }
   }
@@ -419,10 +418,10 @@ export class MongoDB implements PersistenceAdapter {
       doc === undefined || doc === null
         ? undefined
         : doc['_doc']
-        ? doc['_doc']
-        : doc['value']
-        ? doc['value']
-        : doc;
+          ? doc['_doc']
+          : doc['value']
+            ? doc['value']
+            : doc;
     if (receivedItem && receivedItem._id) {
       if (!receivedItem.id) receivedItem.id = receivedItem._id;
       delete receivedItem._id;
