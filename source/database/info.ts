@@ -12,9 +12,11 @@ export class Info {
   options?:
     | string
     | {
-      encrypt: boolean;
-      trustServerCertificate: boolean;
-    };
+        encrypt: boolean;
+        trustServerCertificate: boolean;
+      };
   connectionType?: string;
   ssl?: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
+  connectionTimeout?: number;
+  requestTimeout?: number;
 }
