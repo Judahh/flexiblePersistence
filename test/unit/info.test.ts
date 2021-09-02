@@ -40,14 +40,12 @@ test('add and read array and find object', async (done) => {
   });
   info = new PersistenceInfo(
     {
-      uri:
-        'postgres://ibujvmgywggbqw:75e721b104549ea59dd29a076f50a6c77fc594e21e218663429bf657565f1a93@ec2-52-202-185-87.compute-1.amazonaws.com:5432/d581o8c7v3jv65',
+      uri: 'postgres://ibujvmgywggbqw:75e721b104549ea59dd29a076f50a6c77fc594e21e218663429bf657565f1a93@ec2-52-202-185-87.compute-1.amazonaws.com:5432/d581o8c7v3jv65',
     },
     journaly
   );
   expect(info).toMatchObject({
-    uri:
-      'postgres://ibujvmgywggbqw:75e721b104549ea59dd29a076f50a6c77fc594e21e218663429bf657565f1a93@ec2-52-202-185-87.compute-1.amazonaws.com:5432/d581o8c7v3jv65',
+    uri: 'postgres://ibujvmgywggbqw:75e721b104549ea59dd29a076f50a6c77fc594e21e218663429bf657565f1a93@ec2-52-202-185-87.compute-1.amazonaws.com:5432/d581o8c7v3jv65',
     connectionType: 'postgres',
     user: 'ibujvmgywggbqw',
     password:
@@ -58,14 +56,12 @@ test('add and read array and find object', async (done) => {
   });
   info = new PersistenceInfo(
     {
-      uri:
-        'mongodb+srv://mongo:47zzs4V00j9WJWZk@clusterwhaletest-4zkss.mongodb.net/test?retryWrites=true&w=majority',
+      uri: 'mongodb+srv://mongo:47zzs4V00j9WJWZk@clusterwhaletest-4zkss.mongodb.net/test?retryWrites=true&w=majority',
     },
     journaly
   );
   expect(info).toMatchObject({
-    uri:
-      'mongodb+srv://mongo:47zzs4V00j9WJWZk@clusterwhaletest-4zkss.mongodb.net/test?retryWrites=true&w=majority',
+    uri: 'mongodb+srv://mongo:47zzs4V00j9WJWZk@clusterwhaletest-4zkss.mongodb.net/test?retryWrites=true&w=majority',
     connectionType: 'mongodb+srv',
     user: 'mongo',
     password: '47zzs4V00j9WJWZk',

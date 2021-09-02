@@ -7,6 +7,8 @@ export class PersistenceInfo extends Info implements PoolConfig {
   server: string;
   port?: number;
   user?: string;
+  connectionTimeout?: number;
+  requestTimeout?: number;
   public journaly: SenderReceiver<any>;
 
   constructor(info: Info, journaly: SenderReceiver<any>) {
@@ -15,6 +17,8 @@ export class PersistenceInfo extends Info implements PoolConfig {
     this.uri = info.uri;
     this.ssl = info.ssl;
     this.pool = info.pool;
+    this.connectionTimeout = info.connectionTimeout;
+    this.requestTimeout = info.requestTimeout;
     if (info.uri) {
       let a;
 
