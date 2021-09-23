@@ -6,38 +6,38 @@ import { IEvent } from './event/iEvent';
 import { Operation } from './event/operation';
 import { Write } from './write/write';
 import { Read } from './read/read';
-import { PersistenceBaseAdapter } from './iPersistence/iBasePersistence';
+import { IBasePersistence } from './iPersistence/iBasePersistence';
 import { IPersistence } from './iPersistence/iPersistence';
 
-import { SRARAdapter } from './iPersistence/sRAR/iSRAR';
-import { SRARDirectedAdapter } from './iPersistence/sRAR/iSRARDirected';
+import { ISRAR } from './iPersistence/sRAR/iSRAR';
+import { ISRARDirected } from './iPersistence/sRAR/iSRARDirected';
 
-import { ModifyAdapter } from './iPersistence/sRAR/modify/iModify';
-import { ModifyDirectedAdapter } from './iPersistence/sRAR/modify/iModifyDirected';
+import { IModify } from './iPersistence/sRAR/modify/iModify';
+import { IModifyDirected } from './iPersistence/sRAR/modify/iModifyDirected';
 
-import { ReadAdapter } from './iPersistence/sRAR/read/iRead';
-import { ReadDirectedAdapter } from './iPersistence/sRAR/read/iReadDirected';
+import { IRead } from './iPersistence/sRAR/read/iRead';
+import { IReadDirected } from './iPersistence/sRAR/read/iReadDirected';
 
-import { AlterAdapter } from './iPersistence/sRAR/modify/alter/iAlter';
-import { AlterDirectedAdapter } from './iPersistence/sRAR/modify/alter/iAlterDirected';
-import { RemoveAdapter } from './iPersistence/sRAR/modify/remove/iRemove';
-import { RemoveDirectedAdapter } from './iPersistence/sRAR/modify/remove/iRemoveDirected';
-import { StoreAdapter } from './iPersistence/sRAR/modify/store/iStore';
-import { StoreDirectedAdapter } from './iPersistence/sRAR/modify/store/iStoreDirected';
+import { IAlter } from './iPersistence/sRAR/modify/alter/iAlter';
+import { IAlterDirected } from './iPersistence/sRAR/modify/alter/iAlterDirected';
+import { IRemove } from './iPersistence/sRAR/modify/remove/iRemove';
+import { IRemoveDirected } from './iPersistence/sRAR/modify/remove/iRemoveDirected';
+import { IStore } from './iPersistence/sRAR/modify/store/iStore';
+import { IStoreDirected } from './iPersistence/sRAR/modify/store/iStoreDirected';
 
-import { Output } from './iPersistence/output/iOutput';
+import { IOutput } from './iPersistence/output/iOutput';
 
-import { PersistenceInput } from './iPersistence/input/iInput';
-import { PersistenceInputDirected } from './iPersistence/input/iInputDirected';
+import { IInput } from './iPersistence/input/iInput';
+import { IInputDirected } from './iPersistence/input/iInputDirected';
 
-import { PersistenceInputCreate } from './iPersistence/input/create/iInputCreate';
-import { PersistenceInputDirectedCreate } from './iPersistence/input/create/iInputDirectedCreate';
-import { PersistenceInputRead } from './iPersistence/input/read/iInputRead';
-import { PersistenceInputDirectedRead } from './iPersistence/input/read/iInputDirectedRead';
-import { PersistenceInputUpdate } from './iPersistence/input/update/iInputUpdate';
-import { PersistenceInputDirectedUpdate } from './iPersistence/input/update/iInputDirectedUpdate';
-import { PersistenceInputDelete } from './iPersistence/input/delete/iInputDelete';
-import { PersistenceInputDirectedDelete } from './iPersistence/input/delete/iInputDirectedDelete';
+import { IInputCreate } from './iPersistence/input/create/iInputCreate';
+import { IInputDirectedCreate } from './iPersistence/input/create/iInputDirectedCreate';
+import { IInputRead } from './iPersistence/input/read/iInputRead';
+import { IInputDirectedRead } from './iPersistence/input/read/iInputDirectedRead';
+import { IInputUpdate } from './iPersistence/input/update/iInputUpdate';
+import { IInputDirectedUpdate } from './iPersistence/input/update/iInputDirectedUpdate';
+import { IInputDelete } from './iPersistence/input/delete/iInputDelete';
+import { IInputDirectedDelete } from './iPersistence/input/delete/iInputDirectedDelete';
 
 import { PersistenceInfo } from './database/persistenceInfo';
 import { Info } from './database/info';
@@ -46,38 +46,38 @@ import BaseSchemaDefault from './database/noSQL/mongoDB/baseSchemaDefault';
 
 export {
   Handler,
-  BasicEvent,
-  BasicDirectedEvent,
+  IEvent,
+  IDirectedEvent,
   Event,
   DirectedEvent,
   Operation,
   Write,
   Read,
-  PersistenceBaseAdapter,
-  PersistenceAdapter,
-  SRARAdapter,
-  SRARDirectedAdapter,
-  ModifyAdapter,
-  ModifyDirectedAdapter,
-  ReadAdapter,
-  ReadDirectedAdapter,
-  AlterAdapter,
-  AlterDirectedAdapter,
-  RemoveAdapter,
-  RemoveDirectedAdapter,
-  StoreAdapter,
-  StoreDirectedAdapter,
-  Output,
-  PersistenceInput,
-  PersistenceInputDirected,
-  PersistenceInputCreate,
-  PersistenceInputDirectedCreate,
-  PersistenceInputRead,
-  PersistenceInputDirectedRead,
-  PersistenceInputUpdate,
-  PersistenceInputDirectedUpdate,
-  PersistenceInputDelete,
-  PersistenceInputDirectedDelete,
+  IBasePersistence,
+  IPersistence,
+  ISRAR,
+  ISRARDirected,
+  IModify,
+  IModifyDirected,
+  IRead,
+  IReadDirected,
+  IAlter,
+  IAlterDirected,
+  IRemove,
+  IRemoveDirected,
+  IStore,
+  IStoreDirected,
+  IOutput,
+  IInput,
+  IInputDirected,
+  IInputCreate,
+  IInputDirectedCreate,
+  IInputRead,
+  IInputDirectedRead,
+  IInputUpdate,
+  IInputDirectedUpdate,
+  IInputDelete,
+  IInputDirectedDelete,
   PersistenceInfo,
   Info,
   MongoDB,

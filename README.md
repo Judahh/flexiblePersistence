@@ -184,10 +184,10 @@ selectedItem: any;
 sentItem: any;
 ```
 
-## PersistenceAdapter
+## IPersistence
 
 It's possible to use diferent databases or services implementing
-PersistenceAdapter interface, like MongoDB does.
+IPersistence interface, like MongoDB does.
 
 Other implementations:
 
