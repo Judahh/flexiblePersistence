@@ -68,9 +68,10 @@ export class Handler {
         await this.getReadDB().clear();
         await this.getWrite().clear();
         const rEvents: IOutput<unknown, unknown>[] = [];
-        for (const event of events.receivedItem) {
-          rEvents.push(await this.addEvent(event));
-        }
+        if (events.receivedItem)
+          for (const event of events.receivedItem) {
+            rEvents.push(await this.addEvent(event));
+          }
       } catch (error) {
         console.error(error);
 
