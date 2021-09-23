@@ -5,7 +5,7 @@ import { PersistenceInfo } from '../../source/database/persistenceInfo';
 import { Operation } from '../../source/event/operation';
 import { Event } from '../../source/event/event';
 import { MongoDB } from '../../source/database/noSQL/mongoDB/mongoDB';
-import { PersistencePromise } from '../../source/iPersistence/output/persistencePromise';
+import { Output } from '../../source/iPersistence/output/iOutput';
 import { Journaly, SenderReceiver } from 'journaly';
 import ObjectSchema from './objectSchema';
 
@@ -64,7 +64,7 @@ test('add and read array and find object', async (done) => {
 
     const expected = JSON.parse(
       JSON.stringify(
-        new PersistencePromise({
+        new Output({
           receivedItem: {
             id: persistencePromise2.receivedItem.id,
             test: 'test',
@@ -86,7 +86,7 @@ test('add and read array and find object', async (done) => {
     const persistencePromise3 = await handler.readArray('object', {});
 
     expect(persistencePromise3).toStrictEqual(
-      new PersistencePromise({
+      new Output({
         receivedItem: [],
         result: [],
         selectedItem: {},
@@ -171,7 +171,7 @@ test('add an array and read array and find object', async (done) => {
     );
 
     expect(persistencePromise0).toStrictEqual(
-      new PersistencePromise({
+      new Output({
         receivedItem: {
           acknowledged: true,
           matchedCount: 2,
@@ -209,7 +209,7 @@ test('add an array and read array and find object', async (done) => {
 
     // console.log(persistencePromise2);
 
-    expect(persistencePromise2).toStrictEqual(new PersistencePromise({}));
+    expect(persistencePromise2).toStrictEqual(new Output({}));
 
     const persistencePromise20 = await handler.readArray('object', {});
     // console.log(persistencePromise20);

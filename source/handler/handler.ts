@@ -3,14 +3,14 @@
 import { Write } from '../write/write';
 import { Read } from './../read/read';
 import { Event } from '../event/event';
-import { PersistenceAdapter } from '../iPersistence/iPersistence';
-import { PersistencePromise } from '../iPersistence/output/persistencePromise';
-import { PersistenceInputRead } from '../iPersistence/input/read/iInputRead';
+import { IPersistence } from '../iPersistence/iPersistence';
+import { IOutput } from '../iPersistence/output/iOutput';
+import { IInputRead } from '../iPersistence/input/read/iInputRead';
 export class Handler {
   private read?: Read;
   private write: Write;
 
-  constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
+  constructor(event: IPersistence, read?: IPersistence) {
     this.write = new Write(event, read);
     if (read) {
       this.read = this.write.getRead();
@@ -21,37 +21,35 @@ export class Handler {
     return this.write;
   }
 
-  private doRead(
-    input: PersistenceInputRead
-  ): Promise<PersistencePromise<any>> {
+  private doRead(input: IInputRead): Promise<IOutput<unknown, unknown>> {
     return this.read
       ? this.read.getReadDB().read(input)
       : this.write.read(input);
   }
 
-  addEvent(event: Event): Promise<PersistencePromise<any>> {
+  addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
     return this.write.addEvent(event);
   }
 
   readArray(
     scheme: string,
-    selectedItem?: any
-  ): Promise<PersistencePromise<any>> {
+    selectedItem?: unknown
+  ): Promise<IOutput<unknown, unknown>> {
     return this.doRead({ scheme, selectedItem, single: false });
   }
 
   readItem(
     scheme: string,
-    selectedItem?: any
-  ): Promise<PersistencePromise<any>> {
+    selectedItem?: unknown
+  ): Promise<IOutput<unknown, unknown>> {
     return this.doRead({ scheme, selectedItem, single: true });
   }
 
-  readItemById(scheme: string, id): Promise<PersistencePromise<any>> {
+  readItemById(scheme: string, id): Promise<IOutput<unknown, unknown>> {
     return this.doRead({ scheme, id });
   }
 
-  getReadDB(): PersistenceAdapter {
+  getReadDB(): IPersistence {
     const write = this.getWrite();
     if (write) {
       const read = write.getRead();
@@ -63,13 +61,13 @@ export class Handler {
   migrate(): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        const events = await this.getWrite().read({
+        const events = (await this.getWrite().read({
           scheme: 'events',
           single: false,
-        });
+        })) as IOutput<unknown, Event[]>;
         await this.getReadDB().clear();
         await this.getWrite().clear();
-        const rEvents: any[] = [];
+        const rEvents: IOutput<unknown, unknown>[] = [];
         for (const event of events.receivedItem) {
           rEvents.push(await this.addEvent(event));
         }

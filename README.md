@@ -115,22 +115,22 @@ ssl?: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
 
 ```js
 // use it to add event to databases
-public addEvent(event: Event): Promise<PersistencePromise<any>>;
+public addEvent(event: Event): Promise<Output<any>>;
 
 // use it to read multiple elements from database
 public readArray(
   scheme: string,
   selectedItem: any
-): Promise<PersistencePromise<any>>;
+): Promise<Output<any>>;
 
 // use it to read a single element from database
 public readItem(
   scheme: string,
   selectedItem: any
-): Promise<PersistencePromise<any>>;
+): Promise<Output<any>>;
 
 // use it to read a single element from database using id
-public readItemById(scheme: string, id): Promise<PersistencePromise<any>>;
+public readItemById(scheme: string, id): Promise<Output<any>>;
 ```
 
 ## Event

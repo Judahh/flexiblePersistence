@@ -1,5 +1,5 @@
-import { PersistenceInputDirected } from '../input/iInputDirected';
-import { PersistencePromise } from '../output/persistencePromise';
+import { IInputDirected } from '../input/iInputDirected';
+import { Output } from '../output/iOutput';
 import { IModifyDirected } from './modify/iModifyDirected';
 import { IReadDirected } from './read/iReadDirected';
 
@@ -8,6 +8,6 @@ export interface ISRARDirected<Input, Output>
     IReadDirected<Output> {
   other(
     // eslint-disable-next-line no-unused-vars
-    input: PersistenceInputDirected<Input>
-  ): Promise<PersistencePromise<Output>>;
+    input: IInputDirected<Input>
+  ): Promise<Output<Output>>;
 }

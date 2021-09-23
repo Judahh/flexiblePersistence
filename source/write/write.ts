@@ -1,18 +1,15 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// file deepcode ignore no-any: any needed
 import { Event } from '../event/event';
 import { Read } from '../read/read';
-import { PersistenceAdapter } from '../iPersistence/iPersistence';
-import { PersistencePromise } from '../iPersistence/output/persistencePromise';
-import { PersistenceInputRead } from '../iPersistence/input/read/iInputRead';
+import { IPersistence } from '../iPersistence/iPersistence';
+import { IOutput } from '../iPersistence/output/iOutput';
+import { IInputRead } from '../iPersistence/input/read/iInputRead';
 import { Operation } from '..';
 import { mongo } from 'mongoose';
 export class Write {
   private _read?: Read;
-  private _eventDB: PersistenceAdapter;
+  private _eventDB: IPersistence;
 
-  constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
+  constructor(event: IPersistence, read?: IPersistence) {
     this._eventDB = event;
     if (read) {
       this._read = new Read(read);
@@ -23,7 +20,7 @@ export class Write {
     return this._read;
   }
 
-  addIds(objects) {
+  addIds(objects: Event): void {
     if (Array.isArray(objects)) {
       for (const object of objects) {
         this.addId(object);
@@ -32,7 +29,7 @@ export class Write {
     this.addId(objects);
   }
 
-  addId(object) {
+  addId(object): void {
     if (
       object !== null &&
       typeof object === 'object' &&
@@ -53,7 +50,7 @@ export class Write {
     }
   }
 
-  addEvent(event: Event): Promise<PersistencePromise<any>> {
+  addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
     if (!(event instanceof Event)) event = new Event(event);
     if (!event['id']) event.setId(new mongo.ObjectId());
     // console.log(event.getId());
@@ -63,8 +60,8 @@ export class Write {
     }
     // console.log(event);
 
-    return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const promises: Array<Promise<PersistencePromise<any>>> = [];
+    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const promises: Array<Promise<IOutput<unknown, unknown>>> = [];
       promises.push(this._eventDB.create({ scheme: 'events', item: event }));
       if (this._read) promises.push(this._read.newEvent(event));
       Promise.all(promises)
@@ -73,11 +70,11 @@ export class Write {
     });
   }
 
-  read(input: PersistenceInputRead): Promise<PersistencePromise<any>> {
+  read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
     return this._eventDB.read(input);
   }
 
-  clear(): Promise<PersistencePromise<any>> {
+  clear(): Promise<IOutput<unknown, unknown>> {
     return this._eventDB.delete({ scheme: 'events', single: false });
   }
 }

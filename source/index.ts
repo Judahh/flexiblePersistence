@@ -25,7 +25,7 @@ import { RemoveDirectedAdapter } from './iPersistence/sRAR/modify/remove/iRemove
 import { StoreAdapter } from './iPersistence/sRAR/modify/store/iStore';
 import { StoreDirectedAdapter } from './iPersistence/sRAR/modify/store/iStoreDirected';
 
-import { PersistencePromise } from './iPersistence/output/persistencePromise';
+import { Output } from './iPersistence/output/iOutput';
 
 import { PersistenceInput } from './iPersistence/input/iInput';
 import { PersistenceInputDirected } from './iPersistence/input/iInputDirected';
@@ -67,7 +67,7 @@ export {
   RemoveDirectedAdapter,
   StoreAdapter,
   StoreDirectedAdapter,
-  PersistencePromise,
+  Output,
   PersistenceInput,
   PersistenceInputDirected,
   PersistenceInputCreate,
