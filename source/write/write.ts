@@ -3,9 +3,9 @@
 // file deepcode ignore no-any: any needed
 import { Event } from '../event/event';
 import { Read } from '../read/read';
-import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
+import { PersistenceAdapter } from '../persistenceAdapter/iPersistence';
 import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
-import { PersistenceInputRead } from '../persistenceAdapter/input/read/persistenceInputRead';
+import { PersistenceInputRead } from '../persistenceAdapter/input/read/iInputRead';
 import { Operation } from '..';
 import { mongo } from 'mongoose';
 export class Write {

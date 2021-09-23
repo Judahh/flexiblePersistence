@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { PersistencePromise } from '../../../output/persistencePromise';
-import { PersistenceInputDirectedDelete } from '../../../input/delete/persistenceInputDirectedDelete';
+import { PersistenceInputDirectedDelete } from '../../../input/delete/iInputDirectedDelete';
 
-export interface RemoveDirectedAdapter<Output> {
+export interface IRemoveDirected<Output> {
   nonexistent(
     input: PersistenceInputDirectedDelete
   ): Promise<PersistencePromise<Output>>;

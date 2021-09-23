@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { PersistencePromise } from '../../../output/persistencePromise';
-import { PersistenceInputDelete } from '../../../input/delete/persistenceInputDelete';
+import { PersistenceInputDelete } from '../../../input/delete/iInputDelete';
 
-export interface RemoveAdapter<Output> {
+export interface IRemove<Output> {
   nonexistent(
     input: PersistenceInputDelete
   ): Promise<PersistencePromise<Output>>;

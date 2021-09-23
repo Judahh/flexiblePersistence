@@ -2,7 +2,7 @@
 // file deepcode ignore no-any: any needed
 // file deepcode ignore object-literal-shorthand: argh
 import { Model, Mongoose, Schema } from 'mongoose';
-import { PersistenceAdapter } from './../../../persistenceAdapter/persistenceAdapter';
+import { PersistenceAdapter } from '../../../persistenceAdapter/iPersistence';
 import { PersistenceInfo } from '../../persistenceInfo';
 import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
 // import { Default } from '@flexiblepersistence/default-initializer';
@@ -151,16 +151,25 @@ export class MongoDB implements PersistenceAdapter {
     return this.create(input);
   }
   create(input: PersistenceInputCreate<any>): Promise<PersistencePromise<any>> {
-    if (Array.isArray(input.item)) {
-      return this.createArray(input.scheme, input.item, true, input.options);
-    } else if (Array.isArray(input.item.content)) {
-      return this.createArray(input.scheme, input.item, false, input.options);
+    const isContentArray = Array.isArray(input.item.content);
+    const isRegularArray = Array.isArray(input.item);
+    const isArray = isContentArray || isRegularArray;
+    if (isArray) {
+      return this.createArray(
+        input.scheme,
+        input.item,
+        isRegularArray,
+        input.options
+      );
     } else {
       return this.createItem(input.scheme, input.item);
     }
   }
   update(input: PersistenceInputUpdate<any>): Promise<PersistencePromise<any>> {
-    if (input.single || input.id) {
+    const isContentArray = Array.isArray(input.item.content);
+    const isRegularArray = Array.isArray(input.item);
+    const isArray = isContentArray || isRegularArray;
+    if ((input.single || input.id) && !isArray) {
       return this.updateItem(
         input.scheme,
         input.selectedItem,
@@ -172,6 +181,7 @@ export class MongoDB implements PersistenceAdapter {
         input.scheme,
         input.selectedItem,
         input.item,
+        isRegularArray,
         input.options
       );
     }
@@ -209,60 +219,154 @@ export class MongoDB implements PersistenceAdapter {
       return this.deleteArray(input.scheme, input.selectedItem, input.options);
     }
   }
+
+  async findOneAndUpdateResult(resolve, reject, error, doc, result) {
+    if (error) {
+      reject(error);
+    } else {
+      const item = {
+        receivedItem: this.generateReceivedItem(doc),
+        result: result ? { doc, result } : doc,
+      };
+      console.log('Result UPDATE:', item);
+
+      resolve(item);
+    }
+  }
+  async findOneAndUpdate(
+    model: Model<any>,
+    selectedItem,
+    item,
+    options
+  ): Promise<{ receivedItem: any; result: any }> {
+    return new Promise<{ receivedItem: any; result: any }>(
+      async (resolve, reject) => {
+        delete item.id;
+        delete item._id;
+        const id = selectedItem?.id || selectedItem?._id;
+
+        console.log('findOneAndUpdate:', selectedItem, item, id);
+
+        if (id) {
+          model.findByIdAndUpdate(
+            id,
+            item,
+            { new: true, ...options },
+            (error, doc, result) => {
+              console.log(
+                'findOneAndUpdate FULL:',
+                id,
+                item,
+                options,
+                error,
+                doc,
+                result
+              );
+              this.findOneAndUpdateResult(resolve, reject, error, doc, result);
+            }
+          );
+        } else {
+          model.findOneAndUpdate(
+            selectedItem,
+            item,
+            options,
+            (error, doc, result) => {
+              this.findOneAndUpdateResult(resolve, reject, error, doc, result);
+            }
+          );
+        }
+      }
+    );
+  }
   updateArray(
     scheme: string,
     selectedItem: any,
-    item: any,
+    item: any | any[],
+    regular: boolean,
     options: any
   ): Promise<PersistencePromise<any>> {
-    return new Promise<PersistencePromise<any>>((resolve, reject) => {
+    return new Promise<PersistencePromise<any>>(async (resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
-      const newItem = this.generateNewItem(item);
-      model.updateMany(selectedItem, newItem, options, (error, doc) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(
-            new PersistencePromise({
-              receivedItem: this.generateReceivedItem(doc),
-              result: doc,
-              selectedItem: selectedItem,
-              sentItem: item,
-            })
+      const newItem = Array.isArray(item)
+        ? this.generateNewArray(item, regular)
+        : this.generateNewItem(item);
+
+      if (Array.isArray(newItem)) {
+        console.log('updateArray:', newItem);
+
+        const promisedResponses: Array<Promise<any>> = [];
+        for (let index = 0; index < newItem.length; index++) {
+          const newItemElement = newItem[index];
+
+          const selectedItemElement = Array.isArray(selectedItem)
+            ? selectedItem[index]
+            : {
+                id: newItemElement.id,
+                _id: newItemElement._id,
+                ...selectedItem,
+              };
+
+          promisedResponses.push(
+            this.findOneAndUpdate(
+              model,
+              selectedItemElement,
+              newItemElement,
+              options
+            )
           );
         }
-      });
-    });
-  }
+        const responses = await Promise.all(promisedResponses);
+        console.log('responses: ', responses);
 
-  updateItem(
-    scheme: string,
-    selectedItem: any,
-    item: any,
-    options: any
-  ): Promise<PersistencePromise<any>> {
-    return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
-      const newItem = this.generateNewItem(item);
-      const newSelectedItem = this.generateNewItem(selectedItem);
-      model.findOneAndUpdate(
-        newSelectedItem,
-        newItem,
-        options,
-        (error, doc, result) => {
+        resolve(
+          new PersistencePromise({
+            receivedItem: responses.map((response) => response.receivedItem),
+            result: responses.map((response) => response.result),
+            selectedItem: selectedItem,
+            sentItem: item,
+          })
+        );
+      } else {
+        model.updateMany(selectedItem, newItem, options, (error, doc) => {
           if (error) {
             reject(error);
           } else {
             resolve(
               new PersistencePromise({
                 receivedItem: this.generateReceivedItem(doc),
-                result: result ? { doc, result } : doc,
+                result: doc,
                 selectedItem: selectedItem,
                 sentItem: item,
               })
             );
           }
-        }
+        });
+      }
+    });
+  }
+
+  async updateItem(
+    scheme: string,
+    selectedItem: any,
+    item: any | any[],
+    options: any
+  ): Promise<PersistencePromise<any>> {
+    return new Promise<PersistencePromise<any>>(async (resolve, reject) => {
+      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const newItem = this.generateNewItem(item);
+      const newSelectedItem = this.generateNewItem(selectedItem);
+      const response = await this.findOneAndUpdate(
+        model,
+        newSelectedItem,
+        newItem,
+        options
+      );
+      resolve(
+        new PersistencePromise({
+          ...response,
+          selectedItem: selectedItem,
+          sentItem: item,
+        })
       );
     });
   }
@@ -418,10 +522,10 @@ export class MongoDB implements PersistenceAdapter {
       doc === undefined || doc === null
         ? undefined
         : doc['_doc']
-          ? doc['_doc']
-          : doc['value']
-            ? doc['value']
-            : doc;
+        ? doc['_doc']
+        : doc['value']
+        ? doc['value']
+        : doc;
     if (receivedItem && receivedItem._id) {
       if (!receivedItem.id) receivedItem.id = receivedItem._id;
       delete receivedItem._id;

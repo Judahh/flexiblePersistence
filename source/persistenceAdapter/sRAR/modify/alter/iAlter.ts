@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { PersistencePromise } from '../../../output/persistencePromise';
-import { PersistenceInputUpdate } from '../../../input/update/persistenceInputUpdate';
+import { PersistenceInputUpdate } from '../../../input/update/iInputUpdate';
 
-export interface AlterAdapter<Input, Output> {
+export interface IAlter<Input, Output> {
   correct(
     input: PersistenceInputUpdate<Input>
   ): Promise<PersistencePromise<Output>>;

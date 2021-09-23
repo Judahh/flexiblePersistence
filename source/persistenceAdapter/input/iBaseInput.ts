@@ -3,7 +3,7 @@
 import { BasicEvent } from '../..';
 
 // file deepcode ignore no-any: any needed
-export interface RegularInput {
+export interface IBaseInput {
   scheme: string;
   receivedEvent?: BasicEvent | BasicEvent[];
 }

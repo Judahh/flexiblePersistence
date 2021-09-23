@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BasicEvent } from './basicEvent';
+import { IEvent } from './iEvent';
 import { DirectedEvent } from './directedEvent';
 import { Operation } from './operation';
 export class Event extends DirectedEvent {
@@ -10,7 +10,7 @@ export class Event extends DirectedEvent {
     if (name.includes('_')) name = name.split('_')[1];
     return name;
   }
-  constructor(event: BasicEvent) {
+  constructor(event: IEvent) {
     super(event);
     this.operation = event.operation;
     const tempName =

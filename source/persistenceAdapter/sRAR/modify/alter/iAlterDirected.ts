@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { PersistencePromise } from '../../../output/persistencePromise';
-import { PersistenceInputDirectedUpdate } from '../../../input/update/persistenceInputDirectedUpdate';
+import { PersistenceInputDirectedUpdate } from '../../../input/update/iInputDirectedUpdate';
 
-export interface AlterDirectedAdapter<Input, Output> {
+export interface IAlterDirected<Input, Output> {
   correct(
     input: PersistenceInputDirectedUpdate<Input>
   ): Promise<PersistencePromise<Output>>;

@@ -1,6 +1,6 @@
 import { Operation } from './operation';
 
-export interface BasicDirectedEvent {
+export interface IDirectedEvent {
   operation?: Operation;
   name?: string;
   selection?: unknown;
