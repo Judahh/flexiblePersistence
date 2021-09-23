@@ -2,9 +2,9 @@
 // file deepcode ignore no-any: any needed
 // file deepcode ignore object-literal-shorthand: argh
 import { Model, Mongoose, Schema } from 'mongoose';
-import { PersistenceAdapter } from '../../../persistenceAdapter/iPersistence';
+import { PersistenceAdapter } from '../../../iPersistence/iPersistence';
 import { PersistenceInfo } from '../../persistenceInfo';
-import { PersistencePromise } from '../../../persistenceAdapter/output/persistencePromise';
+import { PersistencePromise } from '../../../iPersistence/output/persistencePromise';
 // import { Default } from '@flexiblepersistence/default-initializer';
 import {
   PersistenceInputUpdate,

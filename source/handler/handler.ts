@@ -3,9 +3,9 @@
 import { Write } from '../write/write';
 import { Read } from './../read/read';
 import { Event } from '../event/event';
-import { PersistenceAdapter } from '../persistenceAdapter/iPersistence';
-import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
-import { PersistenceInputRead } from '../persistenceAdapter/input/read/iInputRead';
+import { PersistenceAdapter } from '../iPersistence/iPersistence';
+import { PersistencePromise } from '../iPersistence/output/persistencePromise';
+import { PersistenceInputRead } from '../iPersistence/input/read/iInputRead';
 export class Handler {
   private read?: Read;
   private write: Write;

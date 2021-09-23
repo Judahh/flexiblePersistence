@@ -5,7 +5,7 @@ import { PersistenceInfo } from '../../source/database/persistenceInfo';
 import { Operation } from '../../source/event/operation';
 import { Event } from '../../source/event/event';
 import { MongoDB } from '../../source/database/noSQL/mongoDB/mongoDB';
-import { PersistencePromise } from '../../source/persistenceAdapter/output/persistencePromise';
+import { PersistencePromise } from '../../source/iPersistence/output/persistencePromise';
 import { Journaly, SenderReceiver } from 'journaly';
 import ObjectSchema from './objectSchema';
 

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Event } from './../event/event';
 import { Operation } from './../event/operation';
-import { PersistenceAdapter } from '../persistenceAdapter/iPersistence';
-import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
-import { PersistenceInput } from '../persistenceAdapter/input/iInput';
+import { PersistenceAdapter } from '../iPersistence/iPersistence';
+import { PersistencePromise } from '../iPersistence/output/persistencePromise';
+import { PersistenceInput } from '../iPersistence/input/iInput';
 export class Read {
   private readDB: PersistenceAdapter;
 
