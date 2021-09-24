@@ -64,9 +64,12 @@ test('add and read array and find object', async (done) => {
 
     expect(persistencePromise1.selectedItem).toStrictEqual({});
 
-    const persistencePromise2 = await handler.addEvent(
+    const persistencePromise2 = (await handler.addEvent(
       new Event({ operation: Operation.delete, name: 'object' })
-    );
+    )) as IOutput<
+      { id: unknown; test: unknown },
+      { id: unknown; test: unknown }
+    >;
 
     const expected = JSON.parse(
       JSON.stringify({
@@ -405,7 +408,13 @@ test('add and read object', async (done) => {
 
     expect(persistencePromise.sentItem).toStrictEqual(obj);
 
-    const persistencePromise1 = await handler.readItemById('object', obj['id']);
+    const persistencePromise1 = (await handler.readItemById(
+      'object',
+      obj['id']
+    )) as IOutput<
+      { id: unknown; test: unknown },
+      { id: unknown; test: unknown }
+    >;
 
     expect(persistencePromise1.receivedItem).toStrictEqual(obj);
 
@@ -486,9 +495,12 @@ test('WRITE add and read array and find object', async (done) => {
   await handler.getWrite().clear();
   const obj = { test: 'test' };
   try {
-    const persistencePromise = await handler.addEvent(
+    const persistencePromise = (await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
-    );
+    )) as IOutput<
+      { id: unknown; test: unknown; timestamp: unknown },
+      { id: unknown; test: unknown; timestamp: unknown }
+    >;
 
     // console.log(obj);
 
@@ -519,13 +531,16 @@ test('WRITE add and read array and find object', async (done) => {
     expect(persistencePromise1.selectedItem).toStrictEqual({});
     expect(persistencePromise1.sentItem).toStrictEqual(undefined);
 
-    const persistencePromise2 = await handler.addEvent(
+    const persistencePromise2 = (await handler.addEvent(
       new Event({
         operation: Operation.delete,
         name: 'object',
         selection: { test: 'test' },
       })
-    );
+    )) as IOutput<
+      { id: unknown; test: unknown; timestamp: string },
+      { id: unknown; test: unknown; timestamp: string }
+    >;
 
     expect(persistencePromise2.receivedItem).toStrictEqual({
       id: persistencePromise2.receivedItem.id,
@@ -549,7 +564,13 @@ test('WRITE add and read array and find object', async (done) => {
       })
     );
 
-    const persistencePromise3 = await handler.readArray('object', {});
+    const persistencePromise3 = (await handler.readArray(
+      'object',
+      {}
+    )) as IOutput<
+      { id: unknown; test: unknown; timestamp: unknown },
+      { id: unknown; test: unknown; timestamp: unknown }[]
+    >;
 
     expect(persistencePromise3.receivedItem.length).toBe(0);
     expect(persistencePromise3.receivedItem).toStrictEqual([]);
