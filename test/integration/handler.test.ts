@@ -36,7 +36,7 @@ test('add and read array and find object', async (done) => {
     )
   );
   const handler = new Handler(write, read);
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   const obj = { test: 'test' };
   try {
     await handler.addEvent(
@@ -102,7 +102,7 @@ test('add and read array and find object', async (done) => {
     await handler.addEvent(
       new Event({ operation: Operation.delete, name: 'object', single: false })
     );
-    await handler.getWrite().clear();
+    await handler.getWrite()?.clear();
     console.error(error);
     await read.close();
     await write.close();
@@ -112,7 +112,7 @@ test('add and read array and find object', async (done) => {
   await handler.addEvent(
     new Event({ operation: Operation.delete, name: 'object', single: false })
   );
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   await read.close();
   await write.close();
   done();
@@ -141,7 +141,7 @@ test('add an array and read array and find object', async (done) => {
     )
   );
   const handler = new Handler(write, read);
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   const obj = { test: 'test' };
   const obj2 = { test: 'test2' };
 
@@ -355,7 +355,7 @@ test('add an array and read array and find object', async (done) => {
     await handler.addEvent(
       new Event({ operation: Operation.delete, name: 'object', single: false })
     );
-    await handler.getWrite().clear();
+    await handler.getWrite()?.clear();
     await read.close();
     await write.close();
     expect(error).toBe(null);
@@ -364,7 +364,7 @@ test('add an array and read array and find object', async (done) => {
   await handler.addEvent(
     new Event({ operation: Operation.delete, name: 'object', single: false })
   );
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   await read.close();
   await write.close();
   done();
@@ -393,7 +393,7 @@ test('add and read object', async (done) => {
     )
   );
   const handler = new Handler(write, read);
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   const obj = { test: 'test' };
   try {
     await handler.addEvent(
@@ -463,7 +463,7 @@ test('add and read object', async (done) => {
     await handler.addEvent(
       new Event({ operation: Operation.delete, name: 'object', single: false })
     );
-    await handler.getWrite().clear();
+    await handler.getWrite()?.clear();
     await read.close();
     await write.close();
     console.error(error);
@@ -473,7 +473,7 @@ test('add and read object', async (done) => {
   await handler.addEvent(
     new Event({ operation: Operation.delete, name: 'object' })
   );
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   await read.close();
   await write.close();
   done();
@@ -492,7 +492,7 @@ test('WRITE add and read array and find object', async (done) => {
     )
   );
   const handler = new Handler(write);
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   const obj = { test: 'test' };
   try {
     const persistencePromise = (await handler.addEvent(
@@ -577,14 +577,14 @@ test('WRITE add and read array and find object', async (done) => {
     expect(persistencePromise3.selectedItem).toStrictEqual({});
     expect(persistencePromise3.sentItem).toStrictEqual(undefined);
 
-    const persistencePromise4 = await handler.getWrite().clear();
-    expect(persistencePromise4.receivedItem).toStrictEqual(undefined);
+    const persistencePromise4 = await handler.getWrite()?.clear();
+    expect(persistencePromise4?.receivedItem).toStrictEqual(undefined);
   } catch (error) {
     console.error(error);
     await handler.addEvent(
       new Event({ operation: Operation.delete, name: 'object', single: false })
     );
-    await handler.getWrite().clear();
+    await handler.getWrite()?.clear();
     await write.close();
     expect(error).toBe(null);
     done();
@@ -592,7 +592,7 @@ test('WRITE add and read array and find object', async (done) => {
   await handler.addEvent(
     new Event({ operation: Operation.delete, name: 'object' })
   );
-  await handler.getWrite().clear();
+  await handler.getWrite()?.clear();
   await write.close();
   done();
 });

@@ -5,15 +5,17 @@ import { IOutput } from '../iPersistence/output/iOutput';
 import { IInputRead } from '../iPersistence/input/read/iInputRead';
 import { Operation } from '..';
 import { mongo } from 'mongoose';
+import IOptions from '../handler/iOptions';
 export class Write {
   protected _read?: Read;
   protected _eventDB: IPersistence;
 
-  constructor(event: IPersistence, read?: IPersistence) {
+  protected options?: IOptions;
+
+  constructor(event: IPersistence, read?: Read, options?: IOptions) {
+    this.options = options;
     this._eventDB = event;
-    if (read) {
-      this._read = new Read(read);
-    }
+    this._read = read;
   }
 
   getRead(): Read | undefined {
@@ -53,20 +55,32 @@ export class Write {
   addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
     if (!(event instanceof Event)) event = new Event(event);
     if (!event['id']) event.setId(new mongo.ObjectId());
-    // console.log(event.getId());
     const operation = event['operation'];
     if (operation === Operation.create || operation === Operation.existent) {
       this.addIds(event);
     }
-    // console.log(event);
 
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+    return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
       const promises: Array<Promise<IOutput<unknown, unknown>>> = [];
-      promises.push(this._eventDB.create({ scheme: 'events', item: event }));
+      const operation = event.getOperation().toString();
+      if (!(this.options?.drop && this.options?.drop[operation])) {
+        promises.push(this._eventDB.create({ scheme: 'events', item: event }));
+      }
       if (this._read) promises.push(this._read.newEvent(event));
-      Promise.all(promises)
-        .then((value) => resolve(value[value.length - 1]))
-        .catch(reject);
+      if (this.options?.isInSeries) {
+        for (let index = 0; index < promises.length; index++) {
+          const promise = promises[index];
+          Promise.resolve(promise)
+            .then((value) =>
+              index === promises.length - 1 ? resolve(value) : undefined
+            )
+            .catch(reject);
+        }
+      } else {
+        Promise.all(promises)
+          .then((value) => resolve(value[value.length - 1]))
+          .catch(reject);
+      }
     });
   }
 

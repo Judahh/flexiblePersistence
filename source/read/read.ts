@@ -31,6 +31,10 @@ export class Read {
     return this.readDB[Operation[event.getOperation()]](input);
   }
 
+  clear(): Promise<boolean> {
+    return this.readDB.clear();
+  }
+
   getReadDB(): IPersistence {
     return this.readDB;
   }

@@ -6,28 +6,45 @@ import { Event } from '../event/event';
 import { IPersistence } from '../iPersistence/iPersistence';
 import { IOutput } from '../iPersistence/output/iOutput';
 import { IInputRead } from '../iPersistence/input/read/iInputRead';
+import IOptions from './iOptions';
 export class Handler {
   protected read?: Read;
-  protected write: Write;
+  protected write?: Write;
+  protected options?: IOptions;
 
-  constructor(event: IPersistence, read?: IPersistence) {
-    this.write = new Write(event, read);
+  constructor(event?: IPersistence, read?: IPersistence, options?: IOptions) {
+    this.options = options;
+
     if (read) {
-      this.read = this.write.getRead();
+      this.read = new Read(read);
+    }
+
+    if (event) {
+      this.write = new Write(event, this.read, this.options);
+    }
+
+    if (!this.read && !this.write) {
+      throw new Error('Handler must have a ReadDB or a WriteDB.');
     }
   }
 
-  getWrite(): Write {
+  getWrite(): Write | undefined {
     return this.write;
   }
 
   protected doRead(input: IInputRead): Promise<IOutput<unknown, unknown>> {
+    if (!this.read && !this.write) {
+      throw new Error('Handler must have a ReadDB.');
+    }
     return this.read
       ? this.read.getReadDB().read(input)
-      : this.write.read(input);
+      : this.write!.read(input);
   }
 
   addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
+    if (!this.write) {
+      throw new Error('Handler must have a WriteDB.');
+    }
     return this.write.addEvent(event);
   }
 
@@ -49,29 +66,28 @@ export class Handler {
     return this.doRead({ scheme, id });
   }
 
-  getReadDB(): IPersistence {
-    const write = this.getWrite();
-    if (write) {
-      const read = write.getRead();
-      if (read) if (read.getReadDB()) return read.getReadDB();
-    }
-    throw new Error('DatabaseHandler must have a ReadDB.');
+  getRead(): Read | undefined {
+    return this.read;
   }
 
   migrate(): Promise<boolean> {
     return new Promise(async (resolve, reject) => {
       try {
-        const events = (await this.getWrite().read({
-          scheme: 'events',
-          single: false,
-        })) as IOutput<unknown, Event[]>;
-        await this.getReadDB().clear();
-        await this.getWrite().clear();
-        const rEvents: IOutput<unknown, unknown>[] = [];
-        if (events.receivedItem)
-          for (const event of events.receivedItem) {
-            rEvents.push(await this.addEvent(event));
-          }
+        if (!this.read || !this.write) {
+          throw new Error('Handler must have a ReadDB or a WriteDB.');
+        } else {
+          const events = (await this.getWrite()!.read({
+            scheme: 'events',
+            single: false,
+          })) as IOutput<unknown, Event[]>;
+          await this.getRead()!.clear();
+          await this.getWrite()!.clear();
+          const rEvents: IOutput<unknown, unknown>[] = [];
+          if (events.receivedItem)
+            for (const event of events.receivedItem) {
+              rEvents.push(await this.addEvent(event));
+            }
+        }
       } catch (error) {
         console.error(error);
 
