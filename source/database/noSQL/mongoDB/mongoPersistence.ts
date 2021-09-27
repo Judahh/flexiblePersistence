@@ -155,7 +155,9 @@ export class MongoPersistence implements IPersistence {
     // console.log('Is Regular Array:', isContentArray);
     // console.log('Is single:', input.single);
 
-    if (input.single && !isArray) {
+    const isEvent = input.item instanceof Event;
+
+    if ((input.single && !isArray) || isEvent) {
       return this.createItem(input.scheme, input.item as Event);
     } else {
       return this.createArray(
@@ -292,7 +294,7 @@ export class MongoPersistence implements IPersistence {
         : this.generateNewItem(item);
 
       if (Array.isArray(newItem)) {
-        console.log('newItem Array:', newItem);
+        // console.log('newItem Array:', newItem);
 
         const promisedResponses: Array<Promise<IOutput<unknown, unknown>>> = [];
         for (let index = 0; index < newItem.length; index++) {
@@ -325,6 +327,7 @@ export class MongoPersistence implements IPersistence {
           );
         }
         const responses = await Promise.all(promisedResponses);
+        // console.log('responses:', responses);
 
         resolve(
           this.cleanReceived({
@@ -335,7 +338,7 @@ export class MongoPersistence implements IPersistence {
           })
         );
       } else {
-        console.log('newItem:', newItem);
+        // console.log('newItem:', newItem);
         model.updateMany(selectedItem, newItem, options, (error, doc) => {
           if (error) {
             reject(error);
@@ -568,12 +571,12 @@ export class MongoPersistence implements IPersistence {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newItem = this.generateNewItem(item);
       model.create(newItem, (error, doc) => {
-        console.log('Scheme:', scheme, item, newItem);
+        // console.log('Scheme:', scheme, item, newItem);
         if (error) {
-          console.error('error:', error);
+          // console.error('error:', error);
           reject(error);
         } else {
-          console.log('doc:', doc);
+          // console.log('doc:', doc);
           resolve(
             this.cleanReceived({
               receivedItem: this.generateReceivedItem(doc),
@@ -597,12 +600,12 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       model.insertMany(items, options, (error, docs) => {
-        console.log('Scheme ARRAY:', scheme, item, items);
+        // console.log('Scheme ARRAY:', scheme, item, items);
         if (error) {
-          console.error('error:', error);
+          // console.error('error:', error);
           reject(error);
         } else {
-          console.log('docs:', docs);
+          // console.log('docs:', docs);
           const receivedItem = this.generateReceivedArray(docs);
           resolve(
             this.cleanReceived({

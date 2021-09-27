@@ -54,8 +54,6 @@ export class Write {
 
   addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
     if (!(event instanceof Event)) event = new Event(event);
-    console.log('addEvent:', event);
-
     if (!event['id']) event.setId(new mongo.ObjectId());
     const operation = event['operation'];
     if (operation === Operation.create || operation === Operation.existent) {
