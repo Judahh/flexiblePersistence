@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { Output } from '../../../output/iOutput';
+import { IOutput } from '../../../output/iOutput';
 import { IInputDelete } from '../../../input/delete/iInputDelete';
 
-export interface IRemove<Output> {
-  nonexistent(input: IInputDelete): Promise<Output<Output>>;
-  delete(input: IInputDelete): Promise<Output<Output>>;
+export interface IRemove<Input, Output> {
+  nonexistent(input: IInputDelete): Promise<IOutput<Input, Output>>;
+  delete(input: IInputDelete): Promise<IOutput<Input, Output>>;
 }

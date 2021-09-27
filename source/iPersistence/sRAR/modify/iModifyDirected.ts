@@ -4,5 +4,5 @@ import { IAlterDirected } from './alter/iAlterDirected';
 
 export interface IModifyDirected<Input, Output>
   extends IStoreDirected<Input, Output>,
-    IRemoveDirected<Output>,
+    IRemoveDirected<Input, Output>,
     IAlterDirected<Input, Output> {}

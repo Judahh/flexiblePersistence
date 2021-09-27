@@ -4,5 +4,5 @@ import { IAlter } from './alter/iAlter';
 
 export interface IModify<Input, Output>
   extends IStore<Input, Output>,
-    IRemove<Output>,
+    IRemove<Input, Output>,
     IAlter<Input, Output> {}

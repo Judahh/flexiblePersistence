@@ -147,6 +147,14 @@ export class MongoPersistence implements IPersistence {
       ? false
       : Array.isArray((input.item as Event).content);
     const isArray = isContentArray || isRegularArray;
+    input.single =
+      input.single === undefined || input.single === null ? true : input.single;
+    // console.log('Input Item:', input.item);
+    // console.log('Is Array:', isArray);
+    // console.log('Is Content Array:', isRegularArray);
+    // console.log('Is Regular Array:', isContentArray);
+    // console.log('Is single:', input.single);
+
     if (input.single && !isArray) {
       return this.createItem(input.scheme, input.item as Event);
     } else {
@@ -164,6 +172,8 @@ export class MongoPersistence implements IPersistence {
       ? false
       : Array.isArray((input.item as Event).content);
     const isArray = isContentArray || isRegularArray;
+    // console.log('Input:', input);
+
     if ((input.single || input.id) && !isArray) {
       return this.updateItem(
         input.scheme,
@@ -282,6 +292,8 @@ export class MongoPersistence implements IPersistence {
         : this.generateNewItem(item);
 
       if (Array.isArray(newItem)) {
+        console.log('newItem Array:', newItem);
+
         const promisedResponses: Array<Promise<IOutput<unknown, unknown>>> = [];
         for (let index = 0; index < newItem.length; index++) {
           const newItemElement = newItem[index];
@@ -293,6 +305,15 @@ export class MongoPersistence implements IPersistence {
                 _id: newItemElement._id,
                 ...selectedItem,
               };
+
+          // delete newItemElement.id;
+          // delete newItemElement._id;
+
+          // console.log(
+          //   '-selectedItemElement:',
+          //   selectedItemElement,
+          //   newItemElement
+          // );
 
           promisedResponses.push(
             this.findOneAndUpdate(
@@ -314,6 +335,7 @@ export class MongoPersistence implements IPersistence {
           })
         );
       } else {
+        console.log('newItem:', newItem);
         model.updateMany(selectedItem, newItem, options, (error, doc) => {
           if (error) {
             reject(error);
@@ -546,14 +568,19 @@ export class MongoPersistence implements IPersistence {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newItem = this.generateNewItem(item);
       model.create(newItem, (error, doc) => {
+        console.log('Scheme:', scheme, item, newItem);
         if (error) {
+          console.error('error:', error);
           reject(error);
         } else {
-          resolve({
-            receivedItem: this.generateReceivedItem(doc),
-            result: doc,
-            sentItem: item,
-          });
+          console.log('doc:', doc);
+          resolve(
+            this.cleanReceived({
+              receivedItem: this.generateReceivedItem(doc),
+              result: doc,
+              sentItem: item,
+            })
+          );
         }
       });
     });
@@ -570,15 +597,20 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       model.insertMany(items, options, (error, docs) => {
+        console.log('Scheme ARRAY:', scheme, item, items);
         if (error) {
+          console.error('error:', error);
           reject(error);
         } else {
+          console.log('docs:', docs);
           const receivedItem = this.generateReceivedArray(docs);
-          resolve({
-            receivedItem: receivedItem,
-            result: docs,
-            sentItem: item,
-          });
+          resolve(
+            this.cleanReceived({
+              receivedItem: receivedItem,
+              result: docs,
+              sentItem: item,
+            })
+          );
         }
       });
     });

@@ -12,7 +12,7 @@ export class Read {
   }
   //  deepcode ignore no-any: any needed
   newEvent(event: Event): Promise<IOutput<unknown, unknown>> {
-    Operation.create.valueOf();
+    //Operation.create.valueOf();
     const id = event.getSelection()
       ? (event.getSelection() as any).id
       : event.isSingle() &&

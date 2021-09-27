@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { IInputDirectedRead } from '../../input/read/iInputDirectedRead';
-import { Output } from '../../output/iOutput';
+import { IOutput } from '../../output/iOutput';
 
-export interface IReadDirected<Output> {
-  read(input: IInputDirectedRead): Promise<Output<Output>>;
+export interface IReadDirected<Input, Output> {
+  read(input: IInputDirectedRead): Promise<IOutput<Input, Output>>;
 }
