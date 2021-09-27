@@ -4,6 +4,7 @@ import {
   Mongoose,
   QueryOptions,
   Schema,
+  Document,
 } from 'mongoose';
 import { IPersistence } from '../../../iPersistence/iPersistence';
 import { PersistenceInfo } from '../../persistenceInfo';
@@ -233,7 +234,7 @@ export class MongoPersistence implements IPersistence {
     // eslint-disable-next-line no-unused-vars
     reject: (_reason?) => void,
     error: unknown,
-    doc: unknown,
+    doc: Document,
     result: unknown
   ): Promise<void> {
     if (error) {
@@ -264,7 +265,13 @@ export class MongoPersistence implements IPersistence {
             item,
             { new: true, ...options },
             (error, doc, result) => {
-              this.findOneAndUpdateResult(resolve, reject, error, doc, result);
+              this.findOneAndUpdateResult(
+                resolve,
+                reject,
+                error,
+                doc as Document,
+                result
+              );
             }
           );
         } else {
@@ -273,7 +280,13 @@ export class MongoPersistence implements IPersistence {
             item,
             options,
             (error, doc, result) => {
-              this.findOneAndUpdateResult(resolve, reject, error, doc, result);
+              this.findOneAndUpdateResult(
+                resolve,
+                reject,
+                error,
+                doc as Document,
+                result
+              );
             }
           );
         }
@@ -422,7 +435,7 @@ export class MongoPersistence implements IPersistence {
         newSelectedItem,
         additionalOptions,
         options,
-        (error, docs: unknown[]) => {
+        (error, docs: Document[]) => {
           if (error) {
             reject(error);
           } else {
@@ -515,7 +528,9 @@ export class MongoPersistence implements IPersistence {
     });
   }
 
-  protected generateReceivedArray(docs: unknown) {
+  protected generateReceivedArray(
+    docs: Document[] | Document | undefined | null
+  ): unknown[] {
     let receivedItem;
     if (Array.isArray(docs))
       receivedItem = docs.map((doc) => this.generateReceivedItem(doc));
@@ -550,7 +565,9 @@ export class MongoPersistence implements IPersistence {
     return item as Event;
   }
 
-  protected generateReceivedItem(doc) {
+  protected generateReceivedItem(
+    doc: Document<unknown, unknown, unknown> | undefined | null
+  ): unknown {
     const receivedItem =
       doc === undefined || doc === null
         ? undefined
@@ -606,7 +623,7 @@ export class MongoPersistence implements IPersistence {
           reject(error);
         } else {
           // console.log('docs:', docs);
-          const receivedItem = this.generateReceivedArray(docs);
+          const receivedItem = this.generateReceivedArray(docs as Document[]);
           resolve(
             this.cleanReceived({
               receivedItem: receivedItem,

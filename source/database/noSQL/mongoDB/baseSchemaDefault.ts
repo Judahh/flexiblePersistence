@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import {
-  Default,
-  DefaultInitializer,
-} from '@flexiblepersistence/default-initializer';
+import { Default, IDefault } from '@flexiblepersistence/default-initializer';
 import { SchemaDefinition, SchemaOptions } from 'mongoose';
 import { settings } from 'ts-mixer';
 settings.initFunction = 'init';
@@ -23,10 +20,10 @@ export default class BaseSchemaDefault extends Default {
   getIndexOptions(): unknown | boolean | string {
     return this.indexOptions;
   }
-  constructor(initDefault?: DefaultInitializer) {
+  constructor(initDefault?: IDefault) {
     super(initDefault);
   }
-  init(initDefault?: DefaultInitializer): void {
+  init(initDefault?: IDefault): void {
     // console.log('init:', initDefault);
 
     super.init(initDefault);
