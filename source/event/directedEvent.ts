@@ -3,6 +3,7 @@ import { IDirectedEvent } from './iDirectedEvent';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export class DirectedEvent {
   id: unknown;
+  _id?: unknown;
   protected timestamp: string;
   content: IDirectedEvent | IDirectedEvent[] | unknown | unknown[];
   protected selection: unknown;

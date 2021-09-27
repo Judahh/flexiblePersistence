@@ -6,8 +6,8 @@ import { IInputRead } from '../iPersistence/input/read/iInputRead';
 import { Operation } from '..';
 import { mongo } from 'mongoose';
 export class Write {
-  private _read?: Read;
-  private _eventDB: IPersistence;
+  protected _read?: Read;
+  protected _eventDB: IPersistence;
 
   constructor(event: IPersistence, read?: IPersistence) {
     this._eventDB = event;

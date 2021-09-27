@@ -1,20 +1,20 @@
-import { Model, Mongoose, QueryOptions, Schema } from 'mongoose';
+import {
+  IndexDefinition,
+  Model,
+  Mongoose,
+  QueryOptions,
+  Schema,
+} from 'mongoose';
 import { IPersistence } from '../../../iPersistence/iPersistence';
 import { PersistenceInfo } from '../../persistenceInfo';
 import { IOutput } from '../../../iPersistence/output/iOutput';
 import { Event } from '../../../event/event';
 
-import {
-  PersistenceInputUpdate,
-  PersistenceInputDelete,
-  PersistenceInputCreate,
-  PersistenceInputRead,
-  Output,
-} from '../../..';
+import { IInputUpdate, IInputDelete, IInputCreate, IInputRead } from '../../..';
 import BaseSchemaDefault from './baseSchemaDefault';
-export class MongoDB implements IPersistence {
-  private persistenceInfo: PersistenceInfo;
-  private mongooseInstance: Mongoose;
+export class MongoPersistence implements IPersistence {
+  protected persistenceInfo: PersistenceInfo;
+  protected mongooseInstance: Mongoose;
 
   element: {
     [name: string]: BaseSchemaDefault;
@@ -65,14 +65,16 @@ export class MongoDB implements IPersistence {
   protected initElement(): void {
     for (const key in this.element) {
       if (Object.prototype.hasOwnProperty.call(this.element, key)) {
-        const element = this.element[key];
+        const element: BaseSchemaDefault = this.element[key];
         if (!this.schema) this.schema = {};
         this.schema[element.getName()] = new this.mongooseInstance.Schema(
           element.getAttributes(),
           element.getOptions()
         );
         if (element.getIndexOptions())
-          this.schema[element.getName()].index(element.getIndexOptions());
+          this.schema[element.getName()].index(
+            element.getIndexOptions() as IndexDefinition
+          );
       }
     }
   }
@@ -86,13 +88,12 @@ export class MongoDB implements IPersistence {
     if (this.schema[name]) return this.schema[name];
     return this.schema['generic'];
   }
-  private clearModel(model: Model<unknown>): Promise<boolean> {
+  protected clearModel(model: Model<unknown>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       model.deleteMany({}, undefined, (error) => {
         if (error) {
           reject(error);
         } else {
-          // console.log('selectedArray :', selectedItem);
           resolve(true);
         }
       });
@@ -124,58 +125,50 @@ export class MongoDB implements IPersistence {
     });
   }
 
-  other(
-    input: PersistenceInputUpdate<unknown>
-  ): Promise<IOutput<unknown, unknown>> {
+  other(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve) => {
       resolve({
         receivedItem: input,
       });
     });
   }
-  correct(
-    input: PersistenceInputUpdate<unknown>
-  ): Promise<IOutput<unknown, unknown>> {
+  correct(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
     return this.update(input);
   }
-  nonexistent(
-    input: PersistenceInputDelete
-  ): Promise<IOutput<unknown, unknown>> {
+  nonexistent(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
     return this.delete(input);
   }
-  existent(
-    input: PersistenceInputCreate<unknown>
-  ): Promise<IOutput<unknown, unknown>> {
+  existent(input: IInputCreate<Event>): Promise<IOutput<unknown, unknown>> {
     return this.create(input);
   }
-  create(
-    input: PersistenceInputCreate<unknown>
-  ): Promise<IOutput<unknown, unknown>> {
-    const isContentArray = Array.isArray(input.item.content);
+  create(input: IInputCreate<Event>): Promise<IOutput<unknown, unknown>> {
     const isRegularArray = Array.isArray(input.item);
+    const isContentArray = isRegularArray
+      ? false
+      : Array.isArray((input.item as Event).content);
     const isArray = isContentArray || isRegularArray;
-    if (isArray) {
+    if (input.single && !isArray) {
+      return this.createItem(input.scheme, input.item as Event);
+    } else {
       return this.createArray(
         input.scheme,
         input.item,
         isRegularArray,
         input.options
       );
-    } else {
-      return this.createItem(input.scheme, input.item);
     }
   }
-  update(
-    input: PersistenceInputUpdate<unknown>
-  ): Promise<IOutput<unknown, unknown>> {
-    const isContentArray = Array.isArray(input.item.content);
+  update(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
     const isRegularArray = Array.isArray(input.item);
+    const isContentArray = isRegularArray
+      ? false
+      : Array.isArray((input.item as Event).content);
     const isArray = isContentArray || isRegularArray;
     if ((input.single || input.id) && !isArray) {
       return this.updateItem(
         input.scheme,
         input.selectedItem,
-        input.item,
+        input.item as Event,
         input.options
       );
     } else {
@@ -188,7 +181,7 @@ export class MongoDB implements IPersistence {
       );
     }
   }
-  read(input: PersistenceInputRead): Promise<IOutput<unknown, unknown>> {
+  read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
     if (input.single || input.id) {
       if (input.id)
         return this.readItemById(
@@ -212,7 +205,7 @@ export class MongoDB implements IPersistence {
       );
     }
   }
-  delete(input: PersistenceInputDelete): Promise<IOutput<unknown, unknown>> {
+  delete(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
     if (input.single || input.id) {
       if (input.id)
         return this.deleteItemById(input.scheme, input.id, input.options);
@@ -238,24 +231,14 @@ export class MongoDB implements IPersistence {
         receivedItem: this.generateReceivedItem(doc),
         result: result ? { doc, result } : doc,
       };
-      console.log('Result UPDATE:', item);
-
       resolve(item);
     }
   }
   async findOneAndUpdate(
     model: Model<unknown>,
-    selectedItem: {
-      id?: unknown;
-      _id?: unknown;
-      content?: unknown;
-    },
-    item: {
-      id?: unknown;
-      _id?: unknown;
-      content?: unknown;
-    },
-    options: QueryOptions
+    selectedItem: Event,
+    item: Event,
+    options?: QueryOptions
   ): Promise<{ receivedItem: unknown; result: unknown }> {
     return new Promise<{ receivedItem: unknown; result: unknown }>(
       async (resolve, reject) => {
@@ -263,23 +246,12 @@ export class MongoDB implements IPersistence {
         delete item._id;
         const id = selectedItem?.id || selectedItem?._id;
 
-        console.log('findOneAndUpdate:', selectedItem, item, id);
-
         if (id) {
           model.findByIdAndUpdate(
             id,
             item,
             { new: true, ...options },
             (error, doc, result) => {
-              console.log(
-                'findOneAndUpdate FULL:',
-                id,
-                item,
-                options,
-                error,
-                doc,
-                result
-              );
               this.findOneAndUpdateResult(resolve, reject, error, doc, result);
             }
           );
@@ -298,15 +270,10 @@ export class MongoDB implements IPersistence {
   }
   updateArray(
     scheme: string,
-    selectedItem: Record<string, unknown>,
-    item:
-      | {
-          id?: unknown;
-          content?: unknown;
-        }
-      | [],
-    regular: boolean,
-    options: QueryOptions
+    selectedItem?: Record<string, unknown>,
+    item?: Event | Event[],
+    regular?: boolean,
+    options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -315,9 +282,7 @@ export class MongoDB implements IPersistence {
         : this.generateNewItem(item);
 
       if (Array.isArray(newItem)) {
-        console.log('updateArray:', newItem);
-
-        const promisedResponses: Array<Promise<Output<unknown, unknown>>> = [];
+        const promisedResponses: Array<Promise<IOutput<unknown, unknown>>> = [];
         for (let index = 0; index < newItem.length; index++) {
           const newItemElement = newItem[index];
 
@@ -339,42 +304,65 @@ export class MongoDB implements IPersistence {
           );
         }
         const responses = await Promise.all(promisedResponses);
-        console.log('responses: ', responses);
 
-        resolve({
-          receivedItem: responses.map((response) => response.receivedItem),
-          result: responses.map((response) => response.result),
-          selectedItem: selectedItem,
-          sentItem: item,
-        });
+        resolve(
+          this.cleanReceived({
+            receivedItem: responses.map((response) => response.receivedItem),
+            result: responses.map((response) => response.result),
+            selectedItem: selectedItem,
+            sentItem: item,
+          })
+        );
       } else {
         model.updateMany(selectedItem, newItem, options, (error, doc) => {
           if (error) {
             reject(error);
           } else {
-            resolve({
-              receivedItem: this.generateReceivedItem(doc),
-              result: doc,
-              selectedItem: selectedItem,
-              sentItem: item,
-            });
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(doc),
+                result: doc,
+                selectedItem: selectedItem,
+                sentItem: item,
+              })
+            );
           }
         });
       }
     });
   }
 
+  protected cleanReceived(received: {
+    receivedItem?;
+    result?;
+    selectedItem?;
+    sentItem?;
+  }): {
+    receivedItem?;
+    result?;
+    selectedItem?;
+    sentItem?;
+  } {
+    if (received.receivedItem === undefined || received.receivedItem === null) {
+      delete received.receivedItem;
+    }
+    if (received.result === undefined || received.result === null) {
+      delete received.result;
+    }
+    if (received.selectedItem === undefined || received.selectedItem === null) {
+      delete received.selectedItem;
+    }
+    if (received.sentItem === undefined || received.sentItem === null) {
+      delete received.sentItem;
+    }
+    return received;
+  }
+
   async updateItem(
     scheme: string,
-    selectedItem: {
-      id?: unknown;
-      content?: unknown;
-    },
-    item: {
-      id?: unknown;
-      content?: unknown;
-    },
-    options: QueryOptions
+    selectedItem?: Event,
+    item?: Event,
+    options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>(async (resolve) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -386,22 +374,21 @@ export class MongoDB implements IPersistence {
         newItem,
         options
       );
-      resolve({
-        ...response,
-        selectedItem: selectedItem,
-        sentItem: item,
-      });
+      resolve(
+        this.cleanReceived({
+          ...response,
+          selectedItem: selectedItem,
+          sentItem: item,
+        })
+      );
     });
   }
 
   readArray(
     scheme: string,
-    selectedItem: {
-      id?: unknown;
-      content?: unknown;
-    },
-    options: QueryOptions,
-    additionalOptions: unknown
+    selectedItem?: Event,
+    options?: QueryOptions,
+    additionalOptions?: unknown
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -414,13 +401,13 @@ export class MongoDB implements IPersistence {
           if (error) {
             reject(error);
           } else {
-            const receivedItem = this.generateReceivedArray(docs);
-            // console.log(receivedItem);
-            resolve({
-              receivedItem: receivedItem,
-              result: docs,
-              selectedItem: selectedItem,
-            });
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedArray(docs),
+                result: docs,
+                selectedItem: selectedItem,
+              })
+            );
           }
         }
       );
@@ -429,17 +416,13 @@ export class MongoDB implements IPersistence {
 
   readItem(
     scheme: string,
-    selectedItem: {
-      id?: unknown;
-      content?: unknown;
-    },
-    options: QueryOptions,
-    additionalOptions: unknown
+    selectedItem?: Event,
+    options?: QueryOptions,
+    additionalOptions?: unknown
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newSelectedItem = this.generateNewItem(selectedItem);
-      // console.log(newSelectedItem);
       model.findOne(
         newSelectedItem,
         additionalOptions,
@@ -448,11 +431,13 @@ export class MongoDB implements IPersistence {
           if (error) {
             reject(error);
           } else {
-            resolve({
-              receivedItem: this.generateReceivedItem(doc),
-              result: doc,
-              selectedItem: selectedItem,
-            });
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(doc),
+                result: doc,
+                selectedItem,
+              })
+            );
           }
         }
       );
@@ -462,8 +447,8 @@ export class MongoDB implements IPersistence {
   readItemById(
     scheme: string,
     id: unknown,
-    options: QueryOptions,
-    additionalOptions: unknown
+    options?: QueryOptions,
+    additionalOptions?: unknown
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -471,11 +456,13 @@ export class MongoDB implements IPersistence {
         if (error) {
           reject(error);
         } else {
-          resolve({
-            receivedItem: this.generateReceivedItem(doc),
-            result: doc,
-            selectedItem: { id: id },
-          });
+          resolve(
+            this.cleanReceived({
+              receivedItem: this.generateReceivedItem(doc),
+              result: doc,
+              selectedItem: { id: id },
+            })
+          );
         }
       });
     });
@@ -483,11 +470,8 @@ export class MongoDB implements IPersistence {
 
   deleteArray(
     scheme: string,
-    selectedItem: {
-      id?: unknown;
-      content?: unknown;
-    },
-    options: QueryOptions
+    selectedItem?: Event,
+    options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -496,16 +480,17 @@ export class MongoDB implements IPersistence {
         if (error) {
           reject(error);
         } else {
-          // console.log('selectedArray :', selectedItem);
-          resolve({
-            selectedItem: selectedItem,
-          });
+          resolve(
+            this.cleanReceived({
+              selectedItem,
+            })
+          );
         }
       });
     });
   }
 
-  private generateReceivedArray(docs: unknown) {
+  protected generateReceivedArray(docs: unknown) {
     let receivedItem;
     if (Array.isArray(docs))
       receivedItem = docs.map((doc) => this.generateReceivedItem(doc));
@@ -513,8 +498,11 @@ export class MongoDB implements IPersistence {
     return receivedItem;
   }
 
-  private generateNewArray(item: { content?: [] } | [], regular?: boolean) {
-    let items: unknown | unknown[] = item;
+  protected generateNewArray(
+    item: Event | Event[],
+    regular?: boolean
+  ): Event | Event[] {
+    let items: Event | Event[] = item;
     if (!Array.isArray(item) && item.content && Array.isArray(item.content)) {
       if (regular)
         items = item?.content?.map((itemC) => this.generateNewItem(itemC));
@@ -525,25 +513,19 @@ export class MongoDB implements IPersistence {
     } else if (Array.isArray(item)) {
       items = item.map((itemC) => this.generateNewItem(itemC));
     }
-    // console.log('generateNewArray:', items);
-
     return items;
   }
 
-  private generateNewItem(item: { id?: unknown; content?: unknown }) {
+  protected generateNewItem(item?: Event | { id?: unknown }): Event {
     if (item && item.id) {
       const newItem = JSON.parse(JSON.stringify(item));
       newItem._id = newItem.id;
-      // console.log('generateNewItem:', newItem.id);
-      // delete newItem.id;
-      // console.log('generateNewItem:', newItem);
       return newItem;
     }
-    // console.log('generateNewItem:', item);
-    return item;
+    return item as Event;
   }
 
-  private generateReceivedItem(doc) {
+  protected generateReceivedItem(doc) {
     const receivedItem =
       doc === undefined || doc === null
         ? undefined
@@ -560,8 +542,6 @@ export class MongoDB implements IPersistence {
   }
 
   createItem(scheme: string, item: Event): Promise<IOutput<unknown, unknown>> {
-    // console.log('NEW:', item);
-
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
       const newItem = this.generateNewItem(item);
@@ -581,13 +561,9 @@ export class MongoDB implements IPersistence {
 
   async createArray(
     scheme: string,
-    item:
-      | {
-          content?: [] | undefined;
-        }
-      | [],
+    item: Event | Event[],
     regular: boolean,
-    options: QueryOptions
+    options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     const items = this.generateNewArray(item, regular);
 
@@ -598,8 +574,6 @@ export class MongoDB implements IPersistence {
           reject(error);
         } else {
           const receivedItem = this.generateReceivedArray(docs);
-          // console.log(receivedItem);
-
           resolve({
             receivedItem: receivedItem,
             result: docs,
@@ -612,8 +586,8 @@ export class MongoDB implements IPersistence {
 
   deleteItem(
     scheme: string,
-    selectedItem: Event,
-    options: QueryOptions
+    selectedItem?: Event,
+    options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -622,13 +596,13 @@ export class MongoDB implements IPersistence {
         if (error) {
           reject(error);
         } else {
-          // console.log('selectedItem :', selectedItem);
-          // console.log('doc :', doc);
-          resolve({
-            receivedItem: this.generateReceivedItem(doc),
-            result: doc,
-            selectedItem: selectedItem,
-          });
+          resolve(
+            this.cleanReceived({
+              receivedItem: this.generateReceivedItem(doc),
+              result: doc,
+              selectedItem: selectedItem,
+            })
+          );
         }
       });
     });
@@ -637,7 +611,7 @@ export class MongoDB implements IPersistence {
   deleteItemById(
     scheme: string,
     id: unknown,
-    options: QueryOptions
+    options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
@@ -645,13 +619,13 @@ export class MongoDB implements IPersistence {
         if (error) {
           reject(error);
         } else {
-          // console.log('selectedItem :', selectedItem);
-          // console.log('doc :', doc);
-          resolve({
-            receivedItem: this.generateReceivedItem(doc),
-            result: doc,
-            selectedItem: { id: id },
-          });
+          resolve(
+            this.cleanReceived({
+              receivedItem: this.generateReceivedItem(doc),
+              result: doc,
+              selectedItem: { id: id },
+            })
+          );
         }
       });
     });

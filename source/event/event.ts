@@ -5,7 +5,7 @@ import { Operation } from './operation';
 export class Event extends DirectedEvent {
   protected operation: Operation;
   protected name!: string;
-  private getConstructorName(object) {
+  protected getConstructorName(object) {
     let name = object.constructor.name;
     if (name.includes('_')) name = name.split('_')[1];
     return name;

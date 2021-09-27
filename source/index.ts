@@ -41,7 +41,7 @@ import { IInputDirectedDelete } from './iPersistence/input/delete/iInputDirected
 
 import { PersistenceInfo } from './database/persistenceInfo';
 import { Info } from './database/info';
-import { MongoDB } from './database/noSQL/mongoDB/mongoDB';
+import { MongoPersistence } from './database/noSQL/mongoDB/mongoPersistence';
 import BaseSchemaDefault from './database/noSQL/mongoDB/baseSchemaDefault';
 
 export {
@@ -80,6 +80,6 @@ export {
   IInputDirectedDelete,
   PersistenceInfo,
   Info,
-  MongoDB,
+  MongoPersistence,
   BaseSchemaDefault,
 };

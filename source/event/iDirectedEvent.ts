@@ -6,7 +6,7 @@ export interface IDirectedEvent {
   selection?: unknown;
   single?: boolean;
   //  deepcode ignore no-any: any needed
-  content?: any | any[];
+  content?: unknown | unknown[];
   timestamp?: string;
   id?: unknown;
   options?: unknown;

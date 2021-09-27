@@ -5,7 +5,7 @@ import { IPersistence } from '../iPersistence/iPersistence';
 import { IOutput } from '../iPersistence/output/iOutput';
 import { IInput } from '../iPersistence/input/iInput';
 export class Read {
-  private readDB: IPersistence;
+  protected readDB: IPersistence;
 
   constructor(readDB: IPersistence) {
     this.readDB = readDB;

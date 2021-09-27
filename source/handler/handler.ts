@@ -7,8 +7,8 @@ import { IPersistence } from '../iPersistence/iPersistence';
 import { IOutput } from '../iPersistence/output/iOutput';
 import { IInputRead } from '../iPersistence/input/read/iInputRead';
 export class Handler {
-  private read?: Read;
-  private write: Write;
+  protected read?: Read;
+  protected write: Write;
 
   constructor(event: IPersistence, read?: IPersistence) {
     this.write = new Write(event, read);
@@ -21,7 +21,7 @@ export class Handler {
     return this.write;
   }
 
-  private doRead(input: IInputRead): Promise<IOutput<unknown, unknown>> {
+  protected doRead(input: IInputRead): Promise<IOutput<unknown, unknown>> {
     return this.read
       ? this.read.getReadDB().read(input)
       : this.write.read(input);
