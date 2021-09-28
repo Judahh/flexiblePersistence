@@ -7,5 +7,5 @@ export interface IInputDirected<Item> {
   additionalOptions?: any;
   eventOptions?: any;
   id?: any;
-  item?: Item | Item[];
+  item?: Item;
 }
