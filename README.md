@@ -186,8 +186,8 @@ sentItem: any;
 
 ## IPersistence
 
-It's possible to use diferent databases or services implementing
-IPersistence interface, like MongoDB does.
+It's possible to use diferent databases or services implementing IPersistence
+interface, like MongoDB does.
 
 Other implementations:
 
