@@ -77,6 +77,7 @@ export class Write {
       }
       if (this._read) promises.push(this._read.newEvent(event));
       if (this.options?.isInSeries) {
+        // console.log('IS IN SERIES');
         for (let index = 0; index < promises.length; index++) {
           const promise = promises[index];
           Promise.resolve(promise)
