@@ -7,6 +7,7 @@ import { IPersistence } from '../iPersistence/iPersistence';
 import { IOutput } from '../iPersistence/output/iOutput';
 import { IInputRead } from '../iPersistence/input/read/iInputRead';
 import IOptions from './iOptions';
+import { Operation } from '../event/operation';
 export class Handler {
   protected read?: Read;
   protected write?: Write;
@@ -62,7 +63,10 @@ export class Handler {
     return this.doRead({ scheme, selectedItem, single: true });
   }
 
-  readItemById(scheme: string, id): Promise<IOutput<unknown, unknown>> {
+  readItemById(
+    scheme: string,
+    id: unknown
+  ): Promise<IOutput<unknown, unknown>> {
     return this.doRead({ scheme, id });
   }
 

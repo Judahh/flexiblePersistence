@@ -62,9 +62,18 @@ export class Write {
 
     return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
       const promises: Array<Promise<IOutput<unknown, unknown>>> = [];
-      const operation = event.getOperation().toString();
+      const operation = Operation[event.getOperation()];
+      // console.log('DROP:', operation);
       if (!(this.options?.drop && this.options?.drop[operation])) {
-        promises.push(this._eventDB.create({ scheme: 'events', item: event }));
+        // console.log('DONT DROP:', operation, this.options?.drop);
+        // if (this.options?.drop)
+        //   console.log('DONT DROP VALUE:', this.options?.drop[operation]);
+        promises.push(
+          this._eventDB.create({
+            scheme: 'events',
+            item: event,
+          })
+        );
       }
       if (this._read) promises.push(this._read.newEvent(event));
       if (this.options?.isInSeries) {
@@ -84,8 +93,8 @@ export class Write {
     });
   }
 
-  read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
-    return this._eventDB.read(input);
+  read(input?: IInputRead): Promise<IOutput<unknown, unknown>> {
+    return this._eventDB.read(input ? input : { scheme: 'events' });
   }
 
   clear(): Promise<IOutput<unknown, unknown>> {

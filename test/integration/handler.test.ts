@@ -37,12 +37,9 @@ test('add and read array and find object', async (done) => {
   );
   const handler = new Handler(write, read);
   await handler.getWrite()?.clear();
+  await handler.getRead()?.clear();
   const obj = { test: 'test' };
   try {
-    await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
-    );
-
     const persistencePromise = await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     );
@@ -99,9 +96,7 @@ test('add and read array and find object', async (done) => {
       selectedItem: {},
     });
   } catch (error) {
-    await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object', single: false })
-    );
+    await handler.getRead()?.clear();
     await handler.getWrite()?.clear();
     console.error(error);
     await read.close();
@@ -109,9 +104,7 @@ test('add and read array and find object', async (done) => {
     expect(error).toBe(null);
     done();
   }
-  await handler.addEvent(
-    new Event({ operation: Operation.delete, name: 'object', single: false })
-  );
+  await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await read.close();
   await write.close();
@@ -142,15 +135,12 @@ test('add an array and read array and find object', async (done) => {
   );
   const handler = new Handler(write, read);
   await handler.getWrite()?.clear();
+  await handler.getRead()?.clear();
   const obj = { test: 'test' };
   const obj2 = { test: 'test2' };
 
   const objArray = [obj, obj2];
   try {
-    await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
-    );
-
     const persistencePromise = await handler.addEvent(
       new Event({
         operation: Operation.create,
@@ -370,18 +360,14 @@ test('add an array and read array and find object', async (done) => {
     expect(persistencePromise5.selectedItem).toStrictEqual({});
   } catch (error) {
     console.error(error);
-    await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object', single: false })
-    );
+    await handler.getRead()?.clear();
     await handler.getWrite()?.clear();
     await read.close();
     await write.close();
     expect(error).toBe(null);
     done();
   }
-  await handler.addEvent(
-    new Event({ operation: Operation.delete, name: 'object', single: false })
-  );
+  await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await read.close();
   await write.close();
@@ -412,12 +398,9 @@ test('add and read object', async (done) => {
   );
   const handler = new Handler(write, read);
   await handler.getWrite()?.clear();
+  await handler.getRead()?.clear();
   const obj = { test: 'test' };
   try {
-    await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object' })
-    );
-
     const persistencePromise = await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     );
@@ -478,9 +461,7 @@ test('add and read object', async (done) => {
 
     expect(persistencePromise5.receivedItem).toStrictEqual([]);
   } catch (error) {
-    await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object', single: false })
-    );
+    await handler.getRead()?.clear();
     await handler.getWrite()?.clear();
     await read.close();
     await write.close();
@@ -488,9 +469,7 @@ test('add and read object', async (done) => {
     expect(error).toBe(null);
     done();
   }
-  await handler.addEvent(
-    new Event({ operation: Operation.delete, name: 'object' })
-  );
+  await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await read.close();
   await write.close();
@@ -599,17 +578,123 @@ test('WRITE add and read array and find object', async (done) => {
     expect(persistencePromise4?.receivedItem).toStrictEqual(undefined);
   } catch (error) {
     console.error(error);
-    await handler.addEvent(
-      new Event({ operation: Operation.delete, name: 'object', single: false })
-    );
+    await handler.getRead()?.clear();
     await handler.getWrite()?.clear();
     await write.close();
     expect(error).toBe(null);
     done();
   }
-  await handler.addEvent(
-    new Event({ operation: Operation.delete, name: 'object' })
+  await handler.getRead()?.clear();
+  await handler.getWrite()?.clear();
+  await write.close();
+  done();
+});
+
+test('Disable Read', async (done) => {
+  const journaly = Journaly.newJournaly() as SenderReceiver<any>;
+  write = new MongoPersistence(
+    new PersistenceInfo(
+      {
+        database: 'write',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
   );
+  const handler = new Handler(write, write, { drop: { read: true } });
+  await handler.getWrite()?.clear();
+  const obj = { test: 'test' };
+  try {
+    (await handler.addEvent(
+      new Event({ operation: Operation.create, name: 'object', content: obj })
+    )) as IOutput<
+      { id: ObjectId; test: string; timestamp: unknown },
+      { id: ObjectId; test: string; timestamp: unknown }
+    >;
+    // console.log('create object', persistencePromise);
+
+    const persistencePromise2 = (await handler.addEvent(
+      new Event({ operation: Operation.read, name: 'object', single: false })
+    )) as IOutput<
+      { id: ObjectId; test: string; timestamp: unknown },
+      { id: ObjectId; test: string; timestamp: unknown }[]
+    >;
+    // console.log('read object', persistencePromise2);
+
+    const persistencePromise3 = (await handler.getWrite()?.read()) as IOutput<
+      { id: ObjectId; test: string; timestamp: unknown },
+      { id: ObjectId; test: string; timestamp: unknown }[]
+    >;
+    // console.log('read events', persistencePromise3?.receivedItem);
+
+    expect(persistencePromise2?.receivedItem?.length).toBe(1);
+    expect(persistencePromise3?.receivedItem?.length).toBe(1);
+  } catch (error) {
+    console.error(error);
+    await handler.getRead()?.clear();
+    await handler.getWrite()?.clear();
+    await write.close();
+    expect(error).toBe(null);
+    done();
+  }
+  await handler.getRead()?.clear();
+  await handler.getWrite()?.clear();
+  await write.close();
+  done();
+});
+
+test('Enable Read', async (done) => {
+  const journaly = Journaly.newJournaly() as SenderReceiver<any>;
+  write = new MongoPersistence(
+    new PersistenceInfo(
+      {
+        database: 'write',
+        host: process.env.MONGO_HOST || 'localhost',
+        port: process.env.MONGO_PORT,
+      },
+      journaly
+    )
+  );
+  const handler = new Handler(write, write, { drop: { read: false } });
+  await handler.getWrite()?.clear();
+  const obj = { test: 'test' };
+  try {
+    (await handler.addEvent(
+      new Event({ operation: Operation.create, name: 'object', content: obj })
+    )) as IOutput<
+      { id: ObjectId; test: string; timestamp: unknown },
+      { id: ObjectId; test: string; timestamp: unknown }
+    >;
+
+    // console.log('create object', persistencePromise);
+
+    const persistencePromise2 = (await handler.addEvent(
+      new Event({ operation: Operation.read, name: 'object', single: false })
+    )) as IOutput<
+      { id: ObjectId; test: string; timestamp: unknown },
+      { id: ObjectId; test: string; timestamp: unknown }[]
+    >;
+
+    // console.log('read object', persistencePromise2);
+
+    const persistencePromise3 = (await handler.getWrite()?.read()) as IOutput<
+      { id: ObjectId; test: string; timestamp: unknown },
+      { id: ObjectId; test: string; timestamp: unknown }[]
+    >;
+    // console.log('read events', persistencePromise3?.receivedItem);
+
+    expect(persistencePromise2?.receivedItem?.length).toBe(1);
+    expect(persistencePromise3?.receivedItem?.length).toBe(2);
+  } catch (error) {
+    console.error(error);
+    await handler.getRead()?.clear();
+    await handler.getWrite()?.clear();
+    await write.close();
+    expect(error).toBe(null);
+    done();
+  }
+  await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await write.close();
   done();

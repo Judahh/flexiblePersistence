@@ -623,7 +623,7 @@ export class MongoPersistence implements IPersistence {
           reject(error);
         } else {
           // console.log('docs:', docs);
-          const receivedItem = this.generateReceivedArray(docs as Document[]);
+          const receivedItem = this.generateReceivedArray(docs as Document);
           resolve(
             this.cleanReceived({
               receivedItem: receivedItem,
