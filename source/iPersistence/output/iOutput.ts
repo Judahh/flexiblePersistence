@@ -3,5 +3,5 @@ export interface IOutput<Input, Output> {
   receivedItem?: Output;
   result?: any;
   selectedItem?: any;
-  sentItem?: Input|Input[];
+  sentItem?: Input;
 }
