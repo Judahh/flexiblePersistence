@@ -1,28 +1,26 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Event } from './../event/event';
 import { Operation } from './../event/operation';
-import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
-import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
-import { PersistenceInput } from '../persistenceAdapter/input/persistenceInput';
+import { IPersistence } from '../iPersistence/iPersistence';
+import { IOutput } from '../iPersistence/output/iOutput';
+import { IInput } from '../iPersistence/input/iInput';
 export class Read {
-  private readDB: PersistenceAdapter;
+  protected readDB: IPersistence;
 
-  constructor(readDB: PersistenceAdapter) {
+  constructor(readDB: IPersistence) {
     this.readDB = readDB;
   }
   //  deepcode ignore no-any: any needed
-  newEvent(event: Event): Promise<PersistencePromise<any>> {
-    Operation.create.valueOf();
+  newEvent(event: Event): Promise<IOutput<unknown, unknown>> {
+    //Operation.create.valueOf();
     const id = event.getSelection()
-      ? //  deepcode ignore no-any: any needed
-        (event.getSelection() as any).id
+      ? (event.getSelection() as any).id
       : event.isSingle() &&
         (event.getOperation() == Operation.create ||
           event.getOperation() == Operation.existent)
       ? event.getId()
       : undefined;
-    //  deepcode ignore no-any: any needed
-    const input: PersistenceInput<any> = {
+    const input: IInput<unknown> = {
       single: event.isSingle(),
       scheme: event.getName(),
       id: id ? String(id) : undefined,
@@ -33,7 +31,11 @@ export class Read {
     return this.readDB[Operation[event.getOperation()]](input);
   }
 
-  getReadDB(): PersistenceAdapter {
+  clear(): Promise<boolean> {
+    return this.readDB.clear();
+  }
+
+  getReadDB(): IPersistence {
     return this.readDB;
   }
 }

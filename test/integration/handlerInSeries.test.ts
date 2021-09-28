@@ -35,7 +35,7 @@ test('add and read array and find object', async (done) => {
       journaly
     )
   );
-  const handler = new Handler(write, read);
+  const handler = new Handler(write, read, { isInSeries: true });
   await handler.getWrite()?.clear();
   await handler.getRead()?.clear();
   const obj = { test: 'test' };
@@ -133,7 +133,7 @@ test('add an array and read array and find object', async (done) => {
       journaly
     )
   );
-  const handler = new Handler(write, read);
+  const handler = new Handler(write, read, { isInSeries: true });
   await handler.getWrite()?.clear();
   await handler.getRead()?.clear();
   const obj = { test: 'test' };
@@ -396,7 +396,7 @@ test('add and read object', async (done) => {
       journaly
     )
   );
-  const handler = new Handler(write, read);
+  const handler = new Handler(write, read, { isInSeries: true });
   await handler.getWrite()?.clear();
   await handler.getRead()?.clear();
   const obj = { test: 'test' };
@@ -488,7 +488,7 @@ test('WRITE add and read array and find object', async (done) => {
       journaly
     )
   );
-  const handler = new Handler(write);
+  const handler = new Handler(write, undefined, { isInSeries: true });
   await handler.getWrite()?.clear();
   const obj = { test: 'test' };
   try {
@@ -602,7 +602,10 @@ test('Disable Read', async (done) => {
       journaly
     )
   );
-  const handler = new Handler(write, write, { drop: { read: true } });
+  const handler = new Handler(write, write, {
+    drop: { read: true },
+    isInSeries: true,
+  });
   await handler.getWrite()?.clear();
   const obj = { test: 'test' };
   try {
@@ -656,7 +659,10 @@ test('Enable Read', async (done) => {
       journaly
     )
   );
-  const handler = new Handler(write, write, { drop: { read: false } });
+  const handler = new Handler(write, write, {
+    drop: { read: false },
+    isInSeries: true,
+  });
   await handler.getWrite()?.clear();
   const obj = { test: 'test' };
   try {

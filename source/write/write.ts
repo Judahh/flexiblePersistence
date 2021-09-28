@@ -1,83 +1,82 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// file deepcode ignore no-any: any needed
+/* eslint-disable no-unused-vars */
 import { Event } from '../event/event';
 import { Read } from '../read/read';
-import { PersistenceAdapter } from '../persistenceAdapter/persistenceAdapter';
-import { PersistencePromise } from '../persistenceAdapter/output/persistencePromise';
-import { PersistenceInputRead } from '../persistenceAdapter/input/read/persistenceInputRead';
+import { IPersistence } from '../iPersistence/iPersistence';
+import { IOutput } from '../iPersistence/output/iOutput';
+import { IInputRead } from '../iPersistence/input/read/iInputRead';
 import { Operation } from '..';
-import { mongo } from 'mongoose';
+import IOptions from '../handler/iOptions';
 export class Write {
-  private _read?: Read;
-  private _eventDB: PersistenceAdapter;
+  protected _read?: Read;
+  protected _eventDB: IPersistence;
 
-  constructor(event: PersistenceAdapter, read?: PersistenceAdapter) {
+  protected options?: IOptions;
+
+  constructor(event: IPersistence, read?: Read, options?: IOptions) {
+    this.options = options;
     this._eventDB = event;
-    if (read) {
-      this._read = new Read(read);
-    }
+    this._read = read;
   }
 
   getRead(): Read | undefined {
     return this._read;
   }
 
-  addIds(objects) {
-    if (Array.isArray(objects)) {
-      for (const object of objects) {
-        this.addId(object);
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  resolvePromises(
+    promises: Array<Promise<IOutput<unknown, unknown>>>,
+    resolve: (
+      value: IOutput<unknown, unknown> | PromiseLike<IOutput<unknown, unknown>>
+    ) => void,
+    reject: (reason?: unknown) => void
+  ) {
+    if (this.options?.isInSeries) {
+      for (let index = 0; index < promises.length; index++) {
+        const promise = promises[index];
+        Promise.resolve(promise)
+          .then((value) =>
+            index === promises.length - 1 ? resolve(value) : undefined
+          )
+          .catch(reject);
       }
-    }
-    this.addId(objects);
-  }
-
-  addId(object) {
-    if (
-      object !== null &&
-      typeof object === 'object' &&
-      !Array.isArray(object)
-    ) {
-      if (object.id === undefined && object._id === undefined)
-        object.id = new mongo.ObjectId();
-      for (const key in object) {
-        if (
-          Object.prototype.hasOwnProperty.call(object, key) &&
-          key !== 'id' &&
-          key !== '_id'
-        ) {
-          const element = object[key];
-          this.addIds(element);
-        }
-      }
-    }
-  }
-
-  addEvent(event: Event): Promise<PersistencePromise<any>> {
-    if (!(event instanceof Event)) event = new Event(event);
-    if (!event['id']) event.setId(new mongo.ObjectId());
-    // console.log(event.getId());
-    const operation = event['operation'];
-    if (operation === Operation.create || operation === Operation.existent) {
-      this.addIds(event);
-    }
-    // console.log(event);
-
-    return new Promise<PersistencePromise<any>>((resolve, reject) => {
-      const promises: Array<Promise<PersistencePromise<any>>> = [];
-      promises.push(this._eventDB.create({ scheme: 'events', item: event }));
-      if (this._read) promises.push(this._read.newEvent(event));
+    } else {
       Promise.all(promises)
         .then((value) => resolve(value[value.length - 1]))
         .catch(reject);
-    });
+    }
   }
 
-  read(input: PersistenceInputRead): Promise<PersistencePromise<any>> {
-    return this._eventDB.read(input);
+  addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown>>(
+      async (
+        resolve: (
+          value:
+            | IOutput<unknown, unknown>
+            | PromiseLike<IOutput<unknown, unknown>>
+        ) => void,
+        reject: (reason?: unknown) => void
+      ) => {
+        const promises: Array<Promise<IOutput<unknown, unknown>>> = [];
+        const operation = Operation[event.getOperation()];
+        if (!(this.options?.drop && this.options?.drop[operation])) {
+          promises.push(
+            this._eventDB.create({
+              scheme: 'events',
+              item: event,
+            })
+          );
+        }
+        if (this._read) promises.push(this._read.newEvent(event));
+        this.resolvePromises(promises, resolve, reject);
+      }
+    );
   }
 
-  clear(): Promise<PersistencePromise<any>> {
+  read(input?: IInputRead): Promise<IOutput<unknown, unknown>> {
+    return this._eventDB.read(input ? input : { scheme: 'events' });
+  }
+
+  clear(): Promise<IOutput<unknown, unknown>> {
     return this._eventDB.delete({ scheme: 'events', single: false });
   }
 }
