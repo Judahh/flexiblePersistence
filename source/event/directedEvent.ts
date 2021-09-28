@@ -1,19 +1,16 @@
-import { BasicDirectedEvent } from './basicDirectedEvent';
+import { IDirectedEvent } from './iDirectedEvent';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export class DirectedEvent {
-  protected id: unknown;
+  id: unknown;
+  _id?: unknown;
   protected timestamp: string;
-  protected content:
-    | BasicDirectedEvent
-    | BasicDirectedEvent[]
-    | unknown
-    | unknown[];
+  content: IDirectedEvent | IDirectedEvent[] | unknown | unknown[];
   protected selection: unknown;
   protected options?: unknown;
   protected single: boolean;
 
-  constructor(event: BasicDirectedEvent) {
+  constructor(event: IDirectedEvent) {
     this.timestamp = event.timestamp || this.currentTimestamp();
     this.content = event.content;
     this.selection = event.selection;
@@ -23,7 +20,7 @@ export class DirectedEvent {
   }
 
   //  deepcode ignore no-any: any needed
-  setContent(content?: BasicDirectedEvent | BasicDirectedEvent[]): void {
+  setContent(content?: IDirectedEvent | IDirectedEvent[]): void {
     this.content = content;
   }
 
@@ -32,7 +29,7 @@ export class DirectedEvent {
   }
 
   //  deepcode ignore no-any: any needed
-  getContent(): BasicDirectedEvent | BasicDirectedEvent[] | any | any[] {
+  getContent(): IDirectedEvent | IDirectedEvent[] | any | any[] {
     return this.content;
   }
 
