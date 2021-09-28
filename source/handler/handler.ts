@@ -8,6 +8,7 @@ import { IOutput } from '../iPersistence/output/iOutput';
 import { IInputRead } from '../iPersistence/input/read/iInputRead';
 import IOptions from './iOptions';
 import { Operation } from '../event/operation';
+import { mongo } from 'mongoose';
 export class Handler {
   protected read?: Read;
   protected write?: Write;
@@ -42,9 +43,51 @@ export class Handler {
       : this.write!.read(input);
   }
 
+  protected addIds(objects: Event): void {
+    if (Array.isArray(objects)) {
+      for (const object of objects) {
+        this.addId(object);
+      }
+    }
+    this.addId(objects);
+  }
+
+  protected addId(object: Event): void {
+    if (
+      object !== null &&
+      typeof object === 'object' &&
+      !Array.isArray(object)
+    ) {
+      if (object.id === undefined && object._id === undefined)
+        object.id = new mongo.ObjectId();
+      for (const key in object) {
+        if (
+          Object.prototype.hasOwnProperty.call(object, key) &&
+          key !== 'id' &&
+          key !== '_id'
+        ) {
+          const element = object[key];
+          this.addIds(element);
+        }
+      }
+    }
+  }
+
+  protected restoreEvent(event: Event): Event {
+    if (!(event instanceof Event)) event = new Event(event);
+    if (!event['id']) event.setId(new mongo.ObjectId());
+    const operation = event['operation'];
+    if (operation === Operation.create || operation === Operation.existent) {
+      this.addIds(event);
+    }
+    return event;
+  }
+
   addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
+    event = this.restoreEvent(event);
     if (!this.write) {
-      throw new Error('Handler must have a WriteDB.');
+      if (this.read) return this.read.newEvent(event);
+      throw new Error('Handler must have a WriteDB or ReadDB.');
     }
     return this.write.addEvent(event);
   }
