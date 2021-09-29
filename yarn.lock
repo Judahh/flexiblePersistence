@@ -326,9 +326,9 @@
     strip-json-comments "^3.1.1"
 
 "@flexiblepersistence/default-initializer@latest":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@flexiblepersistence/default-initializer/-/default-initializer-1.0.1.tgz#4431bf0c1f42b7cfa259c344e48a925ffa42cdbb"
-  integrity sha512-e5i9Z18La1Ev/6msWG+ygZn4Tzf+V6Qk7J12x7+sa1kYk9I1VtA3iszvxgOjUKgPOjd+VY2lRBmNJAG6AC9pIg==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@flexiblepersistence/default-initializer/-/default-initializer-1.0.2.tgz#ff662c227ad1aec0112c789cc0aaee1da4c581bc"
+  integrity sha512-I62aJ0sRIeXJ92v5zaHiFq+FInhdK7g00nJ5mRH4AgwfSynVamHmL9itpRP8PtT2Zbi8NjzrT9RlyzVJ4aj1Ng==
   dependencies:
     journaly latest
     ts-mixer latest
@@ -659,9 +659,9 @@
     mongoose "*"
 
 "@types/node@*", "@types/node@latest":
-  version "16.10.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.10.1.tgz#f3647623199ca920960006b3dccf633ea905f243"
-  integrity sha512-4/Z9DMPKFexZj/Gn3LylFgamNKHm4K3QDi0gz9B26Uk0c8izYf97B5fxfpspMNkWlFupblKM/nV8+NA9Ffvr+w==
+  version "16.10.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.10.2.tgz#5764ca9aa94470adb4e1185fe2e9f19458992b2e"
+  integrity sha512-zCclL4/rx+W5SQTzFs9wyvvyCwoK9QtBpratqz2IYJ3O8Umrn0m3nsTv0wQBk9sRGpvUe9CwPDrQFB10f1FIjQ==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -1464,9 +1464,9 @@ domexception@^2.0.1:
     webidl-conversions "^5.0.0"
 
 electron-to-chromium@^1.3.846:
-  version "1.3.852"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.852.tgz#04091fd848b38e7248e4eb70c05e1f9befd2671b"
-  integrity sha512-vNbdzbbx3d7TStoC0oIVYz6X/tIezHXnreI+4a8I7EqAQ9hpHulz3ar8xChUNcG77A+TtPSKz9B9Xwpt9e1B5w==
+  version "1.3.853"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.853.tgz#f3ed1d31f092cb3a17af188bca6c6a3ec91c3e82"
+  integrity sha512-W4U8n+U8I5/SUaFcqZgbKRmYZwcyEIQVBDf+j5QQK6xChjXnQD+wj248eGR9X4u+dDmDR//8vIfbu4PrdBBIoQ==
 
 emittery@^0.7.1:
   version "0.7.2"
@@ -1500,9 +1500,9 @@ error-ex@^1.3.1:
     is-arrayish "^0.2.1"
 
 es-abstract@^1.18.0-next.1, es-abstract@^1.18.0-next.2, es-abstract@^1.18.2:
-  version "1.18.6"
-  resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.18.6.tgz#2c44e3ea7a6255039164d26559777a6d978cb456"
-  integrity sha512-kAeIT4cku5eNLNuUKhlmtuk1/TRZvQoYccn6TO0cSVdf1kzB0T7+dYuVK9MWM7l+/53W2Q8M7N2c6MQvhXFcUQ==
+  version "1.18.7"
+  resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.18.7.tgz#122daaa523d0a10b0f1be8ed4ce1ee68330c5bb2"
+  integrity sha512-uFG1gyVX91tZIiDWNmPsL8XNpiCk/6tkB7MZphoSJflS4w+KgWyQ2gjCVDnsPxFAo9WjRXG3eqONNYdfbJjAtw==
   dependencies:
     call-bind "^1.0.2"
     es-to-primitive "^1.2.1"
@@ -2905,9 +2905,9 @@ jest@26.6.2:
     jest-cli "^26.6.2"
 
 journaly@latest:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/journaly/-/journaly-4.0.0.tgz#04538490743a60662551f800c9edd1ec41848a77"
-  integrity sha512-7Tw+Z3Y0ixoVDNJKSkBiwNyrh33U4j5zlz1lJNXCzQTUHEjoMsCZcIOGGqIMizDaXxvjXayqmPMQkwXCDHTjsw==
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/journaly/-/journaly-4.0.1.tgz#cb1cc8dc357b715e95a4e5bbb9177b7a333be262"
+  integrity sha512-4z0I5A1PBtZYO2HZrxPKFXD7QMzm2KdF175pEgVvFjNNSQGsLDv4TEO8xfnm0YbVt+VlXBsZj0K+0ZgEERWHlQ==
 
 js-tokens@^4.0.0:
   version "4.0.0"
