@@ -9,6 +9,7 @@ import { Journaly, SenderReceiver } from 'journaly';
 import ObjectSchema from './objectSchema';
 import { IOutput } from '../../source/iPersistence/output/iOutput';
 import { ObjectId } from 'mongoose';
+import { waitForDebugger } from 'inspector';
 
 let read;
 let write;
@@ -486,7 +487,10 @@ test('WRITE add and read array and find object', async (done) => {
         port: process.env.MONGO_PORT,
       },
       journaly
-    )
+    ),
+    {
+      object: new ObjectSchema(),
+    }
   );
   const handler = new Handler(write);
   await handler.getWrite()?.clear();
@@ -569,6 +573,8 @@ test('WRITE add and read array and find object', async (done) => {
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
 
+    // console.log(persistencePromise3?.receivedItem);
+
     expect(persistencePromise3?.receivedItem?.length).toBe(0);
     expect(persistencePromise3.receivedItem).toStrictEqual([]);
     expect(persistencePromise3.selectedItem).toStrictEqual({});
@@ -600,7 +606,10 @@ test('Disable Read', async (done) => {
         port: process.env.MONGO_PORT,
       },
       journaly
-    )
+    ),
+    {
+      object: new ObjectSchema(),
+    }
   );
   const handler = new Handler(write, write, { drop: { read: true } });
   await handler.getWrite()?.clear();
@@ -654,7 +663,10 @@ test('Enable Read', async (done) => {
         port: process.env.MONGO_PORT,
       },
       journaly
-    )
+    ),
+    {
+      object: new ObjectSchema(),
+    }
   );
   const handler = new Handler(write, write, { drop: { read: false } });
   await handler.getWrite()?.clear();
@@ -683,6 +695,7 @@ test('Enable Read', async (done) => {
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
     // console.log('read events', persistencePromise3?.receivedItem);
+    // while (true) { }
 
     expect(persistencePromise2?.receivedItem?.length).toBe(1);
     expect(persistencePromise3?.receivedItem?.length).toBe(2);

@@ -486,7 +486,10 @@ test('WRITE add and read array and find object', async (done) => {
         port: process.env.MONGO_PORT,
       },
       journaly
-    )
+    ),
+    {
+      object: new ObjectSchema(),
+    }
   );
   const handler = new Handler(write, undefined, { isInSeries: true });
   await handler.getWrite()?.clear();
@@ -600,7 +603,10 @@ test('Disable Read', async (done) => {
         port: process.env.MONGO_PORT,
       },
       journaly
-    )
+    ),
+    {
+      object: new ObjectSchema(),
+    }
   );
   const handler = new Handler(write, write, {
     drop: { read: true },
@@ -657,7 +663,10 @@ test('Enable Read', async (done) => {
         port: process.env.MONGO_PORT,
       },
       journaly
-    )
+    ),
+    {
+      object: new ObjectSchema(),
+    }
   );
   const handler = new Handler(write, write, {
     drop: { read: false },
