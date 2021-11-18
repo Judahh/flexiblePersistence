@@ -5,6 +5,7 @@ import {
   QueryOptions,
   Schema,
   Document,
+  InsertManyResult,
 } from 'mongoose';
 import { IPersistence } from '../../../iPersistence/iPersistence';
 import { PersistenceInfo } from '../../persistenceInfo';
@@ -316,10 +317,10 @@ export class MongoPersistence implements IPersistence {
           const selectedItemElement = Array.isArray(selectedItem)
             ? selectedItem[index]
             : {
-                id: newItemElement.id,
-                _id: newItemElement._id,
-                ...selectedItem,
-              };
+              id: newItemElement.id,
+              _id: newItemElement._id,
+              ...selectedItem,
+            };
 
           // delete newItemElement.id;
           // delete newItemElement._id;
@@ -529,7 +530,7 @@ export class MongoPersistence implements IPersistence {
   }
 
   protected generateReceivedArray(
-    docs: Document[] | Document | undefined | null
+    docs: Document[] | Document | InsertManyResult | undefined | null
   ): unknown[] {
     let receivedItem;
     if (Array.isArray(docs))
@@ -566,16 +567,20 @@ export class MongoPersistence implements IPersistence {
   }
 
   protected generateReceivedItem(
-    doc: Document<unknown, unknown, unknown> | undefined | null
+    doc:
+      | Document<unknown, unknown, unknown>
+      | InsertManyResult
+      | undefined
+      | null
   ): unknown {
     const receivedItem =
       doc === undefined || doc === null
         ? undefined
         : doc['_doc']
-        ? doc['_doc']
-        : doc['value']
-        ? doc['value']
-        : doc;
+          ? doc['_doc']
+          : doc['value']
+            ? doc['value']
+            : doc;
     if (receivedItem && receivedItem._id) {
       if (!receivedItem.id) receivedItem.id = receivedItem._id;
       delete receivedItem._id;
@@ -623,7 +628,7 @@ export class MongoPersistence implements IPersistence {
           reject(error);
         } else {
           // console.log('docs:', docs);
-          const receivedItem = this.generateReceivedArray(docs as Document);
+          const receivedItem = this.generateReceivedArray(docs);
           resolve(
             this.cleanReceived({
               receivedItem: receivedItem,
