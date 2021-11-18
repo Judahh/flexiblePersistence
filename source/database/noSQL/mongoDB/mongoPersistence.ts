@@ -1,9 +1,8 @@
 import {
-  IndexDefinition,
   Model,
+  Schema,
   Mongoose,
   QueryOptions,
-  Schema,
   Document,
   InsertManyResult,
 } from 'mongoose';
@@ -14,17 +13,13 @@ import { Event } from '../../../event/event';
 
 import { IInputUpdate, IInputDelete, IInputCreate, IInputRead } from '../../..';
 import BaseSchemaDefault from './baseSchemaDefault';
+import GenericSchema from './genericSchema';
 export class MongoPersistence implements IPersistence {
   protected persistenceInfo: PersistenceInfo;
   protected mongooseInstance: Mongoose;
-
   element: {
     [name: string]: BaseSchemaDefault;
-  } = {};
-
-  schema: {
-    [name: string]: Schema;
-  } = {};
+  } = { Generic: new GenericSchema() };
 
   constructor(
     persistenceInfo: PersistenceInfo,
@@ -50,46 +45,44 @@ export class MongoPersistence implements IPersistence {
       autoIndex: false,
     });
 
-    if (element) this.setElement(element);
-
-    this.schema['generic'] = new this.mongooseInstance.Schema(
-      {
-        id: {
-          type: Schema.Types.ObjectId,
-          unique: true,
-          index: true,
-        },
-      },
-      { strict: false, id: true, versionKey: false }
-    );
+    this.setElement(element);
   }
 
   protected initElement(): void {
     for (const key in this.element) {
       if (Object.prototype.hasOwnProperty.call(this.element, key)) {
         const element: BaseSchemaDefault = this.element[key];
-        if (!this.schema) this.schema = {};
-        this.schema[element.getName()] = new this.mongooseInstance.Schema(
-          element.getAttributes(),
-          element.getOptions()
-        );
-        if (element.getIndexOptions())
-          this.schema[element.getName()].index(
-            element.getIndexOptions() as IndexDefinition
-          );
+        const schema = new this.mongooseInstance.Schema(element.getAttributes(), element.getOptions());
+        const index = element.getIndex();
+        if (index) {
+          schema.index(index, element.getIndexOptions());
+        }
+        this.addModel(element.getName(), schema)
       }
     }
+    // console.log('Mongoose Models:', this.getModels());
   }
 
-  setElement(element: { [name: string]: BaseSchemaDefault }): void {
-    this.element = element;
+  setElement(element?: { [name: string]: BaseSchemaDefault }): void {
+    if (element)
+      this.element = { ...this.element, ...element };
     this.initElement();
   }
 
-  getSchema(name: string): Schema {
-    if (this.schema[name]) return this.schema[name];
-    return this.schema['generic'];
+  getModel(name: string): Model<unknown, unknown, unknown, unknown> {
+    if (this.getModels()[name]) return this.getModels()[name];
+    return this.getModels()['Generic'];
   }
+
+  getModels(): { [index: string]: Model<unknown, unknown, unknown, unknown>; } {
+    return this.mongooseInstance.models;
+  }
+
+  addModel(name: string, schema: Schema): Model<unknown, unknown, unknown, unknown> {
+    // this.model[name] =
+    return this.mongooseInstance.model(name, schema);
+  }
+
   protected clearModel(model: Model<unknown>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
       model.deleteMany({}, undefined, (error) => {
@@ -104,14 +97,14 @@ export class MongoPersistence implements IPersistence {
   clear(): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
       const responses: Array<Promise<boolean>> = [];
-      for (const key in this.mongooseInstance.models) {
+      for (const key in this.getModels()) {
         if (
           Object.prototype.hasOwnProperty.call(
-            this.mongooseInstance.models,
+            this.getModels(),
             key
           )
         ) {
-          const model = this.mongooseInstance.models[key];
+          const model = this.getModel(key);
           responses.push(this.clearModel(model));
         }
       }
@@ -302,7 +295,7 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       const newItem = Array.isArray(item)
         ? this.generateNewArray(item, regular)
         : this.generateNewItem(item);
@@ -404,7 +397,7 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>(async (resolve) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       const newItem = this.generateNewItem(item);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const response = await this.findOneAndUpdate(
@@ -430,7 +423,7 @@ export class MongoPersistence implements IPersistence {
     additionalOptions?: unknown
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.find(
         newSelectedItem,
@@ -460,7 +453,7 @@ export class MongoPersistence implements IPersistence {
     additionalOptions?: unknown
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.findOne(
         newSelectedItem,
@@ -490,7 +483,7 @@ export class MongoPersistence implements IPersistence {
     additionalOptions?: unknown
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       model.findById(id, additionalOptions, options, (error, doc) => {
         if (error) {
           reject(error);
@@ -513,7 +506,7 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.deleteMany(newSelectedItem, options, (error) => {
         if (error) {
@@ -590,7 +583,7 @@ export class MongoPersistence implements IPersistence {
 
   createItem(scheme: string, item: Event): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       const newItem = this.generateNewItem(item);
       model.create(newItem, (error, doc) => {
         // console.log('Scheme:', scheme, item, newItem);
@@ -620,7 +613,7 @@ export class MongoPersistence implements IPersistence {
     const items = this.generateNewArray(item, regular);
 
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       model.insertMany(items, options, (error, docs) => {
         // console.log('Scheme ARRAY:', scheme, item, items);
         if (error) {
@@ -647,7 +640,7 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.findOneAndDelete(newSelectedItem, options, (error, doc) => {
         if (error) {
@@ -671,7 +664,7 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.mongooseInstance.model(scheme, this.getSchema(scheme));
+      const model = this.getModel(scheme);
       model.findByIdAndDelete(id, options, (error, doc) => {
         if (error) {
           reject(error);
