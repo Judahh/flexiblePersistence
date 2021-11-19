@@ -42,7 +42,7 @@
     "pg": "latest"
   },
   "devDependencies": {
-    "@types/jest": "26.0.24",
+    "@types/jest": "27.0.3",
     "@types/node": "latest",
     "@types/mongoose": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
