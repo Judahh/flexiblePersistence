@@ -12,7 +12,7 @@ import { ObjectId } from 'mongoose';
 
 let read;
 let write;
-test('add and read array and find object', async (done) => {
+test('add and read array and find object', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   read = new MongoPersistence(
     new PersistenceInfo(
@@ -102,16 +102,14 @@ test('add and read array and find object', async (done) => {
     await read.close();
     await write.close();
     expect(error).toBe(null);
-    done();
   }
   await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await read.close();
   await write.close();
-  done();
 });
 
-test('add an array and read array and find object', async (done) => {
+test('add an array and read array and find object', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   read = new MongoPersistence(
     new PersistenceInfo(
@@ -365,16 +363,14 @@ test('add an array and read array and find object', async (done) => {
     await read.close();
     await write.close();
     expect(error).toBe(null);
-    done();
   }
   await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await read.close();
   await write.close();
-  done();
 });
 
-test('add and read object', async (done) => {
+test('add and read object', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   read = new MongoPersistence(
     new PersistenceInfo(
@@ -467,16 +463,14 @@ test('add and read object', async (done) => {
     await write.close();
     console.error(error);
     expect(error).toBe(null);
-    done();
   }
   await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await read.close();
   await write.close();
-  done();
 });
 
-test('WRITE add and read array and find object', async (done) => {
+test('WRITE add and read array and find object', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   write = new MongoPersistence(
     new PersistenceInfo(
@@ -585,15 +579,13 @@ test('WRITE add and read array and find object', async (done) => {
     await handler.getWrite()?.clear();
     await write.close();
     expect(error).toBe(null);
-    done();
   }
   await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await write.close();
-  done();
 });
 
-test('Disable Read', async (done) => {
+test('Disable Read', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   write = new MongoPersistence(
     new PersistenceInfo(
@@ -645,15 +637,13 @@ test('Disable Read', async (done) => {
     await handler.getWrite()?.clear();
     await write.close();
     expect(error).toBe(null);
-    done();
   }
   await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await write.close();
-  done();
 });
 
-test('Enable Read', async (done) => {
+test('Enable Read', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   write = new MongoPersistence(
     new PersistenceInfo(
@@ -707,10 +697,8 @@ test('Enable Read', async (done) => {
     await handler.getWrite()?.clear();
     await write.close();
     expect(error).toBe(null);
-    done();
   }
   await handler.getRead()?.clear();
   await handler.getWrite()?.clear();
   await write.close();
-  done();
 });

@@ -3,7 +3,7 @@
 import { PersistenceInfo } from '../../source/database/persistenceInfo';
 import { Journaly, SenderReceiver } from 'journaly';
 
-test('add and read array and find object', async (done) => {
+test('add and read array and find object', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   let info = new PersistenceInfo(
     {
@@ -174,6 +174,4 @@ test('add and read array and find object', async (done) => {
     database: 'database',
     user: 'user',
   });
-
-  done();
 });
