@@ -11,7 +11,7 @@ import { IOutput } from '../../source/iPersistence/output/iOutput';
 import { ObjectId } from 'mongoose';
 
 let read;
-test('add and read array and find object', async (done) => {
+test('add and read array and find object', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   read = new MongoPersistence(
     new PersistenceInfo(
@@ -88,9 +88,7 @@ test('add and read array and find object', async (done) => {
     console.error(error);
     await read.close();
     expect(error).toBe(null);
-    done();
   }
   await handler.getRead()?.clear();
   await read.close();
-  done();
 });
