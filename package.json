@@ -38,6 +38,7 @@
   "dependencies": {
     "@flexiblepersistence/default-initializer": "latest",
     "journaly": "latest",
+    "mongodb": "latest",
     "mongoose": "latest",
     "pg": "latest"
   },

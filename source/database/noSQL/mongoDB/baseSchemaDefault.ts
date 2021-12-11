@@ -1,8 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Default, IDefault } from '@flexiblepersistence/default-initializer';
-import { SchemaDefinition, SchemaOptions, IndexDefinition, IndexOptions } from 'mongoose';
-import { settings } from 'ts-mixer';
-settings.initFunction = 'init';
+import {
+  SchemaDefinition,
+  SchemaOptions,
+  IndexDefinition,
+  IndexOptions,
+} from 'mongoose';
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default class BaseSchemaDefault extends Default {
   protected attributes: SchemaDefinition = {};
@@ -29,8 +33,6 @@ export default class BaseSchemaDefault extends Default {
     super(initDefault);
   }
   init(initDefault?: IDefault): void {
-    // console.log('init:', initDefault);
-
     super.init(initDefault);
   }
 }
