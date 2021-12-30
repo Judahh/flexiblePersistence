@@ -52,20 +52,22 @@ export class MongoPersistence implements IPersistence {
     for (const key in this.element) {
       if (Object.prototype.hasOwnProperty.call(this.element, key)) {
         const element: BaseSchemaDefault = this.element[key];
-        const schema = new this.mongooseInstance.Schema(element.getAttributes(), element.getOptions());
+        const schema = new this.mongooseInstance.Schema(
+          element.getAttributes(),
+          element.getOptions()
+        );
         const index = element.getIndex();
         if (index) {
           schema.index(index, element.getIndexOptions());
         }
-        this.addModel(element.getName(), schema)
+        this.addModel(element.getName(), schema);
       }
     }
     // console.log('Mongoose Models:', this.getModels());
   }
 
   setElement(element?: { [name: string]: BaseSchemaDefault }): void {
-    if (element)
-      this.element = { ...this.element, ...element };
+    if (element) this.element = { ...this.element, ...element };
     this.initElement();
   }
 
@@ -74,11 +76,14 @@ export class MongoPersistence implements IPersistence {
     return this.getModels()['Generic'];
   }
 
-  getModels(): { [index: string]: Model<unknown, unknown, unknown, unknown>; } {
+  getModels(): { [index: string]: Model<unknown, unknown, unknown, unknown> } {
     return this.mongooseInstance.models;
   }
 
-  addModel(name: string, schema: Schema): Model<unknown, unknown, unknown, unknown> {
+  addModel(
+    name: string,
+    schema: Schema
+  ): Model<unknown, unknown, unknown, unknown> {
     // this.model[name] =
     return this.mongooseInstance.model(name, schema);
   }
@@ -98,12 +103,7 @@ export class MongoPersistence implements IPersistence {
     return new Promise<boolean>(async (resolve, reject) => {
       const responses: Array<Promise<boolean>> = [];
       for (const key in this.getModels()) {
-        if (
-          Object.prototype.hasOwnProperty.call(
-            this.getModels(),
-            key
-          )
-        ) {
+        if (Object.prototype.hasOwnProperty.call(this.getModels(), key)) {
           const model = this.getModel(key);
           responses.push(this.clearModel(model));
         }
@@ -195,20 +195,23 @@ export class MongoPersistence implements IPersistence {
           input.scheme,
           input.id,
           input.options,
-          input.additionalOptions
+          input.additionalOptions,
+          input.eventOptions
         );
       return this.readItem(
         input.scheme,
         input.selectedItem,
         input.options,
-        input.additionalOptions
+        input.additionalOptions,
+        input.eventOptions
       );
     } else {
       return this.readArray(
         input.scheme,
         input.selectedItem,
         input.options,
-        input.additionalOptions
+        input.additionalOptions,
+        input.eventOptions
       );
     }
   }
@@ -310,10 +313,10 @@ export class MongoPersistence implements IPersistence {
           const selectedItemElement = Array.isArray(selectedItem)
             ? selectedItem[index]
             : {
-              id: newItemElement.id,
-              _id: newItemElement._id,
-              ...selectedItem,
-            };
+                id: newItemElement.id,
+                _id: newItemElement._id,
+                ...selectedItem,
+              };
 
           // delete newItemElement.id;
           // delete newItemElement._id;
@@ -416,23 +419,84 @@ export class MongoPersistence implements IPersistence {
     });
   }
 
+  generateOptions(
+    options?: QueryOptions,
+    eventOptions?: {
+      page?: string | number;
+      pageSize?: string | number;
+      pagesize?: string | number;
+      numberOfPages?: string | number;
+      numberofpages?: string | number;
+    }
+  ) {
+    if (eventOptions?.pageSize || eventOptions?.pageSize) {
+      const pageSize = eventOptions?.pageSize || eventOptions?.pagesize;
+      const skip =
+        eventOptions?.page && pageSize ? +eventOptions?.page * +pageSize : 0;
+      const compiledOptions = {
+        ...options,
+        limit: pageSize ? +pageSize : undefined,
+        skip: skip ? +skip : undefined,
+      };
+      return compiledOptions;
+    }
+    return options;
+  }
+
+  async count(
+    model: Model<unknown, unknown, unknown, unknown>,
+    selectedItem: Event,
+    options?: QueryOptions,
+    eventOptions?: {
+      page?: string | number;
+      pageSize?: string | number;
+      pagesize?: string | number;
+      numberOfPages?: string | number;
+      numberofpages?: string | number;
+    },
+    compiledOptions?: QueryOptions
+  ): Promise<void> {
+    if (compiledOptions && compiledOptions.limit) {
+      const count = await model.countDocuments(selectedItem, options);
+      if (eventOptions) {
+        eventOptions.numberOfPages = count;
+        eventOptions.numberofpages = count;
+      }
+    }
+  }
+
   readArray(
     scheme: string,
     selectedItem?: Event,
     options?: QueryOptions,
-    additionalOptions?: unknown
+    additionalOptions?: unknown,
+    eventOptions?: {
+      page?: string | number;
+      pageSize?: string | number;
+      pagesize?: string | number;
+      numberOfPages?: string | number;
+      numberofpages?: string | number;
+    }
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const compiledOptions = this.generateOptions(options, eventOptions);
       const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.find(
         newSelectedItem,
         additionalOptions,
-        options,
-        (error, docs: Document[]) => {
+        compiledOptions,
+        async (error, docs: Document[]) => {
           if (error) {
             reject(error);
           } else {
+            await this.count(
+              model,
+              newSelectedItem,
+              options,
+              eventOptions,
+              compiledOptions
+            );
             resolve(
               this.cleanReceived({
                 receivedItem: this.generateReceivedArray(docs),
@@ -450,19 +514,34 @@ export class MongoPersistence implements IPersistence {
     scheme: string,
     selectedItem?: Event,
     options?: QueryOptions,
-    additionalOptions?: unknown
+    additionalOptions?: unknown,
+    eventOptions?: {
+      page?: string | number;
+      pageSize?: string | number;
+      pagesize?: string | number;
+      numberOfPages?: string | number;
+      numberofpages?: string | number;
+    }
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const compiledOptions = this.generateOptions(options, eventOptions);
       const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       model.findOne(
         newSelectedItem,
         additionalOptions,
-        options,
-        (error, doc) => {
+        compiledOptions,
+        async (error, doc) => {
           if (error) {
             reject(error);
           } else {
+            await this.count(
+              model,
+              newSelectedItem,
+              options,
+              eventOptions,
+              compiledOptions
+            );
             resolve(
               this.cleanReceived({
                 receivedItem: this.generateReceivedItem(doc),
@@ -480,23 +559,43 @@ export class MongoPersistence implements IPersistence {
     scheme: string,
     id: unknown,
     options?: QueryOptions,
-    additionalOptions?: unknown
+    additionalOptions?: unknown,
+    eventOptions?: {
+      page?: string | number;
+      pageSize?: string | number;
+      pagesize?: string | number;
+      numberOfPages?: string | number;
+      numberofpages?: string | number;
+    }
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const compiledOptions = this.generateOptions(options, eventOptions);
       const model = this.getModel(scheme);
-      model.findById(id, additionalOptions, options, (error, doc) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(doc),
-              result: doc,
-              selectedItem: { id: id },
-            })
-          );
+      model.findById(
+        id,
+        additionalOptions,
+        compiledOptions,
+        async (error, doc) => {
+          if (error) {
+            reject(error);
+          } else {
+            await this.count(
+              model,
+              { id: id } as Event,
+              options,
+              eventOptions,
+              compiledOptions
+            );
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(doc),
+                result: doc,
+                selectedItem: { id: id },
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -570,10 +669,10 @@ export class MongoPersistence implements IPersistence {
       doc === undefined || doc === null
         ? undefined
         : doc['_doc']
-          ? doc['_doc']
-          : doc['value']
-            ? doc['value']
-            : doc;
+        ? doc['_doc']
+        : doc['value']
+        ? doc['value']
+        : doc;
     if (receivedItem && receivedItem._id) {
       if (!receivedItem.id) receivedItem.id = receivedItem._id;
       delete receivedItem._id;
