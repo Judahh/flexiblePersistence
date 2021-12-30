@@ -459,8 +459,8 @@ export class MongoPersistence implements IPersistence {
     if (compiledOptions && compiledOptions.limit) {
       const count = await model.countDocuments(selectedItem, options);
       if (eventOptions) {
-        eventOptions.numberOfPages = count;
-        eventOptions.numberofpages = count;
+        eventOptions.numberOfPages = Math.ceil(count / compiledOptions.limit);
+        eventOptions.numberofpages = eventOptions.numberOfPages;
       }
     }
   }
