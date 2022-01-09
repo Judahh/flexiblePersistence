@@ -1,3 +1,4 @@
+import { Operation } from '..';
 import { IDirectedEvent } from './iDirectedEvent';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -9,6 +10,8 @@ export class DirectedEvent {
   protected selection: unknown;
   protected options?: unknown;
   protected single: boolean;
+  protected correct: boolean;
+  replace?: boolean; // only for create/update/other
 
   constructor(event: IDirectedEvent) {
     this.timestamp = event.timestamp || this.currentTimestamp();
@@ -17,6 +20,14 @@ export class DirectedEvent {
     this.single = event.single === undefined ? true : event.single;
     this.id = event.id;
     this.options = event.options;
+    this.correct =
+      event.operation !== Operation.read ? event.correct || false : false;
+    this.replace =
+      event.operation === Operation.create ||
+      event.operation === Operation.update ||
+      event.operation === Operation.other
+        ? event.replace || false
+        : undefined;
   }
 
   //  deepcode ignore no-any: any needed
@@ -43,6 +54,14 @@ export class DirectedEvent {
 
   isSingle(): boolean {
     return this.single;
+  }
+
+  isCorrect(): boolean {
+    return this.correct;
+  }
+
+  isReplace(): boolean | undefined {
+    return this.replace;
   }
 
   getId(): unknown {

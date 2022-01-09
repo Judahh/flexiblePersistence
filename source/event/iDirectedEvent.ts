@@ -5,9 +5,10 @@ export interface IDirectedEvent {
   name?: string;
   selection?: unknown;
   single?: boolean;
-  //  deepcode ignore no-any: any needed
   content?: unknown | unknown[];
   timestamp?: string;
   id?: unknown;
   options?: unknown;
+  correct?: boolean;
+  replace?: boolean; // only for create/update/other
 }

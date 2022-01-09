@@ -151,27 +151,25 @@ __v?: unknown;
 Operation: Similar to CRUD
 
 ```js
-existent,
+// existent, => create + flag correct
 //Similar to create, but used to fix database.
 //Use it when a data is missing
 create,
 //Use it to create a new element
 read,
 //Use it to read from database
-correct,
+// correct, => update + flag correct
 //Similar to update, but used to fix database.
 //Use it when a data is wrong
 update,
 //Use it to update an element
-nonexistent,
+// nonexistent, => delete + flag correct
 //Similar to delete, but used to fix database.
 //Use it when an element is not supposed to exist
 delete,
 //Use it to delete an element
+other,
 ```
-
-It's not obligatory to use existent, correct and nonexistent. It's possible to
-use just CRUD operations.
 
 ## Persistence Promise
 
