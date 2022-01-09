@@ -6,6 +6,6 @@ export interface IInputDirectedCreate<Item> {
   options?: any;
   additionalOptions?: any;
   eventOptions?: any;
-  correct: boolean;
+  correct?: boolean;
   replace?: boolean; // only for create/update/other
 }

@@ -8,6 +8,6 @@ export interface IInputDirectedUpdate<Item> {
   eventOptions?: any;
   id?: any;
   item: Item | Item[];
-  correct: boolean;
+  correct?: boolean;
   replace?: boolean; // only for create/update/other
 }

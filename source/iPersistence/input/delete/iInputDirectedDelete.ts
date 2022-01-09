@@ -7,5 +7,5 @@ export interface IInputDirectedDelete {
   additionalOptions?: any;
   eventOptions?: any;
   id?: any;
-  correct: boolean;
+  correct?: boolean;
 }

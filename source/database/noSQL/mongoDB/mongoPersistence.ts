@@ -11,7 +11,13 @@ import { PersistenceInfo } from '../../persistenceInfo';
 import { IOutput } from '../../../iPersistence/output/iOutput';
 import { Event } from '../../../event/event';
 
-import { IInputUpdate, IInputDelete, IInputCreate, IInputRead } from '../../..';
+import {
+  IInputUpdate,
+  IInputDelete,
+  IInputCreate,
+  IInputRead,
+  IInput,
+} from '../../..';
 import BaseSchemaDefault from './baseSchemaDefault';
 import GenericSchema from './genericSchema';
 export class MongoPersistence implements IPersistence {
@@ -120,7 +126,7 @@ export class MongoPersistence implements IPersistence {
     });
   }
 
-  other(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
+  other(input: IInput<Event>): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve) => {
       resolve({
         receivedItem: input,
