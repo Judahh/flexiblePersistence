@@ -18,12 +18,12 @@ import { IModifyDirected } from './iPersistence/sRAR/modify/iModifyDirected';
 import { IRead } from './iPersistence/sRAR/read/iRead';
 import { IReadDirected } from './iPersistence/sRAR/read/iReadDirected';
 
-import { IAlter } from './iPersistence/sRAR/modify/alter/iAlter';
-import { IAlterDirected } from './iPersistence/sRAR/modify/alter/iAlterDirected';
-import { IRemove } from './iPersistence/sRAR/modify/remove/iRemove';
-import { IRemoveDirected } from './iPersistence/sRAR/modify/remove/iRemoveDirected';
-import { IStore } from './iPersistence/sRAR/modify/store/iStore';
-import { IStoreDirected } from './iPersistence/sRAR/modify/store/iStoreDirected';
+import { IUpdate } from './iPersistence/sRAR/modify/update/iUpdate';
+import { IUpdateDirected } from './iPersistence/sRAR/modify/update/iUpdateDirected';
+import { IDelete } from './iPersistence/sRAR/modify/delete/iDelete';
+import { IDeleteDirected } from './iPersistence/sRAR/modify/delete/iDeleteDirected';
+import { ICreate } from './iPersistence/sRAR/modify/create/iCreate';
+import { ICreateDirected } from './iPersistence/sRAR/modify/create/iCreateDirected';
 
 import { IOutput } from './iPersistence/output/iOutput';
 
@@ -61,12 +61,12 @@ export {
   IModifyDirected,
   IRead,
   IReadDirected,
-  IAlter,
-  IAlterDirected,
-  IRemove,
-  IRemoveDirected,
-  IStore,
-  IStoreDirected,
+  IUpdate,
+  IUpdateDirected,
+  IDelete,
+  IDeleteDirected,
+  ICreate,
+  ICreateDirected,
   IOutput,
   IInput,
   IInputDirected,

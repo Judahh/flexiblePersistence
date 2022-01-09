@@ -11,7 +11,7 @@ export class DirectedEvent {
   protected options?: unknown;
   protected single: boolean;
   protected correct: boolean;
-  replace?: boolean; // only for create/update/other
+  protected replace?: boolean; // only for create/update/other
 
   constructor(event: IDirectedEvent) {
     this.timestamp = event.timestamp || this.currentTimestamp();

@@ -15,9 +15,7 @@ export class Read {
     //Operation.create.valueOf();
     const id = event.getSelection()
       ? (event.getSelection() as any).id
-      : event.isSingle() &&
-        (event.getOperation() == Operation.create ||
-          event.getOperation() == Operation.existent)
+      : event.isSingle() && event.getOperation() == Operation.create
       ? event.getId()
       : undefined;
     const input: IInput<unknown> = {
@@ -27,6 +25,8 @@ export class Read {
       selectedItem: event.getSelection(),
       item: event.getContent(),
       eventOptions: event.getOptions(),
+      correct: event.isCorrect(),
+      replace: event.isReplace(),
     };
     return this.readDB[Operation[event.getOperation()]](input);
   }

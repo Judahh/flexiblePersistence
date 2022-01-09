@@ -1,8 +1,8 @@
-import { IStoreDirected } from './store/iStoreDirected';
-import { IRemoveDirected } from './remove/iRemoveDirected';
-import { IAlterDirected } from './alter/iAlterDirected';
+import { ICreateDirected } from './create/iCreateDirected';
+import { IDeleteDirected } from './delete/iDeleteDirected';
+import { IUpdateDirected } from './update/iUpdateDirected';
 
 export interface IModifyDirected<Input, Output>
-  extends IStoreDirected<Input, Output>,
-    IRemoveDirected<Input, Output>,
-    IAlterDirected<Input, Output> {}
+  extends ICreateDirected<Input, Output>,
+    IDeleteDirected<Input, Output>,
+    IUpdateDirected<Input, Output> {}

@@ -77,9 +77,7 @@ export class Handler {
     if (!(event instanceof Event)) event = new Event(event);
     if (!event['id']) event.setId(new mongo.ObjectId());
     const operation = event['operation'];
-    if (operation === Operation.create || operation === Operation.existent) {
-      this.addIds(event);
-    }
+    if (operation === Operation.create) this.addIds(event);
     return event;
   }
 
