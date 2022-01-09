@@ -507,6 +507,8 @@ test('WRITE add and read array and find object', async () => {
       content: obj,
       single: true,
       name: 'object',
+      replace: false,
+      correct: false,
       operation: Operation.create,
       timestamp: persistencePromise?.receivedItem?.timestamp,
     });
@@ -518,6 +520,8 @@ test('WRITE add and read array and find object', async () => {
         content: obj,
         single: true,
         name: 'object',
+        replace: false,
+        correct: false,
         operation: Operation.create,
         timestamp: persistencePromise?.receivedItem?.timestamp,
       },
@@ -543,6 +547,7 @@ test('WRITE add and read array and find object', async () => {
       },
       single: true,
       name: 'object',
+      correct: false,
       operation: Operation.delete,
       timestamp: persistencePromise2?.receivedItem?.timestamp,
     });

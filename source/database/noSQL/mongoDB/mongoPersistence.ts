@@ -11,7 +11,13 @@ import { PersistenceInfo } from '../../persistenceInfo';
 import { IOutput } from '../../../iPersistence/output/iOutput';
 import { Event } from '../../../event/event';
 
-import { IInputUpdate, IInputDelete, IInputCreate, IInputRead } from '../../..';
+import {
+  IInputUpdate,
+  IInputDelete,
+  IInputCreate,
+  IInputRead,
+  IInput,
+} from '../../..';
 import BaseSchemaDefault from './baseSchemaDefault';
 import GenericSchema from './genericSchema';
 export class MongoPersistence implements IPersistence {
@@ -120,22 +126,14 @@ export class MongoPersistence implements IPersistence {
     });
   }
 
-  other(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
+  other(input: IInput<Event>): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve) => {
       resolve({
         receivedItem: input,
       });
     });
   }
-  correct(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
-    return this.update(input);
-  }
-  nonexistent(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
-    return this.delete(input);
-  }
-  existent(input: IInputCreate<Event>): Promise<IOutput<unknown, unknown>> {
-    return this.create(input);
-  }
+
   create(input: IInputCreate<Event>): Promise<IOutput<unknown, unknown>> {
     const isRegularArray = Array.isArray(input.item);
     const isContentArray = isRegularArray
