@@ -425,6 +425,7 @@ export class MongoPersistence implements IPersistence {
       pagesize?: string | number;
       numberOfPages?: string | number;
       numberofpages?: string | number;
+      pages?: string | number;
     }
   ) {
     if (eventOptions?.pageSize || eventOptions?.pageSize) {
@@ -451,14 +452,16 @@ export class MongoPersistence implements IPersistence {
       pagesize?: string | number;
       numberOfPages?: string | number;
       numberofpages?: string | number;
+      pages?: string | number;
     },
     compiledOptions?: QueryOptions
   ): Promise<void> {
     if (compiledOptions && compiledOptions.limit) {
       const count = await model.countDocuments(selectedItem, options);
       if (eventOptions) {
-        eventOptions.numberOfPages = Math.ceil(count / compiledOptions.limit);
-        eventOptions.numberofpages = eventOptions.numberOfPages;
+        eventOptions.pages = Math.ceil(count / compiledOptions.limit);
+        eventOptions.numberOfPages = eventOptions.pages;
+        eventOptions.numberofpages = eventOptions.pages;
       }
     }
   }
@@ -474,6 +477,7 @@ export class MongoPersistence implements IPersistence {
       pagesize?: string | number;
       numberOfPages?: string | number;
       numberofpages?: string | number;
+      pages?: string | number;
     }
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
