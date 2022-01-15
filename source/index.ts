@@ -43,9 +43,13 @@ import { PersistenceInfo } from './database/persistenceInfo';
 import { Info } from './database/info';
 import { MongoPersistence } from './database/noSQL/mongoDB/mongoPersistence';
 import BaseSchemaDefault from './database/noSQL/mongoDB/baseSchemaDefault';
+import { IOptions as IEventOptions } from './event/iOptions';
+import IOptions from './handler/iOptions';
 
 export {
   Handler,
+  IOptions as IHandlerOptions,
+  IEventOptions,
   IEvent,
   IDirectedEvent,
   Event,

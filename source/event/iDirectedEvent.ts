@@ -1,3 +1,4 @@
+import { IOptions } from './iOptions';
 import { Operation } from './operation';
 
 export interface IDirectedEvent {
@@ -8,7 +9,7 @@ export interface IDirectedEvent {
   content?: unknown | unknown[];
   timestamp?: string;
   id?: unknown;
-  options?: unknown;
+  options?: IOptions;
   correct?: boolean;
   replace?: boolean; // only for create/update/other
 }

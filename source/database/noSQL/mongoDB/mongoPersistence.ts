@@ -20,6 +20,7 @@ import {
 } from '../../..';
 import BaseSchemaDefault from './baseSchemaDefault';
 import GenericSchema from './genericSchema';
+import { IOptions } from '../../../event/iOptions';
 export class MongoPersistence implements IPersistence {
   protected persistenceInfo: PersistenceInfo;
   protected mongooseInstance: Mongoose;
@@ -417,17 +418,7 @@ export class MongoPersistence implements IPersistence {
     });
   }
 
-  generateOptions(
-    options?: QueryOptions,
-    eventOptions?: {
-      page?: string | number;
-      pageSize?: string | number;
-      pagesize?: string | number;
-      numberOfPages?: string | number;
-      numberofpages?: string | number;
-      pages?: string | number;
-    }
-  ) {
+  generateOptions(options?: QueryOptions, eventOptions?: IOptions) {
     if (eventOptions?.pageSize || eventOptions?.pageSize) {
       const pageSize = eventOptions?.pageSize || eventOptions?.pagesize;
       const skip =
@@ -446,22 +437,13 @@ export class MongoPersistence implements IPersistence {
     model: Model<unknown, unknown, unknown, unknown>,
     selectedItem: Event,
     options?: QueryOptions,
-    eventOptions?: {
-      page?: string | number;
-      pageSize?: string | number;
-      pagesize?: string | number;
-      numberOfPages?: string | number;
-      numberofpages?: string | number;
-      pages?: string | number;
-    },
+    eventOptions?: IOptions,
     compiledOptions?: QueryOptions
   ): Promise<void> {
     if (compiledOptions && compiledOptions.limit) {
       const count = await model.countDocuments(selectedItem, options);
       if (eventOptions) {
         eventOptions.pages = Math.ceil(count / compiledOptions.limit);
-        eventOptions.numberOfPages = eventOptions.pages;
-        eventOptions.numberofpages = eventOptions.pages;
       }
     }
   }
@@ -471,14 +453,7 @@ export class MongoPersistence implements IPersistence {
     selectedItem?: Event,
     options?: QueryOptions,
     additionalOptions?: unknown,
-    eventOptions?: {
-      page?: string | number;
-      pageSize?: string | number;
-      pagesize?: string | number;
-      numberOfPages?: string | number;
-      numberofpages?: string | number;
-      pages?: string | number;
-    }
+    eventOptions?: IOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
@@ -517,13 +492,7 @@ export class MongoPersistence implements IPersistence {
     selectedItem?: Event,
     options?: QueryOptions,
     additionalOptions?: unknown,
-    eventOptions?: {
-      page?: string | number;
-      pageSize?: string | number;
-      pagesize?: string | number;
-      numberOfPages?: string | number;
-      numberofpages?: string | number;
-    }
+    eventOptions?: IOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
@@ -562,13 +531,7 @@ export class MongoPersistence implements IPersistence {
     id: unknown,
     options?: QueryOptions,
     additionalOptions?: unknown,
-    eventOptions?: {
-      page?: string | number;
-      pageSize?: string | number;
-      pagesize?: string | number;
-      numberOfPages?: string | number;
-      numberofpages?: string | number;
-    }
+    eventOptions?: IOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
