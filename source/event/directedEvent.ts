@@ -1,5 +1,6 @@
 import { Operation } from '..';
 import { IDirectedEvent } from './iDirectedEvent';
+import { IOptions } from './iOptions';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export class DirectedEvent {
@@ -8,7 +9,7 @@ export class DirectedEvent {
   protected timestamp: string;
   content: IDirectedEvent | IDirectedEvent[] | unknown | unknown[];
   protected selection: unknown;
-  protected options?: unknown;
+  protected options?: IOptions;
   protected single: boolean;
   protected correct: boolean;
   protected replace?: boolean; // only for create/update/other
@@ -72,7 +73,7 @@ export class DirectedEvent {
     this.id = id;
   }
 
-  setOptions(options: unknown): void {
+  setOptions(options: IOptions): void {
     this.options = options;
   }
 
