@@ -32,10 +32,6 @@ jobs:
       matrix:
         node-version: [14.x]
 
-    env:
-      MONGO_HOST: mongo
-      MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
-
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@main
@@ -50,6 +46,9 @@ jobs:
           node_version: ${{ matrix.node-version }}
       - name: TEST
         uses: judahh/yarnTest@main
+        env:
+          MONGO_HOST: mongo
+          MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
       - name: ZIP TO ARTIFACT
         if: ${{ github.ref_name == 'main' || github.ref_name == 'master' }}
         uses: judahh/zipToArtifact@main
