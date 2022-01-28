@@ -2502,9 +2502,9 @@ jest@latest:
     jest-cli "^27.4.7"
 
 journaly@latest:
-  version "4.0.5"
-  resolved "https://registry.yarnpkg.com/journaly/-/journaly-4.0.5.tgz#252466eda48d7f0722581f7e1c61fd11ba24fc8d"
-  integrity sha512-B0rXXlKZjkSPA25kdeo/SW34kUPs6AjGxqFczMi+bZylNMO+hHv/LvJh9PuRsQb0hVqIBN1Y+Ron/XpmZtCk+w==
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/journaly/-/journaly-4.0.7.tgz#e6868a57bb7f19589d55f8969de9f7e218682269"
+  integrity sha512-HVM4MPhqevQz7nHTxI3K6eNSmHCPJB1Myvw9rOYFMn8YnadB+yls2nmJuLd4dOZkgHX3iqSyyeKFV4ZIFm8SJg==
 
 js-tokens@^4.0.0:
   version "4.0.0"
