@@ -1,13 +1,19 @@
 name: Publish
 
 on:
-  push:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Test
+    types:
+     - completed
     branches:
-      - master
       - main
+      - master
 
 jobs:
   build:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     # runs all of the steps inside the specified container rather than on the VM host.
@@ -31,31 +37,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://registry.npmjs.org
-      - name: Checkout
-        uses: actions/checkout@main
-      - name: Install
-        uses: borales/actions-yarn@master
+      - name: ARTIFACT TO UNZIP
+        uses: judahh/artifactToUnzip@main
         with:
-          cmd: install # will run `yarn install` command
-      - name: Build
-        uses: borales/actions-yarn@master
-        with:
-          cmd: build # will run `yarn build` command
-      - name: Test
-        uses: borales/actions-yarn@master
-        with:
-          cmd: test # will run `yarn test` command
-      - name: Test Integration
-        uses: borales/actions-yarn@master
-        with:
-          cmd: integration # will run `yarn test` command
-        env:
-          MONGO_HOST: mongo
-          MONGO_PORT: ${{ job.services.mongo.ports[27017] }}
+          production: true
       - name: Publish
         if: contains(matrix.node-version, '14.x')
-        run: |
-          npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NODE_AUTH_TOKEN}}
-          CI: true
+        uses: judahh/npmPublish@main
+        with:
+          node_auth_token: ${{secrets.NODE_AUTH_TOKEN}}
