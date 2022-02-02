@@ -30,6 +30,7 @@ jobs:
         uses: judahh/artifactToUnzip@main
         with:
           production: true
+          ignore: '/source\n/src\n/database\n.test.ts\ntemp.ts\n.yml\ntest\ntests\n'
       - name: Publish
         if: contains(matrix.node-version, '14.x')
         uses: judahh/npmPublish@main
