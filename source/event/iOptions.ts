@@ -3,4 +3,7 @@ export interface IOptions {
   pageSize?: string | number;
   pagesize?: string | number;
   pages?: string | number;
+  noDenseRank?: boolean;
+  noDistinct?: boolean;
+  useRowNumber?: boolean;
 }
