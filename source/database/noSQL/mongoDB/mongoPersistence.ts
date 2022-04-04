@@ -587,7 +587,7 @@ export class MongoPersistence implements IPersistence {
   }
 
   protected generateReceivedArray(
-    docs: Document[] | Document | InsertManyResult | undefined | null
+    docs: Document[] | Document | InsertManyResult<unknown> | undefined | null
   ): unknown[] {
     let receivedItem;
     if (Array.isArray(docs))
@@ -626,7 +626,7 @@ export class MongoPersistence implements IPersistence {
   protected generateReceivedItem(
     doc:
       | Document<unknown, unknown, unknown>
-      | InsertManyResult
+      | InsertManyResult<unknown>
       | undefined
       | null
   ): unknown {
