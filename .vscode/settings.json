@@ -48,5 +48,6 @@
   "diffEditor.ignoreTrimWhitespace": false,
   "[pgsql]": {
     "IF": true
-  }
+  },
+  "python.terminal.activateEnvironment": false
 }

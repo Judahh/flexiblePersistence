@@ -170,7 +170,7 @@ export class MongoPersistence implements IPersistence {
     const isArray = isContentArray || isRegularArray;
     // console.log('Input:', input);
 
-    if ((input.single || input.id) && !isArray) {
+    if ((input.single || input.id && !Array.isArray(input.id)) && !isArray) {
       return this.updateItem(
         input.scheme,
         input.selectedItem,
@@ -188,7 +188,7 @@ export class MongoPersistence implements IPersistence {
     }
   }
   read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
-    if (input.single || input.id) {
+    if (input.single || input.id && !Array.isArray(input.id)) {
       if (input.id)
         return this.readItemById(
           input.scheme,
@@ -215,7 +215,7 @@ export class MongoPersistence implements IPersistence {
     }
   }
   delete(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
-    if (input.single || input.id) {
+    if (input.single || input.id && !Array.isArray(input.id)) {
       if (input.id)
         return this.deleteItemById(input.scheme, input.id, input.options);
       return this.deleteItem(input.scheme, input.selectedItem, input.options);
