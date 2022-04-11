@@ -1,15 +1,15 @@
 /* eslint-disable no-unused-vars */
 export enum CastType {
-  JSON,
-  OBJECT,
-  NONE,
+  toJSON,
+  toObject,
+  none,
 }
 export type Read =
   | {
       array?: CastType;
       item?:
         | {
-            filter?: CastType;
+            byfilter?: CastType;
             byId?: CastType;
           }
         | CastType;
@@ -22,9 +22,11 @@ export type Create =
       item?: CastType;
     }
   | CastType;
-export interface ToCast {
-  create?: Create;
-  read?: Read;
-  update?: Create;
-  delete?: Read;
-}
+export type ToCast =
+  | {
+      create?: Create;
+      read?: Read;
+      update?: Create;
+      delete?: Read;
+    }
+  | CastType;

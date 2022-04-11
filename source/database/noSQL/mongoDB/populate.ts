@@ -3,7 +3,7 @@ export type Read =
       array?: string[];
       item?:
         | {
-            filter?: string[];
+            byfilter?: string[];
             byId?: string[];
           }
         | string[];
@@ -16,9 +16,11 @@ export type Create =
       item?: string[];
     }
   | string[];
-export interface Populate {
-  create?: Create;
-  read?: Read;
-  update?: Create;
-  delete?: Read;
-}
+export type Populate =
+  | {
+      create?: Create;
+      read?: Read;
+      update?: Create;
+      delete?: Read;
+    }
+  | string[];
