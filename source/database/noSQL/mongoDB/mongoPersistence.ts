@@ -64,8 +64,24 @@ export class MongoPersistence implements IPersistence {
           element.getOptions()
         );
         const index = element.getIndex();
+        const virtual = element.getVirtual();
         if (index) {
           schema.index(index, element.getIndexOptions());
+        }
+        if (virtual) {
+          for (const key in virtual) {
+            if (Object.hasOwnProperty.call(virtual, key)) {
+              const element = virtual[key];
+              const currentVirtual = schema.virtual(key);
+              if (element)
+                for (const key in element) {
+                  if (Object.hasOwnProperty.call(element, key)) {
+                    const element2 = element[key];
+                    currentVirtual[key](element2);
+                  }
+                }
+            }
+          }
         }
         this.addModel(element.getName(), schema);
       }
@@ -94,6 +110,17 @@ export class MongoPersistence implements IPersistence {
     // this.model[name] =
     return this.mongooseInstance.model(name, schema);
   }
+
+  // protected populateAll(query): Promise<Event> {
+  //   return new Promise<Event>(async (resolve, reject) => {
+  //     const response = await model.findOne(item, options);
+  //     if (!response) {
+  //       reject(response);
+  //       return;
+  //     }
+  //     resolve(response);
+  //   });
+  // }
 
   protected clearModel(model: Model<unknown>): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
@@ -170,7 +197,7 @@ export class MongoPersistence implements IPersistence {
     const isArray = isContentArray || isRegularArray;
     // console.log('Input:', input);
 
-    if ((input.single || input.id && !Array.isArray(input.id)) && !isArray) {
+    if ((input.single || (input.id && !Array.isArray(input.id))) && !isArray) {
       return this.updateItem(
         input.scheme,
         input.selectedItem,
@@ -188,7 +215,7 @@ export class MongoPersistence implements IPersistence {
     }
   }
   read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
-    if (input.single || input.id && !Array.isArray(input.id)) {
+    if (input.single || (input.id && !Array.isArray(input.id))) {
       if (input.id)
         return this.readItemById(
           input.scheme,
@@ -215,7 +242,7 @@ export class MongoPersistence implements IPersistence {
     }
   }
   delete(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
-    if (input.single || input.id && !Array.isArray(input.id)) {
+    if (input.single || (input.id && !Array.isArray(input.id))) {
       if (input.id)
         return this.deleteItemById(input.scheme, input.id, input.options);
       return this.deleteItem(input.scheme, input.selectedItem, input.options);

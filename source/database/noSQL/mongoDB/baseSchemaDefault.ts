@@ -6,6 +6,9 @@ import {
   IndexDefinition,
   IndexOptions,
 } from 'mongoose';
+import { Populate } from './populate';
+import { ToCast } from './toCast';
+import { Virtual } from './virtual';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export default class BaseSchemaDefault extends Default {
@@ -13,6 +16,9 @@ export default class BaseSchemaDefault extends Default {
   protected options: SchemaOptions = {};
   protected index?: IndexDefinition;
   protected indexOptions?: IndexOptions;
+  protected virtual?: Virtual;
+  protected populate?: Populate;
+  protected toCast?: ToCast;
 
   getAttributes(): SchemaDefinition {
     return this.attributes;
@@ -29,6 +35,19 @@ export default class BaseSchemaDefault extends Default {
   getIndexOptions(): IndexOptions | undefined {
     return this.indexOptions;
   }
+
+  getVirtual(): Virtual | undefined {
+    return this.virtual;
+  }
+
+  getPopulate(): Populate | undefined {
+    return this.populate;
+  }
+
+  getToCast(): ToCast | undefined {
+    return this.toCast;
+  }
+
   constructor(initDefault?: IDefault) {
     super(initDefault);
   }
