@@ -163,6 +163,14 @@ export class MongoPersistence implements IPersistence {
     return query;
   }
 
+  protected execute(query, callback) {
+    if (query.exec) {
+      return query.exec(callback);
+    } else {
+      return query(callback);
+    }
+  }
+
   protected toCast(type: CastType): string {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -492,34 +500,37 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
       const newItem = this.generateNewItem(item);
-      this.populateAll(
-        model,
-        model.create(newItem),
-        Operation.create,
-        Type.item,
-        SubType.byFilter
-      ).exec((error, doc) => {
-        // console.log('Scheme:', scheme, item, newItem);
-        if (error) {
-          // console.error('error:', error);
-          reject(error);
-        } else {
-          // console.log('doc:', doc);
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
-                doc,
-                model,
-                Operation.create,
-                Type.item,
-                SubType.byFilter
-              ),
-              result: doc,
-              sentItem: item,
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.create(newItem),
+          Operation.create,
+          Type.item,
+          SubType.byFilter
+        ),
+        (error, doc) => {
+          // console.log('Scheme:', scheme, item, newItem);
+          if (error) {
+            // console.error('error:', error);
+            reject(error);
+          } else {
+            // console.log('doc:', doc);
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(
+                  doc,
+                  model,
+                  Operation.create,
+                  Type.item,
+                  SubType.byFilter
+                ),
+                result: doc,
+                sentItem: item,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -533,35 +544,38 @@ export class MongoPersistence implements IPersistence {
 
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
-      this.populateAll(
-        model,
-        model.insertMany(items, options),
-        Operation.create,
-        Type.array,
-        SubType.byFilter
-      ).exec((error, docs) => {
-        // console.log('Scheme ARRAY:', scheme, item, items);
-        if (error) {
-          // console.error('error:', error);
-          reject(error);
-        } else {
-          // console.log('docs:', docs);
-          const receivedItem = this.generateReceivedArray(
-            docs,
-            model,
-            Operation.create,
-            Type.array,
-            SubType.byFilter
-          );
-          resolve(
-            this.cleanReceived({
-              receivedItem: receivedItem,
-              result: docs,
-              sentItem: item,
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.insertMany(items, options),
+          Operation.create,
+          Type.array,
+          SubType.byFilter
+        ),
+        (error, docs) => {
+          // console.log('Scheme ARRAY:', scheme, item, items);
+          if (error) {
+            // console.error('error:', error);
+            reject(error);
+          } else {
+            // console.log('docs:', docs);
+            const receivedItem = this.generateReceivedArray(
+              docs,
+              model,
+              Operation.create,
+              Type.array,
+              SubType.byFilter
+            );
+            resolve(
+              this.cleanReceived({
+                receivedItem: receivedItem,
+                result: docs,
+                sentItem: item,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -576,38 +590,41 @@ export class MongoPersistence implements IPersistence {
       const compiledOptions = this.generateOptions(options, eventOptions);
       const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      this.populateAll(
-        model,
-        model.find(newSelectedItem, additionalOptions, compiledOptions),
-        Operation.read,
-        Type.array,
-        SubType.byFilter
-      ).exec(async (error, docs: Document[]) => {
-        if (error) {
-          reject(error);
-        } else {
-          await this.count(
-            model,
-            newSelectedItem,
-            options,
-            eventOptions,
-            compiledOptions
-          );
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedArray(
-                docs,
-                model,
-                Operation.read,
-                Type.array,
-                SubType.byFilter
-              ),
-              result: docs,
-              selectedItem: selectedItem,
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.find(newSelectedItem, additionalOptions, compiledOptions),
+          Operation.read,
+          Type.array,
+          SubType.byFilter
+        ),
+        async (error, docs: Document[]) => {
+          if (error) {
+            reject(error);
+          } else {
+            await this.count(
+              model,
+              newSelectedItem,
+              options,
+              eventOptions,
+              compiledOptions
+            );
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedArray(
+                  docs,
+                  model,
+                  Operation.read,
+                  Type.array,
+                  SubType.byFilter
+                ),
+                result: docs,
+                selectedItem: selectedItem,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -622,38 +639,41 @@ export class MongoPersistence implements IPersistence {
       const compiledOptions = this.generateOptions(options, eventOptions);
       const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      this.populateAll(
-        model,
-        model.findOne(newSelectedItem, additionalOptions, compiledOptions),
-        Operation.read,
-        Type.item,
-        SubType.byFilter
-      ).exec(async (error, doc) => {
-        if (error) {
-          reject(error);
-        } else {
-          await this.count(
-            model,
-            newSelectedItem,
-            options,
-            eventOptions,
-            compiledOptions
-          );
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
-                doc,
-                model,
-                Operation.read,
-                Type.item,
-                SubType.byFilter
-              ),
-              result: doc,
-              selectedItem,
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.findOne(newSelectedItem, additionalOptions, compiledOptions),
+          Operation.read,
+          Type.item,
+          SubType.byFilter
+        ),
+        async (error, doc) => {
+          if (error) {
+            reject(error);
+          } else {
+            await this.count(
+              model,
+              newSelectedItem,
+              options,
+              eventOptions,
+              compiledOptions
+            );
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(
+                  doc,
+                  model,
+                  Operation.read,
+                  Type.item,
+                  SubType.byFilter
+                ),
+                result: doc,
+                selectedItem,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -667,38 +687,41 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
       const model = this.getModel(scheme);
-      this.populateAll(
-        model,
-        model.findById(id, additionalOptions, compiledOptions),
-        Operation.read,
-        Type.item,
-        SubType.byId
-      ).exec(async (error, doc) => {
-        if (error) {
-          reject(error);
-        } else {
-          await this.count(
-            model,
-            { id: id } as Event,
-            options,
-            eventOptions,
-            compiledOptions
-          );
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
-                doc,
-                model,
-                Operation.read,
-                Type.item,
-                SubType.byId
-              ),
-              result: doc,
-              selectedItem: { id: id },
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.findById(id, additionalOptions, compiledOptions),
+          Operation.read,
+          Type.item,
+          SubType.byId
+        ),
+        async (error, doc) => {
+          if (error) {
+            reject(error);
+          } else {
+            await this.count(
+              model,
+              { id: id } as Event,
+              options,
+              eventOptions,
+              compiledOptions
+            );
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(
+                  doc,
+                  model,
+                  Operation.read,
+                  Type.item,
+                  SubType.byId
+                ),
+                result: doc,
+                selectedItem: { id: id },
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -787,26 +810,35 @@ export class MongoPersistence implements IPersistence {
         );
       } else {
         // console.log('newItem:', newItem);
-        model.updateMany(selectedItem, newItem, options, (error, doc) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(
-              this.cleanReceived({
-                receivedItem: this.generateReceivedItem(
-                  doc,
-                  model,
-                  Operation.update,
-                  Type.array,
-                  SubType.byFilter
-                ),
-                result: doc,
-                selectedItem: selectedItem,
-                sentItem: item,
-              })
-            );
+        this.execute(
+          this.populateAll(
+            model,
+            model.updateMany(selectedItem, newItem, options),
+            Operation.update,
+            Type.array,
+            SubType.byFilter
+          ),
+          (error, doc) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(
+                this.cleanReceived({
+                  receivedItem: this.generateReceivedItem(
+                    doc,
+                    model,
+                    Operation.update,
+                    Type.array,
+                    SubType.byFilter
+                  ),
+                  result: doc,
+                  selectedItem: selectedItem,
+                  sentItem: item,
+                })
+              );
+            }
           }
-        });
+        );
       }
     });
   }
@@ -819,23 +851,26 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      this.populateAll(
-        model,
-        model.deleteMany(newSelectedItem, options),
-        Operation.delete,
-        Type.array,
-        SubType.byFilter
-      ).exec((error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(
-            this.cleanReceived({
-              selectedItem,
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.deleteMany(newSelectedItem, options),
+          Operation.delete,
+          Type.array,
+          SubType.byFilter
+        ),
+        (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(
+              this.cleanReceived({
+                selectedItem,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -847,31 +882,34 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      this.populateAll(
-        model,
-        model.findOneAndDelete(newSelectedItem, options),
-        Operation.delete,
-        Type.item,
-        SubType.byFilter
-      ).exec((error, doc) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
-                doc,
-                model,
-                Operation.delete,
-                Type.item,
-                SubType.byFilter
-              ),
-              result: doc,
-              selectedItem: selectedItem,
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.findOneAndDelete(newSelectedItem, options),
+          Operation.delete,
+          Type.item,
+          SubType.byFilter
+        ),
+        (error, doc) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(
+                  doc,
+                  model,
+                  Operation.delete,
+                  Type.item,
+                  SubType.byFilter
+                ),
+                result: doc,
+                selectedItem: selectedItem,
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -882,31 +920,34 @@ export class MongoPersistence implements IPersistence {
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
-      this.populateAll(
-        model,
-        model.findByIdAndDelete(id, options),
-        Operation.delete,
-        Type.item,
-        SubType.byId
-      ).exec((error, doc) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
-                doc,
-                model,
-                Operation.delete,
-                Type.item,
-                SubType.byId
-              ),
-              result: doc,
-              selectedItem: { id: id },
-            })
-          );
+      this.execute(
+        this.populateAll(
+          model,
+          model.findByIdAndDelete(id, options),
+          Operation.delete,
+          Type.item,
+          SubType.byId
+        ),
+        (error, doc) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(
+                  doc,
+                  model,
+                  Operation.delete,
+                  Type.item,
+                  SubType.byId
+                ),
+                result: doc,
+                selectedItem: { id: id },
+              })
+            );
+          }
         }
-      });
+      );
     });
   }
 
@@ -952,10 +993,14 @@ export class MongoPersistence implements IPersistence {
         const id = selectedItem?.id || selectedItem?._id;
 
         if (id) {
-          model.findByIdAndUpdate(
-            id,
-            item,
-            { new: true, ...options },
+          this.execute(
+            this.populateAll(
+              model,
+              model.findByIdAndUpdate(id, item, { new: true, ...options }),
+              Operation.update,
+              Type.item,
+              SubType.byId
+            ),
             (error, doc, result) => {
               this.findOneAndUpdateResult(
                 resolve,
@@ -971,10 +1016,14 @@ export class MongoPersistence implements IPersistence {
             }
           );
         } else {
-          model.findOneAndUpdate(
-            selectedItem,
-            item,
-            options,
+          this.execute(
+            this.populateAll(
+              model,
+              model.findOneAndUpdate(selectedItem, item, options),
+              Operation.update,
+              Type.item,
+              SubType.byFilter
+            ),
             (error, doc, result) => {
               this.findOneAndUpdateResult(
                 resolve,
