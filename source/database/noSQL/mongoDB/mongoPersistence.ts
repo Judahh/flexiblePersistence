@@ -276,31 +276,7 @@ export class MongoPersistence implements IPersistence {
       );
     }
   }
-  update(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
-    const isRegularArray = Array.isArray(input.item);
-    const isContentArray = isRegularArray
-      ? false
-      : Array.isArray((input.item as Event).content);
-    const isArray = isContentArray || isRegularArray;
-    // console.log('Input:', input);
 
-    if ((input.single || (input.id && !Array.isArray(input.id))) && !isArray) {
-      return this.updateItem(
-        input.scheme,
-        input.selectedItem,
-        input.item as Event,
-        input.options
-      );
-    } else {
-      return this.updateArray(
-        input.scheme,
-        input.selectedItem,
-        input.item,
-        isRegularArray,
-        input.options
-      );
-    }
-  }
   read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
     if (input.single || (input.id && !Array.isArray(input.id))) {
       if (input.id)
@@ -328,6 +304,33 @@ export class MongoPersistence implements IPersistence {
       );
     }
   }
+
+  update(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
+    const isRegularArray = Array.isArray(input.item);
+    const isContentArray = isRegularArray
+      ? false
+      : Array.isArray((input.item as Event).content);
+    const isArray = isContentArray || isRegularArray;
+    // console.log('Input:', input);
+
+    if ((input.single || (input.id && !Array.isArray(input.id))) && !isArray) {
+      return this.updateItem(
+        input.scheme,
+        input.selectedItem,
+        input.item as Event,
+        input.options
+      );
+    } else {
+      return this.updateArray(
+        input.scheme,
+        input.selectedItem,
+        input.item,
+        isRegularArray,
+        input.options
+      );
+    }
+  }
+
   delete(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
     if (input.single || (input.id && !Array.isArray(input.id))) {
       if (input.id)
@@ -336,172 +339,6 @@ export class MongoPersistence implements IPersistence {
     } else {
       return this.deleteArray(input.scheme, input.selectedItem, input.options);
     }
-  }
-
-  async findOneAndUpdateResult(
-    // eslint-disable-next-line no-unused-vars
-    resolve: (_value?) => void,
-    // eslint-disable-next-line no-unused-vars
-    reject: (_reason?) => void,
-    error: unknown,
-    doc: Document,
-    result: unknown,
-    model?: Model<unknown, unknown, unknown, unknown>,
-    operation?: Operation,
-    type?: Type,
-    subType?: SubType
-  ): Promise<void> {
-    if (error) {
-      reject(error);
-    } else {
-      const item = {
-        receivedItem: this.generateReceivedItem(
-          doc,
-          model,
-          operation,
-          type,
-          subType
-        ),
-        result: result ? { doc, result } : doc,
-      };
-      resolve(item);
-    }
-  }
-  async findOneAndUpdate(
-    model: Model<unknown>,
-    selectedItem: Event,
-    item: Event,
-    options?: QueryOptions
-  ): Promise<{ receivedItem: unknown; result: unknown }> {
-    return new Promise<{ receivedItem: unknown; result: unknown }>(
-      async (resolve, reject) => {
-        delete item.id;
-        delete item._id;
-        const id = selectedItem?.id || selectedItem?._id;
-
-        if (id) {
-          model.findByIdAndUpdate(
-            id,
-            item,
-            { new: true, ...options },
-            (error, doc, result) => {
-              this.findOneAndUpdateResult(
-                resolve,
-                reject,
-                error,
-                doc as Document,
-                result,
-                model,
-                Operation.update,
-                Type.item,
-                SubType.byId
-              );
-            }
-          );
-        } else {
-          model.findOneAndUpdate(
-            selectedItem,
-            item,
-            options,
-            (error, doc, result) => {
-              this.findOneAndUpdateResult(
-                resolve,
-                reject,
-                error,
-                doc as Document,
-                result,
-                model,
-                Operation.update,
-                Type.item,
-                SubType.byFilter
-              );
-            }
-          );
-        }
-      }
-    );
-  }
-  updateArray(
-    scheme: string,
-    selectedItem?: Record<string, unknown>,
-    item?: Event | Event[],
-    regular?: boolean,
-    options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
-      const model = this.getModel(scheme);
-      const newItem = Array.isArray(item)
-        ? this.generateNewArray(item, regular)
-        : this.generateNewItem(item);
-
-      if (Array.isArray(newItem)) {
-        // console.log('newItem Array:', newItem);
-
-        const promisedResponses: Array<Promise<IOutput<unknown, unknown>>> = [];
-        for (let index = 0; index < newItem.length; index++) {
-          const newItemElement = newItem[index];
-
-          const selectedItemElement = Array.isArray(selectedItem)
-            ? selectedItem[index]
-            : {
-                id: newItemElement.id,
-                _id: newItemElement._id,
-                ...selectedItem,
-              };
-
-          // delete newItemElement.id;
-          // delete newItemElement._id;
-
-          // console.log(
-          //   '-selectedItemElement:',
-          //   selectedItemElement,
-          //   newItemElement
-          // );
-
-          promisedResponses.push(
-            this.findOneAndUpdate(
-              model,
-              selectedItemElement,
-              newItemElement,
-              options
-            )
-          );
-        }
-        const responses = await Promise.all(promisedResponses);
-        // console.log('responses:', responses);
-
-        resolve(
-          this.cleanReceived({
-            receivedItem: responses.map((response) => response.receivedItem),
-            result: responses.map((response) => response.result),
-            selectedItem: selectedItem,
-            sentItem: item,
-          })
-        );
-      } else {
-        // console.log('newItem:', newItem);
-        model.updateMany(selectedItem, newItem, options, (error, doc) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(
-              this.cleanReceived({
-                receivedItem: this.generateReceivedItem(
-                  doc,
-                  model,
-                  Operation.update,
-                  Type.array,
-                  SubType.byFilter
-                ),
-                result: doc,
-                selectedItem: selectedItem,
-                sentItem: item,
-              })
-            );
-          }
-        });
-      }
-    });
   }
 
   protected cleanReceived(received: {
@@ -528,32 +365,6 @@ export class MongoPersistence implements IPersistence {
       delete received.sentItem;
     }
     return received;
-  }
-
-  async updateItem(
-    scheme: string,
-    selectedItem?: Event,
-    item?: Event,
-    options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>(async (resolve) => {
-      const model = this.getModel(scheme);
-      const newItem = this.generateNewItem(item);
-      const newSelectedItem = this.generateNewItem(selectedItem);
-      const response = await this.findOneAndUpdate(
-        model,
-        newSelectedItem,
-        newItem,
-        options
-      );
-      resolve(
-        this.cleanReceived({
-          ...response,
-          selectedItem: selectedItem,
-          sentItem: item,
-        })
-      );
-    });
   }
 
   generateOptions(options?: QueryOptions, eventOptions?: IOptions) {
@@ -584,163 +395,6 @@ export class MongoPersistence implements IPersistence {
         eventOptions.pages = Math.ceil(count / compiledOptions.limit);
       }
     }
-  }
-
-  readArray(
-    scheme: string,
-    selectedItem?: Event,
-    options?: QueryOptions,
-    additionalOptions?: unknown,
-    eventOptions?: IOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const compiledOptions = this.generateOptions(options, eventOptions);
-      const model = this.getModel(scheme);
-      const newSelectedItem = this.generateNewItem(selectedItem);
-      this.populateAll(
-        model,
-        model.find(newSelectedItem, additionalOptions, compiledOptions),
-        Operation.read,
-        Type.array,
-        SubType.byFilter
-      ).exec(async (error, docs: Document[]) => {
-        if (error) {
-          reject(error);
-        } else {
-          await this.count(
-            model,
-            newSelectedItem,
-            options,
-            eventOptions,
-            compiledOptions
-          );
-          resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedArray(
-                docs,
-                model,
-                Operation.read,
-                Type.array,
-                SubType.byFilter
-              ),
-              result: docs,
-              selectedItem: selectedItem,
-            })
-          );
-        }
-      });
-    });
-  }
-
-  readItem(
-    scheme: string,
-    selectedItem?: Event,
-    options?: QueryOptions,
-    additionalOptions?: unknown,
-    eventOptions?: IOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const compiledOptions = this.generateOptions(options, eventOptions);
-      const model = this.getModel(scheme);
-      const newSelectedItem = this.generateNewItem(selectedItem);
-      model.findOne(
-        newSelectedItem,
-        additionalOptions,
-        compiledOptions,
-        async (error, doc) => {
-          if (error) {
-            reject(error);
-          } else {
-            await this.count(
-              model,
-              newSelectedItem,
-              options,
-              eventOptions,
-              compiledOptions
-            );
-            resolve(
-              this.cleanReceived({
-                receivedItem: this.generateReceivedItem(
-                  doc,
-                  model,
-                  Operation.read,
-                  Type.item,
-                  SubType.byFilter
-                ),
-                result: doc,
-                selectedItem,
-              })
-            );
-          }
-        }
-      );
-    });
-  }
-
-  readItemById(
-    scheme: string,
-    id: unknown,
-    options?: QueryOptions,
-    additionalOptions?: unknown,
-    eventOptions?: IOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const compiledOptions = this.generateOptions(options, eventOptions);
-      const model = this.getModel(scheme);
-      model.findById(
-        id,
-        additionalOptions,
-        compiledOptions,
-        async (error, doc) => {
-          if (error) {
-            reject(error);
-          } else {
-            await this.count(
-              model,
-              { id: id } as Event,
-              options,
-              eventOptions,
-              compiledOptions
-            );
-            resolve(
-              this.cleanReceived({
-                receivedItem: this.generateReceivedItem(
-                  doc,
-                  model,
-                  Operation.read,
-                  Type.item,
-                  SubType.byId
-                ),
-                result: doc,
-                selectedItem: { id: id },
-              })
-            );
-          }
-        }
-      );
-    });
-  }
-
-  deleteArray(
-    scheme: string,
-    selectedItem?: Event,
-    options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.getModel(scheme);
-      const newSelectedItem = this.generateNewItem(selectedItem);
-      model.deleteMany(newSelectedItem, options, (error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(
-            this.cleanReceived({
-              selectedItem,
-            })
-          );
-        }
-      });
-    });
   }
 
   protected generateReceivedArray(
@@ -838,7 +492,13 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
       const newItem = this.generateNewItem(item);
-      model.create(newItem, (error, doc) => {
+      this.populateAll(
+        model,
+        model.create(newItem),
+        Operation.create,
+        Type.item,
+        SubType.byFilter
+      ).exec((error, doc) => {
         // console.log('Scheme:', scheme, item, newItem);
         if (error) {
           // console.error('error:', error);
@@ -873,7 +533,13 @@ export class MongoPersistence implements IPersistence {
 
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
-      model.insertMany(items, options, (error, docs) => {
+      this.populateAll(
+        model,
+        model.insertMany(items, options),
+        Operation.create,
+        Type.array,
+        SubType.byFilter
+      ).exec((error, docs) => {
         // console.log('Scheme ARRAY:', scheme, item, items);
         if (error) {
           // console.error('error:', error);
@@ -899,6 +565,280 @@ export class MongoPersistence implements IPersistence {
     });
   }
 
+  readArray(
+    scheme: string,
+    selectedItem?: Event,
+    options?: QueryOptions,
+    additionalOptions?: unknown,
+    eventOptions?: IOptions
+  ): Promise<IOutput<unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const compiledOptions = this.generateOptions(options, eventOptions);
+      const model = this.getModel(scheme);
+      const newSelectedItem = this.generateNewItem(selectedItem);
+      this.populateAll(
+        model,
+        model.find(newSelectedItem, additionalOptions, compiledOptions),
+        Operation.read,
+        Type.array,
+        SubType.byFilter
+      ).exec(async (error, docs: Document[]) => {
+        if (error) {
+          reject(error);
+        } else {
+          await this.count(
+            model,
+            newSelectedItem,
+            options,
+            eventOptions,
+            compiledOptions
+          );
+          resolve(
+            this.cleanReceived({
+              receivedItem: this.generateReceivedArray(
+                docs,
+                model,
+                Operation.read,
+                Type.array,
+                SubType.byFilter
+              ),
+              result: docs,
+              selectedItem: selectedItem,
+            })
+          );
+        }
+      });
+    });
+  }
+
+  readItem(
+    scheme: string,
+    selectedItem?: Event,
+    options?: QueryOptions,
+    additionalOptions?: unknown,
+    eventOptions?: IOptions
+  ): Promise<IOutput<unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const compiledOptions = this.generateOptions(options, eventOptions);
+      const model = this.getModel(scheme);
+      const newSelectedItem = this.generateNewItem(selectedItem);
+      this.populateAll(
+        model,
+        model.findOne(newSelectedItem, additionalOptions, compiledOptions),
+        Operation.read,
+        Type.item,
+        SubType.byFilter
+      ).exec(async (error, doc) => {
+        if (error) {
+          reject(error);
+        } else {
+          await this.count(
+            model,
+            newSelectedItem,
+            options,
+            eventOptions,
+            compiledOptions
+          );
+          resolve(
+            this.cleanReceived({
+              receivedItem: this.generateReceivedItem(
+                doc,
+                model,
+                Operation.read,
+                Type.item,
+                SubType.byFilter
+              ),
+              result: doc,
+              selectedItem,
+            })
+          );
+        }
+      });
+    });
+  }
+
+  readItemById(
+    scheme: string,
+    id: unknown,
+    options?: QueryOptions,
+    additionalOptions?: unknown,
+    eventOptions?: IOptions
+  ): Promise<IOutput<unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const compiledOptions = this.generateOptions(options, eventOptions);
+      const model = this.getModel(scheme);
+      this.populateAll(
+        model,
+        model.findById(id, additionalOptions, compiledOptions),
+        Operation.read,
+        Type.item,
+        SubType.byId
+      ).exec(async (error, doc) => {
+        if (error) {
+          reject(error);
+        } else {
+          await this.count(
+            model,
+            { id: id } as Event,
+            options,
+            eventOptions,
+            compiledOptions
+          );
+          resolve(
+            this.cleanReceived({
+              receivedItem: this.generateReceivedItem(
+                doc,
+                model,
+                Operation.read,
+                Type.item,
+                SubType.byId
+              ),
+              result: doc,
+              selectedItem: { id: id },
+            })
+          );
+        }
+      });
+    });
+  }
+
+  async updateItem(
+    scheme: string,
+    selectedItem?: Event,
+    item?: Event,
+    options?: QueryOptions
+  ): Promise<IOutput<unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown>>(async (resolve) => {
+      const model = this.getModel(scheme);
+      const newItem = this.generateNewItem(item);
+      const newSelectedItem = this.generateNewItem(selectedItem);
+      const response = await this.findOneAndUpdate(
+        model,
+        newSelectedItem,
+        newItem,
+        options
+      );
+      resolve(
+        this.cleanReceived({
+          ...response,
+          selectedItem: selectedItem,
+          sentItem: item,
+        })
+      );
+    });
+  }
+
+  updateArray(
+    scheme: string,
+    selectedItem?: Record<string, unknown>,
+    item?: Event | Event[],
+    regular?: boolean,
+    options?: QueryOptions
+  ): Promise<IOutput<unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
+      const model = this.getModel(scheme);
+      const newItem = Array.isArray(item)
+        ? this.generateNewArray(item, regular)
+        : this.generateNewItem(item);
+
+      if (Array.isArray(newItem)) {
+        // console.log('newItem Array:', newItem);
+
+        const promisedResponses: Array<Promise<IOutput<unknown, unknown>>> = [];
+        for (let index = 0; index < newItem.length; index++) {
+          const newItemElement = newItem[index];
+
+          const selectedItemElement = Array.isArray(selectedItem)
+            ? selectedItem[index]
+            : {
+                id: newItemElement.id,
+                _id: newItemElement._id,
+                ...selectedItem,
+              };
+
+          // delete newItemElement.id;
+          // delete newItemElement._id;
+
+          // console.log(
+          //   '-selectedItemElement:',
+          //   selectedItemElement,
+          //   newItemElement
+          // );
+
+          promisedResponses.push(
+            this.findOneAndUpdate(
+              model,
+              selectedItemElement,
+              newItemElement,
+              options
+            )
+          );
+        }
+        const responses = await Promise.all(promisedResponses);
+        // console.log('responses:', responses);
+
+        resolve(
+          this.cleanReceived({
+            receivedItem: responses.map((response) => response.receivedItem),
+            result: responses.map((response) => response.result),
+            selectedItem: selectedItem,
+            sentItem: item,
+          })
+        );
+      } else {
+        // console.log('newItem:', newItem);
+        model.updateMany(selectedItem, newItem, options, (error, doc) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(
+              this.cleanReceived({
+                receivedItem: this.generateReceivedItem(
+                  doc,
+                  model,
+                  Operation.update,
+                  Type.array,
+                  SubType.byFilter
+                ),
+                result: doc,
+                selectedItem: selectedItem,
+                sentItem: item,
+              })
+            );
+          }
+        });
+      }
+    });
+  }
+
+  deleteArray(
+    scheme: string,
+    selectedItem?: Event,
+    options?: QueryOptions
+  ): Promise<IOutput<unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+      const model = this.getModel(scheme);
+      const newSelectedItem = this.generateNewItem(selectedItem);
+      this.populateAll(
+        model,
+        model.deleteMany(newSelectedItem, options),
+        Operation.delete,
+        Type.array,
+        SubType.byFilter
+      ).exec((error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(
+            this.cleanReceived({
+              selectedItem,
+            })
+          );
+        }
+      });
+    });
+  }
+
   deleteItem(
     scheme: string,
     selectedItem?: Event,
@@ -907,7 +847,13 @@ export class MongoPersistence implements IPersistence {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      model.findOneAndDelete(newSelectedItem, options, (error, doc) => {
+      this.populateAll(
+        model,
+        model.findOneAndDelete(newSelectedItem, options),
+        Operation.delete,
+        Type.item,
+        SubType.byFilter
+      ).exec((error, doc) => {
         if (error) {
           reject(error);
         } else {
@@ -936,7 +882,13 @@ export class MongoPersistence implements IPersistence {
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const model = this.getModel(scheme);
-      model.findByIdAndDelete(id, options, (error, doc) => {
+      this.populateAll(
+        model,
+        model.findByIdAndDelete(id, options),
+        Operation.delete,
+        Type.item,
+        SubType.byId
+      ).exec((error, doc) => {
         if (error) {
           reject(error);
         } else {
@@ -956,6 +908,90 @@ export class MongoPersistence implements IPersistence {
         }
       });
     });
+  }
+
+  async findOneAndUpdateResult(
+    // eslint-disable-next-line no-unused-vars
+    resolve: (_value?) => void,
+    // eslint-disable-next-line no-unused-vars
+    reject: (_reason?) => void,
+    error: unknown,
+    doc: Document,
+    result: unknown,
+    model?: Model<unknown, unknown, unknown, unknown>,
+    operation?: Operation,
+    type?: Type,
+    subType?: SubType
+  ): Promise<void> {
+    if (error) {
+      reject(error);
+    } else {
+      const item = {
+        receivedItem: this.generateReceivedItem(
+          doc,
+          model,
+          operation,
+          type,
+          subType
+        ),
+        result: result ? { doc, result } : doc,
+      };
+      resolve(item);
+    }
+  }
+  async findOneAndUpdate(
+    model: Model<unknown>,
+    selectedItem: Event,
+    item: Event,
+    options?: QueryOptions
+  ): Promise<{ receivedItem: unknown; result: unknown }> {
+    return new Promise<{ receivedItem: unknown; result: unknown }>(
+      async (resolve, reject) => {
+        delete item.id;
+        delete item._id;
+        const id = selectedItem?.id || selectedItem?._id;
+
+        if (id) {
+          model.findByIdAndUpdate(
+            id,
+            item,
+            { new: true, ...options },
+            (error, doc, result) => {
+              this.findOneAndUpdateResult(
+                resolve,
+                reject,
+                error,
+                doc as Document,
+                result,
+                model,
+                Operation.update,
+                Type.item,
+                SubType.byId
+              );
+            }
+          );
+        } else {
+          model.findOneAndUpdate(
+            selectedItem,
+            item,
+            options,
+            (error, doc, result) => {
+              this.findOneAndUpdateResult(
+                resolve,
+                reject,
+                error,
+                doc as Document,
+                result,
+                model,
+                Operation.update,
+                Type.item,
+                SubType.byFilter
+              );
+            }
+          );
+        }
+      }
+    );
   }
 
   getPersistenceInfo(): PersistenceInfo {

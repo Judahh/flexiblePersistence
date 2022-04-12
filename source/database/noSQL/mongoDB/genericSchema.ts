@@ -12,6 +12,9 @@ export default class GenericSchema extends BaseSchemaDefault {
       index: true,
     },
   };
-  protected options = { strict: false, id: true, versionKey: false };
-
+  protected options: SchemaOptions = {
+    strict: false,
+    id: true,
+    versionKey: false,
+  };
 }
