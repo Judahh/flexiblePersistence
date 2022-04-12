@@ -129,49 +129,84 @@ export class MongoPersistence implements IPersistence {
   }
 
   protected populate(query, queryParams: unknown[], populate: string[]) {
-    for (const element of populate) {
-      query = query(...queryParams).populate(element);
+    if (populate !== undefined && populate.length > 0) {
+      queryParams = this.filterQueryParams(queryParams);
+      // console.log('populate:', query, queryParams);
+      for (const element of populate) {
+        if (queryParams.length > 0)
+          query = query(...queryParams).populate(element);
+        else query = query().populate(element);
+      }
     }
+    return query;
   }
 
   protected populateAll(
     model: Model<unknown>,
     query,
     queryParams: unknown[],
-    fullOperation?: FullOperation
+    fullOperation?: FullOperation,
+    // eslint-disable-next-line no-unused-vars
+    callback?: (..._params) => void
   ) {
+    queryParams = this.filterQueryParams(queryParams);
     const populate: Populate = model.schema['populateOptions'];
+    // console.log('populateAll:', queryParams);
 
     if (populate) {
       if (Array.isArray(populate)) {
-        this.populate(query, queryParams, populate);
+        query = this.populate(query, queryParams, populate);
       } else if (fullOperation?.operation !== undefined) {
         const populateOpertaion = populate[Operation[fullOperation?.operation]];
         if (Array.isArray(populateOpertaion)) {
-          this.populate(query, queryParams, populateOpertaion);
+          query = this.populate(query, queryParams, populateOpertaion);
         } else if (fullOperation?.type !== undefined) {
           const populateType = populateOpertaion[Type[fullOperation?.type]];
           if (Array.isArray(populateType)) {
-            this.populate(query, queryParams, populateType);
+            query = this.populate(query, queryParams, populateType);
           } else if (fullOperation?.subType !== undefined) {
             const populateSubType =
               populateType[SubType[fullOperation?.subType]];
             if (Array.isArray(populateSubType)) {
-              this.populate(query, queryParams, populateSubType);
+              query = this.populate(query, queryParams, populateSubType);
             }
           }
         }
       }
     }
-    return query;
+    return this.execute(query, queryParams, callback);
   }
 
   protected execute(query, queryParams, callback) {
-    if (query.exec) {
-      return query(...queryParams).exec(callback);
+    queryParams = this.filterQueryParams(queryParams);
+    // console.log('execute:', queryParams);
+    if (query.exec !== undefined) {
+      // console.log('query.exec:');
+
+      if (queryParams.length > 0) return query(...queryParams).exec(callback);
+      return query().exec(callback);
     } else {
-      return query(...queryParams, callback);
+      // console.log('NO query.exec:');
+      if (queryParams.length > 0) return query(...queryParams, callback);
+      return query({}, callback);
     }
+  }
+
+  protected filterQueryParams(queryParams: unknown[]) {
+    if (
+      queryParams !== undefined &&
+      queryParams !== null &&
+      queryParams.length > 0
+    )
+      for (
+        let index = queryParams.length - 1;
+        index >= 0 && queryParams[index] === undefined;
+        index--
+      ) {
+        queryParams.splice(index, 1);
+      }
+    else queryParams = [];
+    return queryParams;
   }
 
   protected toCast(type: CastType): string {
@@ -477,10 +512,13 @@ export class MongoPersistence implements IPersistence {
         ? doc['value']
         : doc;
 
+    // console.log('Received cast:', cast);
+
     receivedItem =
       cast !== undefined &&
       cast !== null &&
       cast !== '' &&
+      cast !== 'none' &&
       doc !== undefined &&
       doc !== null
         ? doc[cast]()
@@ -522,10 +560,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [model, model.create, [newItem], fullOperation],
-        callback
+      this.populateAll(
+        model,
+        model.create.bind(model),
+        [newItem],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -566,10 +606,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [model, model.insertMany, [items, options], fullOperation],
-        callback
+      this.populateAll(
+        model,
+        model.insertMany.bind(model),
+        [items, options],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -591,6 +633,7 @@ export class MongoPersistence implements IPersistence {
         subType: SubType.byFilter,
       };
       const callback = async (error, docs: Document[]) => {
+        // console.log('Scheme readArray:', scheme);
         if (error) {
           reject(error);
         } else {
@@ -614,15 +657,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [
-          model,
-          model.find,
-          [newSelectedItem, additionalOptions, compiledOptions],
-          fullOperation,
-        ],
-        callback
+      this.populateAll(
+        model,
+        model.find.bind(model),
+        [newSelectedItem, additionalOptions, compiledOptions],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -644,6 +684,7 @@ export class MongoPersistence implements IPersistence {
         subType: SubType.byFilter,
       };
       const callback = async (error, doc) => {
+        // console.log('Scheme readArray:', scheme);
         if (error) {
           reject(error);
         } else {
@@ -667,15 +708,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [
-          model,
-          model.findOne,
-          [newSelectedItem, additionalOptions, compiledOptions],
-          fullOperation,
-        ],
-        callback
+      this.populateAll(
+        model,
+        model.findOne.bind(model),
+        [newSelectedItem, additionalOptions, compiledOptions],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -719,15 +757,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [
-          model,
-          model.findById,
-          [id, additionalOptions, compiledOptions],
-          fullOperation,
-        ],
-        callback
+      this.populateAll(
+        model,
+        model.findById.bind(model),
+        [id, additionalOptions, compiledOptions],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -823,6 +858,7 @@ export class MongoPersistence implements IPersistence {
           subType: SubType.byFilter,
         };
         const callback = (error, doc) => {
+          // console.log('Scheme:', scheme);
           if (error) {
             reject(error);
           } else {
@@ -840,15 +876,12 @@ export class MongoPersistence implements IPersistence {
             );
           }
         };
-        this.execute(
-          this.populateAll,
-          [
-            model,
-            model.updateMany,
-            [selectedItem, newItem, options],
-            fullOperation,
-          ],
-          callback
+        this.populateAll(
+          model,
+          model.updateMany.bind(model),
+          [selectedItem, newItem, options],
+          fullOperation,
+          callback.bind(this)
         );
       }
     });
@@ -868,6 +901,7 @@ export class MongoPersistence implements IPersistence {
         subType: SubType.byFilter,
       };
       const callback = (error) => {
+        // console.log('Scheme:', scheme);
         if (error) {
           reject(error);
         } else {
@@ -878,10 +912,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [model, model.deleteMany, [newSelectedItem, options], fullOperation],
-        callback
+      this.populateAll(
+        model,
+        model.deleteMany.bind(model),
+        [newSelectedItem, options],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -900,6 +936,7 @@ export class MongoPersistence implements IPersistence {
         subType: SubType.byFilter,
       };
       const callback = (error, doc) => {
+        // console.log('Scheme:', scheme);
         if (error) {
           reject(error);
         } else {
@@ -916,15 +953,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [
-          model,
-          model.findOneAndDelete,
-          [newSelectedItem, options],
-          fullOperation,
-        ],
-        callback
+      this.populateAll(
+        model,
+        model.findOneAndDelete.bind(model),
+        [newSelectedItem, options],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -942,6 +976,7 @@ export class MongoPersistence implements IPersistence {
         subType: SubType.byId,
       };
       const callback = (error, doc) => {
+        // console.log('Scheme:', scheme);
         if (error) {
           reject(error);
         } else {
@@ -958,10 +993,12 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.execute(
-        this.populateAll,
-        [model, model.findByIdAndDelete, [id, options], fullOperation],
-        callback
+      this.populateAll(
+        model,
+        model.findByIdAndDelete.bind(model),
+        [id, options],
+        fullOperation,
+        callback.bind(this)
       );
     });
   }
@@ -1006,6 +1043,7 @@ export class MongoPersistence implements IPersistence {
         if (id) {
           fullOperation.subType = SubType.byId;
           const callback = (error, doc, result) => {
+            // console.log('selectedItem:', selectedItem);
             this.findOneAndUpdateResult(
               resolve,
               reject,
@@ -1016,19 +1054,17 @@ export class MongoPersistence implements IPersistence {
               fullOperation
             );
           };
-          this.execute(
-            this.populateAll,
-            [
-              model,
-              model.findByIdAndUpdate,
-              [id, item, { new: true, ...options }],
-              fullOperation,
-            ],
-            callback
+          this.populateAll(
+            model,
+            model.findByIdAndUpdate.bind(model),
+            [id, item, { new: true, ...options }],
+            fullOperation,
+            callback.bind(this)
           );
         } else {
           fullOperation.subType = SubType.byFilter;
           const callback = (error, doc, result) => {
+            // console.log('selectedItem:', selectedItem);
             this.findOneAndUpdateResult(
               resolve,
               reject,
@@ -1039,15 +1075,12 @@ export class MongoPersistence implements IPersistence {
               fullOperation
             );
           };
-          this.execute(
-            this.populateAll,
-            [
-              model,
-              model.findOneAndUpdate,
-              [selectedItem, item, options],
-              fullOperation,
-            ],
-            callback
+          this.populateAll(
+            model,
+            model.findOneAndUpdate.bind(model),
+            [selectedItem, item, options],
+            fullOperation,
+            callback.bind(this)
           );
         }
       }

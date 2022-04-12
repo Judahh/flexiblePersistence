@@ -20,7 +20,7 @@
     "prepublish": "",
     "build": "rm -rf dist/ && tsc",
     "test": "jest --passWithNoTests --ci --verbose --forceExit --detectOpenHandles",
-    "integration": "jest -i -c integration.config.json --passWithNoTests  --ci --verbose --forceExit --detectOpenHandles",
+    "integration": "jest -c integration.config.json --passWithNoTests --ci --verbose --forceExit --detectOpenHandles --runInBand",
     "prestart": "",
     "tsc": "tsc",
     "tsc:w": "tsc -w"
