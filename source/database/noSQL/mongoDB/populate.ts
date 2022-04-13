@@ -1,21 +1,21 @@
 export type Read =
   | {
-      array?: string[];
+      array?: unknown[];
       item?:
         | {
-            byfilter?: string[];
-            byId?: string[];
+            byfilter?: unknown[];
+            byId?: unknown[];
           }
-        | string[];
+        | unknown[];
     }
-  | string[];
+  | unknown[];
 
 export type Create =
   | {
-      array?: string[];
-      item?: string[];
+      array?: unknown[];
+      item?: unknown[];
     }
-  | string[];
+  | unknown[];
 export type Populate =
   | {
       create?: Create;
@@ -23,4 +23,4 @@ export type Populate =
       update?: Create;
       delete?: Read;
     }
-  | string[];
+  | unknown[];

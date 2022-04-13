@@ -45,6 +45,16 @@ import { MongoPersistence } from './database/noSQL/mongoDB/mongoPersistence';
 import BaseSchemaDefault from './database/noSQL/mongoDB/baseSchemaDefault';
 import { IOptions as IEventOptions } from './event/iOptions';
 import IOptions from './handler/iOptions';
+import {
+  Populate,
+  Read as TypeRead,
+  Create as TypeCreate,
+} from './database/noSQL/mongoDB/populate';
+import { CastType } from './database/noSQL/mongoDB/toCast';
+import { Virtual } from './database/noSQL/mongoDB/virtual';
+import { FullOperation } from './event/fullOperation';
+import { SubType } from './event/subType';
+import { Type } from './event/type';
 
 export {
   Handler,
@@ -86,4 +96,12 @@ export {
   Info,
   MongoPersistence,
   BaseSchemaDefault,
+  Populate,
+  TypeRead,
+  TypeCreate,
+  CastType,
+  Virtual,
+  FullOperation,
+  SubType,
+  Type,
 };

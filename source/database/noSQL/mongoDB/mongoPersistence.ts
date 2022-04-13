@@ -22,7 +22,6 @@ import {
 import BaseSchemaDefault from './baseSchemaDefault';
 import GenericSchema from './genericSchema';
 import { IOptions } from '../../../event/iOptions';
-import { Populate } from './populate';
 import { Type } from '../../../event/type';
 import { SubType } from '../../../event/subType';
 import { CastType, ToCast } from './toCast';
@@ -128,19 +127,31 @@ export class MongoPersistence implements IPersistence {
     return this.mongooseInstance.model(name, schema);
   }
 
-  protected populate(query, queryParams: unknown[], populate: string[]) {
-    if (populate !== undefined && populate.length > 0) {
+  protected populate(
+    query,
+    queryParams: unknown[],
+    populate?: unknown[],
+    callback?
+  ) {
+    const hasCallback = callback !== undefined && callback !== null;
+    const hasPopulate =
+      populate !== undefined && populate !== null && populate.length > 0;
+    if (hasPopulate) {
       queryParams = this.filterQueryParams(queryParams);
-      // console.log('populate:', query, queryParams);
+      query = query(...queryParams);
+      console.log('populate:', query, query.name, queryParams);
       for (const element of populate) {
-        if (queryParams.length > 0)
-          query = query(...queryParams).populate(element);
-        else query = query().populate(element);
+        console.log('populate:', element);
+        query = query.populate(element);
       }
+      query = hasCallback ? query.exec(callback) : query.exec();
+    } else {
+      query = hasCallback
+        ? query(...queryParams, callback)
+        : query(...queryParams);
     }
     return query;
   }
-
   protected populateAll(
     model: Model<unknown>,
     query,
@@ -150,50 +161,57 @@ export class MongoPersistence implements IPersistence {
     callback?: (..._params) => void
   ) {
     queryParams = this.filterQueryParams(queryParams);
-    const populate: Populate = model.schema['populateOptions'];
+    const populate = model.schema['populateOptions'];
     // console.log('populateAll:', queryParams);
-
     if (populate) {
       if (Array.isArray(populate)) {
-        query = this.populate(query, queryParams, populate);
+        return this.populate(query, queryParams, populate, callback);
       } else if (fullOperation?.operation !== undefined) {
         const populateOpertaion = populate[Operation[fullOperation?.operation]];
         if (Array.isArray(populateOpertaion)) {
-          query = this.populate(query, queryParams, populateOpertaion);
+          return this.populate(query, queryParams, populateOpertaion, callback);
         } else if (fullOperation?.type !== undefined) {
           const populateType = populateOpertaion[Type[fullOperation?.type]];
           if (Array.isArray(populateType)) {
-            query = this.populate(query, queryParams, populateType);
+            return this.populate(query, queryParams, populateType, callback);
           } else if (fullOperation?.subType !== undefined) {
             const populateSubType =
               populateType[SubType[fullOperation?.subType]];
             if (Array.isArray(populateSubType)) {
-              query = this.populate(query, queryParams, populateSubType);
+              return this.populate(
+                query,
+                queryParams,
+                populateSubType,
+                callback
+              );
             }
           }
         }
       }
     }
-    return this.execute(query, queryParams, callback);
+    return this.populate(query, queryParams, undefined, callback);
   }
 
-  protected execute(query, queryParams, callback) {
+  protected execute(query, queryParams, callback?) {
     queryParams = this.filterQueryParams(queryParams);
+    const hasCallback = callback !== undefined && callback !== null;
     // console.log('execute:', queryParams);
     if (typeof query !== 'function') {
       if (query.exec !== undefined) {
-        if (queryParams.length > 0) return query.exec(callback);
-        return query.exec(callback);
+        return hasCallback ? query.exec(callback) : query(queryParams);
       }
       return query;
     } else if (typeof query === 'function') {
       try {
-        if (queryParams.length > 0) return query(...queryParams, callback);
+        if (queryParams.length > 0)
+          return hasCallback
+            ? query(...queryParams, callback)
+            : query(...queryParams);
         return query({}, callback);
       } catch (error) {
         const functionQuery =
           queryParams.length > 0 ? query(...queryParams) : query();
-        if (typeof functionQuery.exec !== undefined) {
+        if (typeof functionQuery.exec !== undefined && hasCallback) {
           return functionQuery.exec(callback);
         } else {
           return functionQuery;
