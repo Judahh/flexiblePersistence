@@ -180,15 +180,25 @@ export class MongoPersistence implements IPersistence {
   protected execute(query, queryParams, callback) {
     queryParams = this.filterQueryParams(queryParams);
     // console.log('execute:', queryParams);
-    if (query.exec !== undefined) {
-      // console.log('query.exec:');
-
-      if (queryParams.length > 0) return query(...queryParams).exec(callback);
-      return query().exec(callback);
-    } else {
-      // console.log('NO query.exec:');
-      if (queryParams.length > 0) return query(...queryParams, callback);
-      return query({}, callback);
+    if (typeof query !== 'function') {
+      if (query.exec !== undefined) {
+        if (queryParams.length > 0) return query.exec(callback);
+        return query.exec(callback);
+      }
+      return query;
+    } else if (typeof query === 'function') {
+      try {
+        if (queryParams.length > 0) return query(...queryParams, callback);
+        return query({}, callback);
+      } catch (error) {
+        const functionQuery =
+          queryParams.length > 0 ? query(...queryParams) : query();
+        if (typeof functionQuery.exec !== undefined) {
+          return functionQuery.exec(callback);
+        } else {
+          return functionQuery;
+        }
+      }
     }
   }
 
