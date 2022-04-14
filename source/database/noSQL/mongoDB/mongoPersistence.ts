@@ -146,12 +146,20 @@ export class MongoPersistence implements IPersistence {
       }
       query = hasCallback ? query.exec(callback) : query.exec();
     } else {
-      if (queryParams !== undefined && queryParams !== null) {
+      if (
+        queryParams !== undefined &&
+        queryParams !== null &&
+        queryParams?.length > 0
+      ) {
         query = hasCallback
           ? query(...queryParams, callback)
           : query(...queryParams);
       } else {
-        query = hasCallback ? query.exec(callback) : query.exec();
+        if (query?.exec !== undefined && query?.exec !== null) {
+          query = hasCallback ? query.exec(callback) : query.exec();
+        } else {
+          query = hasCallback ? query({}, callback) : query();
+        }
       }
     }
     return query;
