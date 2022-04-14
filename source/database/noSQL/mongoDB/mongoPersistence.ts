@@ -136,8 +136,8 @@ export class MongoPersistence implements IPersistence {
     const hasCallback = callback !== undefined && callback !== null;
     const hasPopulate =
       populate !== undefined && populate !== null && populate.length > 0;
+    queryParams = this.filterQueryParams(queryParams);
     if (hasPopulate) {
-      queryParams = this.filterQueryParams(queryParams);
       query = query(...queryParams);
       console.log('populate:', query, query.name, queryParams);
       for (const element of populate) {
@@ -146,11 +146,8 @@ export class MongoPersistence implements IPersistence {
       }
       query = hasCallback ? query.exec(callback) : query.exec();
     } else {
-      if (
-        queryParams !== undefined &&
-        queryParams !== null &&
-        queryParams?.length > 0
-      ) {
+      const hasQueryParams = queryParams?.length > 0;
+      if (hasQueryParams) {
         query = hasCallback
           ? query(...queryParams, callback)
           : query(...queryParams);
