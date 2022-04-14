@@ -129,7 +129,7 @@ export class MongoPersistence implements IPersistence {
 
   protected populate(
     query,
-    queryParams: unknown[],
+    queryParams?: unknown[],
     populate?: unknown[],
     callback?
   ) {
@@ -146,16 +146,20 @@ export class MongoPersistence implements IPersistence {
       }
       query = hasCallback ? query.exec(callback) : query.exec();
     } else {
-      query = hasCallback
-        ? query(...queryParams, callback)
-        : query(...queryParams);
+      if (queryParams !== undefined && queryParams !== null) {
+        query = hasCallback
+          ? query(...queryParams, callback)
+          : query(...queryParams);
+      } else {
+        query = hasCallback ? query.exec(callback) : query.exec();
+      }
     }
     return query;
   }
   protected populateAll(
     model: Model<unknown>,
     query,
-    queryParams: unknown[],
+    queryParams?: unknown[],
     fullOperation?: FullOperation,
     // eslint-disable-next-line no-unused-vars
     callback?: (..._params) => void
@@ -167,23 +171,52 @@ export class MongoPersistence implements IPersistence {
       if (Array.isArray(populate)) {
         return this.populate(query, queryParams, populate, callback);
       } else if (fullOperation?.operation !== undefined) {
-        const populateOpertaion = populate[Operation[fullOperation?.operation]];
-        if (Array.isArray(populateOpertaion)) {
-          return this.populate(query, queryParams, populateOpertaion, callback);
-        } else if (fullOperation?.type !== undefined) {
-          const populateType = populateOpertaion[Type[fullOperation?.type]];
-          if (Array.isArray(populateType)) {
-            return this.populate(query, queryParams, populateType, callback);
-          } else if (fullOperation?.subType !== undefined) {
-            const populateSubType =
-              populateType[SubType[fullOperation?.subType]];
-            if (Array.isArray(populateSubType)) {
-              return this.populate(
-                query,
-                queryParams,
-                populateSubType,
-                callback
-              );
+        const operation = Operation[fullOperation?.operation];
+        const hasOparation = operation !== undefined && operation !== null;
+        const populateOpertaion = hasOparation
+          ? populate[operation]
+          : undefined;
+        const hasPopulateOparation =
+          populateOpertaion !== undefined && populateOpertaion !== null;
+        if (hasPopulateOparation) {
+          if (Array.isArray(populateOpertaion)) {
+            return this.populate(
+              query,
+              queryParams,
+              populateOpertaion,
+              callback
+            );
+          } else if (fullOperation?.type !== undefined) {
+            const type = Type[fullOperation?.type];
+            const hasType = type !== undefined && type !== null;
+            const populateType = hasType ? populateOpertaion[type] : undefined;
+            const hasPopulateType =
+              populateType !== undefined && populateType !== null;
+            if (hasPopulateType) {
+              if (Array.isArray(populateType)) {
+                return this.populate(
+                  query,
+                  queryParams,
+                  populateType,
+                  callback
+                );
+              } else if (fullOperation?.subType !== undefined) {
+                const subType = SubType[fullOperation?.subType];
+                const hasSubType = subType !== undefined && subType !== null;
+                const populateSubType = hasSubType
+                  ? populateType[subType]
+                  : undefined;
+                const hasPopulateSubType =
+                  populateSubType !== undefined && populateSubType !== null;
+                if (hasPopulateSubType && Array.isArray(populateSubType)) {
+                  return this.populate(
+                    query,
+                    queryParams,
+                    populateSubType,
+                    callback
+                  );
+                }
+              }
             }
           }
         }
@@ -220,7 +253,7 @@ export class MongoPersistence implements IPersistence {
     }
   }
 
-  protected filterQueryParams(queryParams: unknown[]) {
+  protected filterQueryParams(queryParams?: unknown[]) {
     if (
       queryParams !== undefined &&
       queryParams !== null &&
@@ -264,24 +297,40 @@ export class MongoPersistence implements IPersistence {
           fullOperation?.operation === null
         )
           return '';
-        toCast = toCast[Operation[fullOperation?.operation]];
-        if (typeof toCast === 'number') {
-          return this.toCast(toCast);
-        } else {
-          if (fullOperation?.type === undefined || fullOperation?.type === null)
-            return '';
-          toCast = toCast[Type[fullOperation?.type]];
+        const operation = Operation[fullOperation?.operation];
+        const hasOperation = operation !== undefined && operation !== null;
+        toCast = hasOperation ? toCast[operation] : undefined;
+        let hasToCast = toCast !== undefined && toCast !== null;
+        if (hasToCast) {
           if (typeof toCast === 'number') {
             return this.toCast(toCast);
           } else {
             if (
-              fullOperation?.subType === undefined ||
-              fullOperation?.subType === null
+              fullOperation?.type === undefined ||
+              fullOperation?.type === null
             )
               return '';
-            toCast = toCast[SubType[fullOperation?.subType]];
-            if (typeof toCast === 'number') {
-              return this.toCast(toCast);
+            const type = Type[fullOperation?.type];
+            const hasType = type !== undefined && type !== null;
+            toCast = hasType ? toCast[type] : undefined;
+            hasToCast = toCast !== undefined && toCast !== null;
+            if (hasToCast) {
+              if (typeof toCast === 'number') {
+                return this.toCast(toCast);
+              } else {
+                if (
+                  fullOperation?.subType === undefined ||
+                  fullOperation?.subType === null
+                )
+                  return '';
+                const subType = SubType[fullOperation?.subType];
+                const hasSubType = subType !== undefined && subType !== null;
+                toCast = hasSubType ? toCast[subType] : undefined;
+                hasToCast = toCast !== undefined && toCast !== null;
+                if (hasToCast && typeof toCast === 'number') {
+                  return this.toCast(toCast);
+                }
+              }
             }
           }
         }
