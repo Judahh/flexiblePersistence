@@ -3,7 +3,7 @@
 import { PersistenceInfo } from '../../source/database/persistenceInfo';
 import { Journaly, SenderReceiver } from 'journaly';
 
-test('add and read array and find object', async () => {
+test('Test Connections', async () => {
   const journaly = Journaly.newJournaly() as SenderReceiver<any>;
   let info = new PersistenceInfo(
     {
