@@ -50,7 +50,7 @@ import {
   Read as TypeRead,
   Create as TypeCreate,
 } from './database/noSQL/mongoDB/populate';
-import { CastType } from './database/noSQL/mongoDB/toCast';
+import { CastType, Read as CastRead, Create as CastCreate, ToCast } from './database/noSQL/mongoDB/toCast';
 import { Virtual } from './database/noSQL/mongoDB/virtual';
 import { FullOperation } from './event/fullOperation';
 import { SubType } from './event/subType';
@@ -100,6 +100,9 @@ export {
   TypeRead,
   TypeCreate,
   CastType,
+  CastRead,
+  CastCreate,
+  ToCast,
   Virtual,
   FullOperation,
   SubType,
