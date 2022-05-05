@@ -283,7 +283,11 @@ export class MongoPersistence implements IPersistence {
               }
               if (key.includes('.$')) {
                 const keySplit = key.split('.$');
-                element[keySplit[0]] = {};
+                if (
+                  element[keySplit[0]] === undefined ||
+                  element[keySplit[0]] === null
+                )
+                  element[keySplit[0]] = {};
                 let newKey = '$' + keySplit[1];
                 if (
                   (isArray || Array.isArray(element[key])) &&
