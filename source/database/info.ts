@@ -8,7 +8,12 @@ export class Info {
   port?: number | string;
   username?: string;
   password?: string;
-  pool?: { max: number; min: number; idleTimeoutMillis: number };
+  pool?: {
+    max: number;
+    min: number;
+    idleTimeoutMillis: number;
+    acquireTimeoutMillis: number;
+  };
   options?:
     | string
     | {
