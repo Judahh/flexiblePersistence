@@ -302,9 +302,9 @@
     strip-json-comments "^3.1.1"
 
 "@flexiblepersistence/default-initializer@latest":
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/@flexiblepersistence/default-initializer/-/default-initializer-1.0.8.tgz#1ed6144bf88f84bdda177d1d1e8a9ead24ca7b33"
-  integrity sha512-r+IDqU0U0fXwejrNAqLOljwyiL3RboM5FWNtqvG2ryVUMAv5zLuDNfrAoBgo4JPNZbOaDheudNR4mWXBDUYNbw==
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@flexiblepersistence/default-initializer/-/default-initializer-1.0.9.tgz#27a90f3183b82d9614f42e82c474dc2cb9efa6c0"
+  integrity sha512-BX14MJt3/WwNh1J/DO9RGeBTvxij1n/l96cv27NwxWA8bvDkX2w+A8fkW3AM4/2c1Jp6x0y3i2j/Zub8APAGjw==
   dependencies:
     journaly latest
 
@@ -1110,9 +1110,9 @@ camelcase@^6.2.0:
   integrity sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==
 
 caniuse-lite@^1.0.30001332:
-  version "1.0.30001338"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001338.tgz#b5dd7a7941a51a16480bdf6ff82bded1628eec0d"
-  integrity sha512-1gLHWyfVoRDsHieO+CaeYe7jSo/MT7D7lhaXUiwwbuR5BwQxORs0f1tAwUSQr3YbxRXJvxHM/PA5FfPQRnsPeQ==
+  version "1.0.30001339"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001339.tgz#f9aece4ea8156071613b27791547ba0b33f176cf"
+  integrity sha512-Es8PiVqCe+uXdms0Gu5xP5PF2bxLR7OBp3wUzUnuO7OHzhOfCyg3hdiGWVPVxhiuniOzng+hTc1u3fEQ0TlkSQ==
 
 chalk@^2.0.0:
   version "2.4.2"
@@ -2002,9 +2002,9 @@ internal-slot@^1.0.3:
     side-channel "^1.0.4"
 
 ip@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.5.tgz#bdded70114290828c0a039e72ef25f5aaec4354a"
-  integrity sha1-vd7XARQpCCjAoDnnLvJfWq7ENUo=
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/ip/-/ip-1.1.6.tgz#5a651a37644586e18b6ba3b48ca122bf56495f67"
+  integrity sha512-/dAvCivFs/VexXAtiAoMIqyhkhStNC9CPD0h1noonimOgB1xrCkexF2c5CjlqQ72GgMPjN6tiV+oreoPv3Ft1g==
 
 is-arrayish@^0.2.1:
   version "0.2.1"
@@ -2600,9 +2600,9 @@ jest@27.5.1:
     jest-cli "^27.5.1"
 
 journaly@latest:
-  version "4.0.8"
-  resolved "https://registry.yarnpkg.com/journaly/-/journaly-4.0.8.tgz#22f96cbb5c39e7af79d7c60628cd53d6f94e5167"
-  integrity sha512-CTkfT374fiOH2h2xzx/Nm3hoAt+D5Kh4gSPHp6rzds4GkbDIi2I2D2NXWSMjAXtM9nQsXPLB0rPc29Uct2tCMw==
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/journaly/-/journaly-4.0.9.tgz#51565564d53ffa21457d21708d1d885dc165dc41"
+  integrity sha512-hgynUXtritL7AtNtCmRYwl0O6Ejp04kcmXfge4fxFlntrDX7W3yIqzA6f7qKtCMCIYdHh1oLncXBu1zHYfF8/Q==
 
 js-tokens@^4.0.0:
   version "4.0.0"
