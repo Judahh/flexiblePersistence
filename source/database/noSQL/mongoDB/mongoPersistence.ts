@@ -258,6 +258,52 @@ export class MongoPersistence implements IPersistence {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected advancedFilter(queryParams?: any[]): void {
+    if (
+      queryParams !== undefined &&
+      queryParams !== null &&
+      queryParams.length > 0
+    )
+      for (const element of queryParams) {
+        if (element !== undefined && element !== null) {
+          for (const key in element) {
+            if (
+              key !== undefined &&
+              key !== null &&
+              element[key] !== undefined &&
+              element[key] !== null
+            ) {
+              let isArray = false;
+              if (key.includes('[]')) {
+                const keySplit = key.split('[]');
+                element[keySplit[0]] = element[key];
+                delete element[key];
+                isArray = true;
+              }
+              if (key.includes('.$')) {
+                const keySplit = key.split('.$');
+                if (
+                  element[keySplit[0]] === undefined ||
+                  element[keySplit[0]] === null
+                )
+                  element[keySplit[0]] = {};
+                let newKey = '$' + keySplit[1];
+                if (
+                  (isArray || Array.isArray(element[key])) &&
+                  keySplit[1] === 'ne'
+                ) {
+                  newKey = '$nin';
+                }
+                element[keySplit[0]][newKey] = element[key];
+                delete element[key];
+              }
+            }
+          }
+        }
+      }
+  }
+
   protected filterQueryParams(queryParams?: unknown[]) {
     if (
       queryParams !== undefined &&
@@ -272,6 +318,7 @@ export class MongoPersistence implements IPersistence {
         queryParams.splice(index, 1);
       }
     else queryParams = [];
+    this.advancedFilter.bind(this)(queryParams);
     return queryParams;
   }
 
