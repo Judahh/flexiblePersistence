@@ -71,6 +71,7 @@ export class MongoPersistence implements IPersistence {
         const index = element.getIndex();
         const virtual = element.getVirtual();
         const populate = element.getPopulate();
+        const pipeline = element.getPipeline();
         const toCast = element.getToCast();
         if (index) {
           schema.index(index, element.getIndexOptions());
@@ -96,6 +97,9 @@ export class MongoPersistence implements IPersistence {
         }
         if (toCast) {
           schema['toCastOptions'] = toCast;
+        }
+        if (pipeline) {
+          schema['pipelineOptions'] = pipeline;
         }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -131,11 +135,13 @@ export class MongoPersistence implements IPersistence {
     query,
     queryParams?: unknown[],
     populate?: unknown[],
+    pipeline?: unknown[],
     callback?
   ) {
     const hasCallback = callback !== undefined && callback !== null;
     const hasPopulate =
       populate !== undefined && populate !== null && populate.length > 0;
+    const hasPipeline = pipeline !== undefined && pipeline !== null;
     queryParams = this.filterQueryParams(queryParams);
     if (hasPopulate) {
       query = query(...queryParams);
@@ -144,18 +150,56 @@ export class MongoPersistence implements IPersistence {
         console.log('populate:', element);
         query = query.populate(element);
       }
-      query = hasCallback ? query.exec(callback) : query.exec();
+      query = hasCallback
+        ? hasPipeline && query.aggregate
+          ? query.aggregate(pipeline).exec(callback)
+          : query.exec(callback)
+        : hasPipeline && query.aggregate
+        ? query.aggregate(pipeline).exec()
+        : query.exec();
     } else {
       const hasQueryParams = queryParams?.length > 0;
       if (hasQueryParams) {
         query = hasCallback
-          ? query(...queryParams, callback)
+          ? hasPipeline
+            ? query(...queryParams)
+                .aggregate(pipeline)
+                .exec(callback)
+            : query(...queryParams, callback)
+          : hasPipeline
+          ? query(...queryParams)
+              .aggregate(pipeline)
+              .exec()
           : query(...queryParams);
       } else {
         if (query?.exec !== undefined && query?.exec !== null) {
-          query = hasCallback ? query.exec(callback) : query.exec();
+          query = hasCallback
+            ? hasPipeline && query.aggregate
+              ? query.aggregate(pipeline).exec(callback)
+              : query.exec(callback)
+            : hasPipeline && query.aggregate
+            ? query.aggregate(pipeline).exec()
+            : query.exec();
         } else {
-          query = hasCallback ? query({}, callback) : query();
+          if (hasCallback) {
+            if (hasPipeline) {
+              query = query();
+              query = query.aggregate
+                ? query.aggregate(pipeline).exec(callback)
+                : query.exec(callback);
+            } else {
+              query = query({}, callback);
+            }
+          } else {
+            if (hasPipeline) {
+              query = query();
+              query = query.aggregate
+                ? query.aggregate(pipeline).exec()
+                : query.exec();
+            } else {
+              query = query();
+            }
+          }
         }
       }
     }
@@ -171,10 +215,11 @@ export class MongoPersistence implements IPersistence {
   ) {
     queryParams = this.filterQueryParams(queryParams);
     const populate = model.schema['populateOptions'];
+    const pipeline = model.schema['pipelineOptions'];
     // console.log('populateAll:', queryParams);
     if (populate) {
       if (Array.isArray(populate)) {
-        return this.populate(query, queryParams, populate, callback);
+        return this.populate(query, queryParams, populate, pipeline, callback);
       } else if (fullOperation?.operation !== undefined) {
         const operation = Operation[fullOperation?.operation];
         const hasOparation = operation !== undefined && operation !== null;
@@ -189,6 +234,7 @@ export class MongoPersistence implements IPersistence {
               query,
               queryParams,
               populateOpertaion,
+              pipeline,
               callback
             );
           } else if (fullOperation?.type !== undefined) {
@@ -203,6 +249,7 @@ export class MongoPersistence implements IPersistence {
                   query,
                   queryParams,
                   populateType,
+                  pipeline,
                   callback
                 );
               } else if (fullOperation?.subType !== undefined) {
@@ -218,6 +265,7 @@ export class MongoPersistence implements IPersistence {
                     query,
                     queryParams,
                     populateSubType,
+                    pipeline,
                     callback
                   );
                 }
@@ -227,7 +275,7 @@ export class MongoPersistence implements IPersistence {
         }
       }
     }
-    return this.populate(query, queryParams, undefined, callback);
+    return this.populate(query, queryParams, undefined, pipeline, callback);
   }
 
   protected execute(query, queryParams, callback?) {

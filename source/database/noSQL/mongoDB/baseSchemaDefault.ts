@@ -5,6 +5,7 @@ import {
   SchemaOptions,
   IndexDefinition,
   IndexOptions,
+  PipelineStage,
 } from 'mongoose';
 import { Populate } from './populate';
 import { ToCast } from './toCast';
@@ -18,6 +19,7 @@ export default class BaseSchemaDefault extends Default {
   protected indexOptions?: IndexOptions;
   protected virtual?: Virtual;
   protected populate?: Populate;
+  protected pipeline?: PipelineStage[];
   protected toCast?: ToCast;
 
   getAttributes(): SchemaDefinition {
@@ -46,6 +48,10 @@ export default class BaseSchemaDefault extends Default {
 
   getToCast(): ToCast | undefined {
     return this.toCast;
+  }
+
+  getPipeline(): PipelineStage[] | undefined {
+    return this.pipeline;
   }
 
   constructor(initDefault?: IDefault) {
