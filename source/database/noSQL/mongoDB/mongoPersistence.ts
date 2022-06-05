@@ -135,7 +135,7 @@ export class MongoPersistence implements IPersistence {
     query,
     queryParams?: unknown[],
     populate?: unknown[],
-    pipeline?: unknown[],
+    pipeline?: { $project? }[],
     callback?
   ) {
     const hasCallback = callback !== undefined && callback !== null;
@@ -153,32 +153,98 @@ export class MongoPersistence implements IPersistence {
       query = hasCallback
         ? hasPipeline && query.aggregate
           ? query.aggregate(pipeline).exec(callback)
+          : hasPipeline && query.select
+          ? query
+              .select(
+                pipeline?.find(
+                  (element) =>
+                    element.$project !== undefined && element.$project !== null
+                )?.$project
+              )
+              .exec(callback)
           : query.exec(callback)
         : hasPipeline && query.aggregate
         ? query.aggregate(pipeline).exec()
+        : hasPipeline && query.select
+        ? query
+            .select(
+              pipeline?.find(
+                (element) =>
+                  element.$project !== undefined && element.$project !== null
+              )?.$project
+            )
+            .exec()
         : query.exec();
     } else {
       const hasQueryParams = queryParams?.length > 0;
       if (hasQueryParams) {
-        query = hasCallback
-          ? hasPipeline
-            ? query(...queryParams)
-                .aggregate(pipeline)
-                .exec(callback)
-            : query(...queryParams, callback)
-          : hasPipeline
-          ? query(...queryParams)
-              .aggregate(pipeline)
-              .exec()
-          : query(...queryParams);
+        if (hasCallback) {
+          if (hasPipeline) {
+            query = query(...queryParams);
+            query = query.aggregate
+              ? query.aggregate(pipeline).exec(callback)
+              : query.select
+              ? query
+                  .select(
+                    pipeline?.find(
+                      (element) =>
+                        element.$project !== undefined &&
+                        element.$project !== null
+                    )?.$project
+                  )
+                  .exec(callback)
+              : query.exec(callback);
+          } else {
+            query = query(...queryParams, callback);
+          }
+        } else {
+          if (hasPipeline) {
+            query = query(...queryParams);
+            query = query.aggregate
+              ? query.aggregate(pipeline).exec()
+              : query.select
+              ? query
+                  .select(
+                    pipeline?.find(
+                      (element) =>
+                        element.$project !== undefined &&
+                        element.$project !== null
+                    )?.$project
+                  )
+                  .exec()
+              : query.exec();
+          } else {
+            query = query(...queryParams);
+          }
+        }
       } else {
         if (query?.exec !== undefined && query?.exec !== null) {
           query = hasCallback
             ? hasPipeline && query.aggregate
               ? query.aggregate(pipeline).exec(callback)
+              : hasPipeline && query.select
+              ? query
+                  .select(
+                    pipeline?.find(
+                      (element) =>
+                        element.$project !== undefined &&
+                        element.$project !== null
+                    )?.$project
+                  )
+                  .exec(callback)
               : query.exec(callback)
             : hasPipeline && query.aggregate
             ? query.aggregate(pipeline).exec()
+            : hasPipeline && query.select
+            ? query
+                .select(
+                  pipeline?.find(
+                    (element) =>
+                      element.$project !== undefined &&
+                      element.$project !== null
+                  )?.$project
+                )
+                .exec()
             : query.exec();
         } else {
           if (hasCallback) {
@@ -186,6 +252,16 @@ export class MongoPersistence implements IPersistence {
               query = query();
               query = query.aggregate
                 ? query.aggregate(pipeline).exec(callback)
+                : query.select
+                ? query
+                    .select(
+                      pipeline?.find(
+                        (element) =>
+                          element.$project !== undefined &&
+                          element.$project !== null
+                      )?.$project
+                    )
+                    .exec(callback)
                 : query.exec(callback);
             } else {
               query = query({}, callback);
@@ -195,6 +271,16 @@ export class MongoPersistence implements IPersistence {
               query = query();
               query = query.aggregate
                 ? query.aggregate(pipeline).exec()
+                : query.select
+                ? query
+                    .select(
+                      pipeline?.find(
+                        (element) =>
+                          element.$project !== undefined &&
+                          element.$project !== null
+                      )?.$project
+                    )
+                    .exec()
                 : query.exec();
             } else {
               query = query();
