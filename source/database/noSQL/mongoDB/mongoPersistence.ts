@@ -80,12 +80,16 @@ export class MongoPersistence implements IPersistence {
           for (const key in virtual) {
             if (Object.hasOwnProperty.call(virtual, key)) {
               const element = virtual[key];
-              const currentVirtual = schema.virtual(key);
+              const currentVirtual = schema.virtual(key, element);
               if (element)
                 for (const key in element) {
                   if (Object.hasOwnProperty.call(element, key)) {
                     const element2 = element[key];
-                    currentVirtual[key](element2);
+                    if (currentVirtual[key] instanceof Function) {
+                      currentVirtual[key](element2);
+                    } else {
+                      currentVirtual[key] = element2;
+                    }
                   }
                 }
             }
