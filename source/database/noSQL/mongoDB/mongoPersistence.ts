@@ -790,6 +790,7 @@ export class MongoPersistence implements IPersistence {
       newItem._id = newItem.id;
       return newItem;
     }
+    if (item === undefined) return {} as Event;
     return item as Event;
   }
 
