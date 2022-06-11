@@ -1,21 +1,29 @@
+import { PopulateOptions } from 'mongoose';
+
 export type Read =
   | {
-      array?: unknown[];
+      array?: (string | PopulateOptions)[] | string | PopulateOptions;
       item?:
         | {
-            byfilter?: unknown[];
-            byId?: unknown[];
+            byfilter?: (string | PopulateOptions)[] | string | PopulateOptions;
+            byId?: (string | PopulateOptions)[] | string | PopulateOptions;
           }
-        | unknown[];
+        | (string | PopulateOptions)[]
+        | string
+        | PopulateOptions;
     }
-  | unknown[];
+  | (string | PopulateOptions)[]
+  | string
+  | PopulateOptions;
 
 export type Create =
   | {
-      array?: unknown[];
-      item?: unknown[];
+      array?: (string | PopulateOptions)[] | string | PopulateOptions;
+      item?: (string | PopulateOptions)[] | string | PopulateOptions;
     }
-  | unknown[];
+  | (string | PopulateOptions)[]
+  | string
+  | PopulateOptions;
 export type Populate =
   | {
       create?: Create;
@@ -23,4 +31,6 @@ export type Populate =
       update?: Create;
       delete?: Read;
     }
-  | unknown[];
+  | (string | PopulateOptions)[]
+  | string
+  | PopulateOptions;
