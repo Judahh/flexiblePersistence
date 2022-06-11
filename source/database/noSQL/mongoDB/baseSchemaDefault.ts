@@ -8,6 +8,7 @@ import {
   PipelineStage,
   AggregateOptions,
 } from 'mongoose';
+import { PipelineCRUD } from './pipelineCRUD';
 import { Populate } from './populate';
 import { ToCast } from './toCast';
 import { Virtual } from './virtual';
@@ -20,7 +21,7 @@ export default class BaseSchemaDefault extends Default {
   protected indexOptions?: IndexOptions;
   protected virtual?: Virtual;
   protected populate?: Populate;
-  protected pipeline?: PipelineStage[];
+  protected pipeline?: PipelineStage | PipelineStage[] | PipelineCRUD;
   protected pipelineOptions?: AggregateOptions;
   protected toCast?: ToCast;
 
@@ -56,7 +57,7 @@ export default class BaseSchemaDefault extends Default {
     return this.toCast;
   }
 
-  getPipeline(): PipelineStage[] | undefined {
+  getPipeline(): PipelineStage | PipelineStage[] | PipelineCRUD | undefined {
     return this.pipeline;
   }
 

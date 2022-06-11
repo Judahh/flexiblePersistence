@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Model,
   Schema,
@@ -8,6 +9,7 @@ import {
   PipelineStage,
   AnyObject,
   PopulateOptions,
+  AggregateOptions,
 } from 'mongoose';
 import { IPersistence } from '../../../iPersistence/iPersistence';
 import { PersistenceInfo } from '../../persistenceInfo';
@@ -21,6 +23,7 @@ import {
   IInputRead,
   IInput,
   Operation,
+  Populate,
 } from '../../..';
 import BaseSchemaDefault from './baseSchemaDefault';
 import GenericSchema from './genericSchema';
@@ -30,6 +33,7 @@ import { SubType } from '../../../event/subType';
 import { CastType, ToCast } from './toCast';
 import { FullOperation } from '../../../event/fullOperation';
 import { ObjectId } from 'mongodb';
+import { PipelineCRUD, PipelineCRUDType } from './pipelineCRUD';
 export class MongoPersistence implements IPersistence {
   protected persistenceInfo: PersistenceInfo;
   protected mongooseInstance: Mongoose;
@@ -145,7 +149,7 @@ export class MongoPersistence implements IPersistence {
 
   protected populateStep(
     query,
-    populateOptions: string | PopulateOptions | PopulateOptions[],
+    populateOptions: (string | PopulateOptions)[] | string | PopulateOptions,
     populate,
     callback
   ) {
@@ -160,16 +164,63 @@ export class MongoPersistence implements IPersistence {
     return query;
   }
 
+  protected getCrud(method: string): PipelineCRUDType {
+    switch (method) {
+      case 'create':
+      case 'insertMany':
+        return PipelineCRUDType.create;
+      case 'find':
+      case 'findOne':
+      case 'findById':
+        return PipelineCRUDType.read;
+      case 'updateMany':
+      case 'findOneAndUpdate':
+      case 'findByIdAndUpdate':
+        return PipelineCRUDType.update;
+      case 'deleteMany':
+      case 'findOneAnddelete':
+      case 'findByIdAndDelete':
+        return PipelineCRUDType.delete;
+    }
+    return PipelineCRUDType.read;
+  }
+
+  protected isPipelineCrud(
+    pipeline: PipelineStage | PipelineStage[] | PipelineCRUD | undefined
+  ): boolean {
+    let isPipeline =
+      pipeline &&
+      !Array.isArray(pipeline) &&
+      // @ts-ignore
+      (pipeline.create !== undefined ||
+        // @ts-ignore
+        pipeline.read !== undefined ||
+        // @ts-ignore
+        pipeline.update !== undefined ||
+        // @ts-ignore
+        pipeline.delete !== undefined);
+    isPipeline = isPipeline || false;
+    return isPipeline;
+  }
+
   protected populate(
     scheme: string,
     method: string,
     queryParams: unknown[],
-    populateOptions: string | PopulateOptions | PopulateOptions[],
+    populateOptions: (string | PopulateOptions)[] | string | PopulateOptions,
     callback?
   ) {
     const model = this.getModel(scheme);
-    const pipeline = model.schema['pipeline'];
-    const pipelineOptions = model.schema['pipelineOptions'];
+    const crud = this.getCrud(method);
+    model.aggregate();
+    let pipeline: PipelineStage | PipelineStage[] | PipelineCRUD | undefined =
+      model.schema['pipeline'];
+    pipeline = (this.isPipelineCrud(pipeline) ? pipeline?.[crud] : pipeline) as
+      | PipelineStage
+      | PipelineStage[]
+      | undefined;
+    const pipelineOptions: AggregateOptions | undefined =
+      model.schema['pipelineOptions'];
     const hasPopulate =
       populateOptions !== undefined &&
       populateOptions !== null &&
@@ -193,11 +244,11 @@ export class MongoPersistence implements IPersistence {
         string,
         any
       >;
-      // const thirdParam = queryParams?.[2];
+      //! missing: const thirdParam = queryParams?.[2];
       const queryPipeline: PipelineStage[] = [{ $match: firstParam }];
-      switch (method) {
-        case 'create':
-        case 'insertMany':
+
+      switch (crud) {
+        case PipelineCRUDType.create:
           queryPipeline.push({
             $merge: {
               into: model.collection.collectionName,
@@ -208,9 +259,7 @@ export class MongoPersistence implements IPersistence {
           });
           break;
 
-        case 'updateMany':
-        case 'findOneAndUpdate':
-        case 'findByIdAndUpdate':
+        case PipelineCRUDType.update:
           queryPipeline.push({
             $merge: {
               into: model.collection.collectionName,
@@ -221,28 +270,19 @@ export class MongoPersistence implements IPersistence {
             },
           });
           break;
-
-        case 'deleteMany':
-        case 'findOneAnddelete':
-        case 'findByIdAndDelete':
-          break;
-
-        case 'find':
-        case 'findOne':
-        case 'findById':
-          break;
-
-        default:
-          break;
       }
 
-      pipeline.unshift(...queryPipeline);
-
+      pipeline = Array.isArray(pipeline)
+        ? [...pipeline, ...queryPipeline]
+        : pipeline
+        ? [pipeline, ...queryPipeline]
+        : queryPipeline;
       if (
         method === 'deleteMany' ||
         method === 'findOneAndDelete' ||
         method === 'findByIdAndDelete'
       ) {
+        //@ts-ignore
         query = model.aggregate(pipeline, pipelineOptions).then((result) => {
           const queryIds = result.map((doc) => doc._id);
           query = model.deleteMany(
@@ -261,6 +301,7 @@ export class MongoPersistence implements IPersistence {
           );
         }, callback);
       } else {
+        //@ts-ignore
         query = model.aggregate(pipeline, pipelineOptions, (...params) => {
           if (hasPopulate)
             query = this.populateStep(
@@ -294,7 +335,7 @@ export class MongoPersistence implements IPersistence {
   ) {
     queryParams = this.filterQueryParams(queryParams);
     const model = this.getModel(scheme);
-    const populate = model.schema['populateOptions'];
+    const populate = model.schema['populateOptions'] as Populate | undefined;
 
     // console.log('populateAll:', queryParams);
     if (populate) {
