@@ -5,6 +5,9 @@ import {
   QueryOptions,
   Document,
   InsertManyResult,
+  PipelineStage,
+  AnyObject,
+  PopulateOptions,
 } from 'mongoose';
 import { IPersistence } from '../../../iPersistence/iPersistence';
 import { PersistenceInfo } from '../../persistenceInfo';
@@ -26,6 +29,7 @@ import { Type } from '../../../event/type';
 import { SubType } from '../../../event/subType';
 import { CastType, ToCast } from './toCast';
 import { FullOperation } from '../../../event/fullOperation';
+import { ObjectId } from 'mongodb';
 export class MongoPersistence implements IPersistence {
   protected persistenceInfo: PersistenceInfo;
   protected mongooseInstance: Mongoose;
@@ -72,6 +76,7 @@ export class MongoPersistence implements IPersistence {
         const virtual = element.getVirtual();
         const populate = element.getPopulate();
         const pipeline = element.getPipeline();
+        const pipelineOptions = element.getPipelineOptions();
         const toCast = element.getToCast();
         if (index) {
           schema.index(index, element.getIndexOptions());
@@ -103,7 +108,10 @@ export class MongoPersistence implements IPersistence {
           schema['toCastOptions'] = toCast;
         }
         if (pipeline) {
-          schema['pipelineOptions'] = pipeline;
+          schema['pipeline'] = pipeline;
+        }
+        if (pipelineOptions) {
+          schema['pipelineOptions'] = pipelineOptions;
         }
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -136,168 +144,123 @@ export class MongoPersistence implements IPersistence {
   }
 
   protected populate(
-    query,
+    model: Model<unknown>,
+    method: string,
     queryParams?: unknown[],
-    populate?: unknown[],
-    pipeline?: { $project? }[],
+    populate?: PopulateOptions[],
+    pipeline?: PipelineStage[],
+    pipelineOptions?,
     callback?
   ) {
-    const hasCallback = callback !== undefined && callback !== null;
+    // const hasCallback = callback !== undefined && callback !== null;
     const hasPopulate =
       populate !== undefined && populate !== null && populate.length > 0;
     const hasPipeline = pipeline !== undefined && pipeline !== null;
     queryParams = this.filterQueryParams(queryParams);
-    if (hasPopulate) {
-      query = query(...queryParams);
-      console.log('populate:', query, query.name, queryParams);
-      for (const element of populate) {
-        console.log('populate:', element);
-        query = query.populate(element);
+    let query: any = undefined;
+    model.collection.collectionName;
+    if (hasPipeline) {
+      let firstParam: AnyObject | ObjectId | string | number =
+        queryParams?.[0] as AnyObject | ObjectId | string | number;
+      firstParam = (
+        typeof firstParam === 'string' ||
+        typeof firstParam === 'number' ||
+        firstParam instanceof ObjectId
+          ? { id: firstParam }
+          : firstParam
+      ) as AnyObject;
+      const secondParam: Record<string, any> = queryParams?.[1] as Record<
+        string,
+        any
+      >;
+      // const thirdParam = queryParams?.[2];
+      const queryPipeline: PipelineStage[] = [{ $match: firstParam }];
+      switch (method) {
+        case 'create':
+        case 'insertMany':
+          queryPipeline.push({
+            $merge: {
+              into: model.collection.collectionName,
+              on: 'id',
+              whenMatched: 'fail',
+              whenNotMatched: 'insert',
+            },
+          });
+          break;
+
+        case 'updateMany':
+        case 'findOneAndUpdate':
+        case 'findByIdAndUpdate':
+          queryPipeline.push({
+            $merge: {
+              into: model.collection.collectionName,
+              on: Object.keys(firstParam),
+              let: secondParam,
+              whenMatched: 'replace',
+              whenNotMatched: 'fail',
+            },
+          });
+          break;
+
+        case 'deleteMany':
+        case 'findOneAnddelete':
+        case 'findByIdAndDelete':
+          break;
+
+        case 'find':
+        case 'findOne':
+        case 'findById':
+          break;
+
+        default:
+          break;
       }
-      query = hasCallback
-        ? hasPipeline && query.aggregate
-          ? query.aggregate(pipeline).exec(callback)
-          : hasPipeline && query.select
-          ? query
-              .select(
-                pipeline?.find(
-                  (element) =>
-                    element.$project !== undefined && element.$project !== null
-                )?.$project
-              )
-              .exec(callback)
-          : query.exec(callback)
-        : hasPipeline && query.aggregate
-        ? query.aggregate(pipeline).exec()
-        : hasPipeline && query.select
-        ? query
-            .select(
-              pipeline?.find(
-                (element) =>
-                  element.$project !== undefined && element.$project !== null
-              )?.$project
-            )
-            .exec()
-        : query.exec();
-    } else {
-      const hasQueryParams = queryParams?.length > 0;
-      if (hasQueryParams) {
-        if (hasCallback) {
-          if (hasPipeline) {
-            query = query(...queryParams);
-            query = query.aggregate
-              ? query.aggregate(pipeline).exec(callback)
-              : query.select
-              ? query
-                  .select(
-                    pipeline?.find(
-                      (element) =>
-                        element.$project !== undefined &&
-                        element.$project !== null
-                    )?.$project
-                  )
-                  .exec(callback)
-              : query.exec(callback);
-          } else {
-            query = query(...queryParams, callback);
-          }
-        } else {
-          if (hasPipeline) {
-            query = query(...queryParams);
-            query = query.aggregate
-              ? query.aggregate(pipeline).exec()
-              : query.select
-              ? query
-                  .select(
-                    pipeline?.find(
-                      (element) =>
-                        element.$project !== undefined &&
-                        element.$project !== null
-                    )?.$project
-                  )
-                  .exec()
-              : query.exec();
-          } else {
-            query = query(...queryParams);
-          }
-        }
+
+      pipeline.unshift(...queryPipeline);
+
+      if (
+        method === 'deleteMany' ||
+        method === 'findOneAndDelete' ||
+        method === 'findByIdAndDelete'
+      ) {
+        query = model.aggregate(pipeline, pipelineOptions).then((result) => {
+          const queryIds = result.map((doc) => doc._id);
+          query = model.deleteMany(
+            { _id: { $in: queryIds } },
+            secondParam,
+            (...params) => {
+              if (hasPopulate)
+                query = model.populate(params[0], populate, callback);
+              else query = callback(...params);
+            }
+          );
+        }, callback);
       } else {
-        if (query?.exec !== undefined && query?.exec !== null) {
-          query = hasCallback
-            ? hasPipeline && query.aggregate
-              ? query.aggregate(pipeline).exec(callback)
-              : hasPipeline && query.select
-              ? query
-                  .select(
-                    pipeline?.find(
-                      (element) =>
-                        element.$project !== undefined &&
-                        element.$project !== null
-                    )?.$project
-                  )
-                  .exec(callback)
-              : query.exec(callback)
-            : hasPipeline && query.aggregate
-            ? query.aggregate(pipeline).exec()
-            : hasPipeline && query.select
-            ? query
-                .select(
-                  pipeline?.find(
-                    (element) =>
-                      element.$project !== undefined &&
-                      element.$project !== null
-                  )?.$project
-                )
-                .exec()
-            : query.exec();
-        } else {
-          if (hasCallback) {
-            if (hasPipeline) {
-              query = query();
-              query = query.aggregate
-                ? query.aggregate(pipeline).exec(callback)
-                : query.select
-                ? query
-                    .select(
-                      pipeline?.find(
-                        (element) =>
-                          element.$project !== undefined &&
-                          element.$project !== null
-                      )?.$project
-                    )
-                    .exec(callback)
-                : query.exec(callback);
-            } else {
-              query = query({}, callback);
-            }
-          } else {
-            if (hasPipeline) {
-              query = query();
-              query = query.aggregate
-                ? query.aggregate(pipeline).exec()
-                : query.select
-                ? query
-                    .select(
-                      pipeline?.find(
-                        (element) =>
-                          element.$project !== undefined &&
-                          element.$project !== null
-                      )?.$project
-                    )
-                    .exec()
-                : query.exec();
-            } else {
-              query = query();
-            }
-          }
+        query = model.aggregate(pipeline, pipelineOptions, (...params) => {
+          if (hasPopulate)
+            query = model.populate(params[0], populate, callback);
+          else query = callback(...params);
+        });
+      }
+    } else {
+      query = model?.[method]?.bind(model);
+      if (hasPopulate) {
+        query = query?.(...queryParams);
+        console.log('populate:', query, query.name, queryParams);
+        for (const element of populate) {
+          console.log('populate:', element);
+          query = query.populate(element);
         }
+        query = query.exec(callback);
+      } else {
+        query = query(...queryParams, callback);
       }
     }
     return query;
   }
   protected populateAll(
     model: Model<unknown>,
-    query,
+    method: string, //query (model[method].bind(model)) => model.create.bind(model)
     queryParams?: unknown[],
     fullOperation?: FullOperation,
     // eslint-disable-next-line no-unused-vars
@@ -305,11 +268,20 @@ export class MongoPersistence implements IPersistence {
   ) {
     queryParams = this.filterQueryParams(queryParams);
     const populate = model.schema['populateOptions'];
-    const pipeline = model.schema['pipelineOptions'];
+    const pipeline = model.schema['pipeline'];
+    const pipelineOptions = model.schema['pipelineOptions'];
     // console.log('populateAll:', queryParams);
     if (populate) {
       if (Array.isArray(populate)) {
-        return this.populate(query, queryParams, populate, pipeline, callback);
+        return this.populate(
+          model,
+          method,
+          queryParams,
+          populate,
+          pipeline,
+          pipelineOptions,
+          callback
+        );
       } else if (fullOperation?.operation !== undefined) {
         const operation = Operation[fullOperation?.operation];
         const hasOparation = operation !== undefined && operation !== null;
@@ -321,10 +293,12 @@ export class MongoPersistence implements IPersistence {
         if (hasPopulateOparation) {
           if (Array.isArray(populateOpertaion)) {
             return this.populate(
-              query,
+              model,
+              method,
               queryParams,
               populateOpertaion,
               pipeline,
+              pipelineOptions,
               callback
             );
           } else if (fullOperation?.type !== undefined) {
@@ -336,10 +310,12 @@ export class MongoPersistence implements IPersistence {
             if (hasPopulateType) {
               if (Array.isArray(populateType)) {
                 return this.populate(
-                  query,
+                  model,
+                  method,
                   queryParams,
                   populateType,
                   pipeline,
+                  pipelineOptions,
                   callback
                 );
               } else if (fullOperation?.subType !== undefined) {
@@ -352,10 +328,12 @@ export class MongoPersistence implements IPersistence {
                   populateSubType !== undefined && populateSubType !== null;
                 if (hasPopulateSubType && Array.isArray(populateSubType)) {
                   return this.populate(
-                    query,
+                    model,
+                    method,
                     queryParams,
                     populateSubType,
                     pipeline,
+                    pipelineOptions,
                     callback
                   );
                 }
@@ -365,7 +343,14 @@ export class MongoPersistence implements IPersistence {
         }
       }
     }
-    return this.populate(query, queryParams, undefined, pipeline, callback);
+    return this.populate(
+      model,
+      method,
+      queryParams,
+      undefined,
+      pipeline,
+      callback
+    );
   }
 
   protected execute(query, queryParams, callback?) {
@@ -829,7 +814,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.create.bind(model),
+        'create',
         [newItem],
         fullOperation,
         callback.bind(this)
@@ -875,7 +860,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.insertMany.bind(model),
+        'insertMany',
         [items, options],
         fullOperation,
         callback.bind(this)
@@ -926,7 +911,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.find.bind(model),
+        'find',
         [newSelectedItem, additionalOptions, compiledOptions],
         fullOperation,
         callback.bind(this)
@@ -977,7 +962,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.findOne.bind(model),
+        'findOne',
         [newSelectedItem, additionalOptions, compiledOptions],
         fullOperation,
         callback.bind(this)
@@ -1026,7 +1011,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.findById.bind(model),
+        'findById',
         [id, additionalOptions, compiledOptions],
         fullOperation,
         callback.bind(this)
@@ -1145,7 +1130,7 @@ export class MongoPersistence implements IPersistence {
         };
         this.populateAll(
           model,
-          model.updateMany.bind(model),
+          'updateMany',
           [selectedItem, newItem, options],
           fullOperation,
           callback.bind(this)
@@ -1181,7 +1166,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.deleteMany.bind(model),
+        'deleteMany',
         [newSelectedItem, options],
         fullOperation,
         callback.bind(this)
@@ -1222,7 +1207,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.findOneAndDelete.bind(model),
+        'findOneAndDelete',
         [newSelectedItem, options],
         fullOperation,
         callback.bind(this)
@@ -1262,7 +1247,7 @@ export class MongoPersistence implements IPersistence {
       };
       this.populateAll(
         model,
-        model.findByIdAndDelete.bind(model),
+        'findByIdAndDelete',
         [id, options],
         fullOperation,
         callback.bind(this)
@@ -1323,7 +1308,7 @@ export class MongoPersistence implements IPersistence {
           };
           this.populateAll(
             model,
-            model.findByIdAndUpdate.bind(model),
+            'findByIdAndUpdate',
             [id, item, { new: true, ...options }],
             fullOperation,
             callback.bind(this)
@@ -1344,7 +1329,7 @@ export class MongoPersistence implements IPersistence {
           };
           this.populateAll(
             model,
-            model.findOneAndUpdate.bind(model),
+            'findOneAndUpdate',
             [selectedItem, item, options],
             fullOperation,
             callback.bind(this)
