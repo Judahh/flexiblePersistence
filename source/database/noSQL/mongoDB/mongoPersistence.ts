@@ -143,20 +143,40 @@ export class MongoPersistence implements IPersistence {
     return this.mongooseInstance.model(name, schema);
   }
 
+  protected populateStep(
+    query,
+    populateOptions: string | PopulateOptions | PopulateOptions[],
+    populate,
+    callback
+  ) {
+    if (Array.isArray(populateOptions))
+      for (const populateOption of populateOptions) {
+        console.log('populate:', populateOption);
+        if (populate) query = query.populate(populate, populateOption);
+        else query = query.populate(populateOption);
+      }
+    else query = query.populate(populate);
+    query.exec(callback);
+    return query;
+  }
+
   protected populate(
-    model: Model<unknown>,
+    scheme: string,
     method: string,
-    queryParams?: unknown[],
-    populate?: PopulateOptions[],
-    pipeline?: PipelineStage[],
-    pipelineOptions?,
+    queryParams: unknown[],
+    populateOptions: string | PopulateOptions | PopulateOptions[],
     callback?
   ) {
-    // const hasCallback = callback !== undefined && callback !== null;
+    const model = this.getModel(scheme);
+    const pipeline = model.schema['pipeline'];
+    const pipelineOptions = model.schema['pipelineOptions'];
     const hasPopulate =
-      populate !== undefined && populate !== null && populate.length > 0;
+      populateOptions !== undefined &&
+      populateOptions !== null &&
+      Array.isArray(populateOptions)
+        ? populateOptions.length > 0
+        : true;
     const hasPipeline = pipeline !== undefined && pipeline !== null;
-    queryParams = this.filterQueryParams(queryParams);
     let query: any = undefined;
     model.collection.collectionName;
     if (hasPipeline) {
@@ -230,7 +250,12 @@ export class MongoPersistence implements IPersistence {
             secondParam,
             (...params) => {
               if (hasPopulate)
-                query = model.populate(params[0], populate, callback);
+                query = this.populateStep(
+                  model,
+                  populateOptions,
+                  params[0],
+                  callback
+                );
               else query = callback(...params);
             }
           );
@@ -238,7 +263,12 @@ export class MongoPersistence implements IPersistence {
       } else {
         query = model.aggregate(pipeline, pipelineOptions, (...params) => {
           if (hasPopulate)
-            query = model.populate(params[0], populate, callback);
+            query = this.populateStep(
+              model,
+              populateOptions,
+              params[0],
+              callback
+            );
           else query = callback(...params);
         });
       }
@@ -247,11 +277,7 @@ export class MongoPersistence implements IPersistence {
       if (hasPopulate) {
         query = query?.(...queryParams);
         console.log('populate:', query, query.name, queryParams);
-        for (const element of populate) {
-          console.log('populate:', element);
-          query = query.populate(element);
-        }
-        query = query.exec(callback);
+        query = this.populateStep(query, populateOptions, undefined, callback);
       } else {
         query = query(...queryParams, callback);
       }
@@ -259,7 +285,7 @@ export class MongoPersistence implements IPersistence {
     return query;
   }
   protected populateAll(
-    model: Model<unknown>,
+    scheme: string,
     method: string, //query (model[method].bind(model)) => model.create.bind(model)
     queryParams?: unknown[],
     fullOperation?: FullOperation,
@@ -267,21 +293,13 @@ export class MongoPersistence implements IPersistence {
     callback?: (..._params) => void
   ) {
     queryParams = this.filterQueryParams(queryParams);
+    const model = this.getModel(scheme);
     const populate = model.schema['populateOptions'];
-    const pipeline = model.schema['pipeline'];
-    const pipelineOptions = model.schema['pipelineOptions'];
+
     // console.log('populateAll:', queryParams);
     if (populate) {
       if (Array.isArray(populate)) {
-        return this.populate(
-          model,
-          method,
-          queryParams,
-          populate,
-          pipeline,
-          pipelineOptions,
-          callback
-        );
+        return this.populate(scheme, method, queryParams, populate, callback);
       } else if (fullOperation?.operation !== undefined) {
         const operation = Operation[fullOperation?.operation];
         const hasOparation = operation !== undefined && operation !== null;
@@ -293,12 +311,10 @@ export class MongoPersistence implements IPersistence {
         if (hasPopulateOparation) {
           if (Array.isArray(populateOpertaion)) {
             return this.populate(
-              model,
+              scheme,
               method,
               queryParams,
               populateOpertaion,
-              pipeline,
-              pipelineOptions,
               callback
             );
           } else if (fullOperation?.type !== undefined) {
@@ -310,12 +326,10 @@ export class MongoPersistence implements IPersistence {
             if (hasPopulateType) {
               if (Array.isArray(populateType)) {
                 return this.populate(
-                  model,
+                  scheme,
                   method,
                   queryParams,
                   populateType,
-                  pipeline,
-                  pipelineOptions,
                   callback
                 );
               } else if (fullOperation?.subType !== undefined) {
@@ -328,12 +342,10 @@ export class MongoPersistence implements IPersistence {
                   populateSubType !== undefined && populateSubType !== null;
                 if (hasPopulateSubType && Array.isArray(populateSubType)) {
                   return this.populate(
-                    model,
+                    scheme,
                     method,
                     queryParams,
                     populateSubType,
-                    pipeline,
-                    pipelineOptions,
                     callback
                   );
                 }
@@ -343,14 +355,7 @@ export class MongoPersistence implements IPersistence {
         }
       }
     }
-    return this.populate(
-      model,
-      method,
-      queryParams,
-      undefined,
-      pipeline,
-      callback
-    );
+    return this.populate(scheme, method, queryParams, [], callback);
   }
 
   protected execute(query, queryParams, callback?) {
@@ -457,10 +462,8 @@ export class MongoPersistence implements IPersistence {
       : value;
   }
 
-  protected toCastAll(
-    model: Model<unknown>,
-    fullOperation?: FullOperation
-  ): string {
+  protected toCastAll(schema: string, fullOperation?: FullOperation): string {
+    const model = this.getModel(schema);
     let toCast: ToCast = model.schema['toCastOptions'];
 
     if (toCast) {
@@ -514,9 +517,10 @@ export class MongoPersistence implements IPersistence {
     return '';
   }
 
-  protected clearModel(model: Model<unknown>): Promise<boolean> {
+  protected clearModel(scheme: string): Promise<boolean> {
     return new Promise<boolean>((resolve, reject) => {
-      model.deleteMany({}, undefined, (error) => {
+      const model = this.getModel(scheme);
+      model?.deleteMany({}, undefined, (error) => {
         if (error) {
           reject(error);
         } else {
@@ -530,8 +534,7 @@ export class MongoPersistence implements IPersistence {
       const responses: Array<Promise<boolean>> = [];
       for (const key in this.getModels()) {
         if (Object.prototype.hasOwnProperty.call(this.getModels(), key)) {
-          const model = this.getModel(key);
-          responses.push(this.clearModel(model));
+          responses.push(this.clearModel(key));
         }
       }
       const response = await Promise.all(responses);
@@ -688,12 +691,13 @@ export class MongoPersistence implements IPersistence {
   }
 
   async count(
-    model: Model<unknown, unknown, unknown, unknown>,
+    scheme: string,
     selectedItem: Event,
     options?: QueryOptions,
     eventOptions?: IOptions,
     compiledOptions?: QueryOptions
   ): Promise<void> {
+    const model = this.getModel(scheme);
     if (compiledOptions && compiledOptions.limit) {
       const count = await model.countDocuments(selectedItem, options);
       if (eventOptions) {
@@ -704,15 +708,20 @@ export class MongoPersistence implements IPersistence {
 
   protected generateReceivedArray(
     docs: Document[] | Document | InsertManyResult<unknown> | undefined | null,
-    model?: Model<unknown, unknown, unknown, unknown>,
+    scheme?: string,
     fullOperation?: FullOperation
   ): unknown[] {
     let receivedItem;
     if (Array.isArray(docs))
       receivedItem = docs.map((doc) =>
-        this.generateReceivedItem(doc, model, fullOperation)
+        this.generateReceivedItem.bind(this)(doc, scheme, fullOperation)
       );
-    else receivedItem = this.generateReceivedItem(docs, model, fullOperation);
+    else
+      receivedItem = this.generateReceivedItem.bind(this)(
+        docs,
+        scheme,
+        fullOperation
+      );
     return receivedItem;
   }
 
@@ -749,11 +758,11 @@ export class MongoPersistence implements IPersistence {
       | InsertManyResult<unknown>
       | undefined
       | null,
-    model?: Model<unknown, unknown, unknown, unknown>,
+    scheme?: string,
     fullOperation?: FullOperation
   ): unknown {
     const cast =
-      model !== undefined ? this.toCastAll(model, fullOperation) : '';
+      scheme !== undefined ? this.toCastAll(scheme, fullOperation) : '';
 
     let receivedItem =
       doc === undefined || doc === null
@@ -785,7 +794,6 @@ export class MongoPersistence implements IPersistence {
 
   createItem(scheme: string, item: Event): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.getModel(scheme);
       const newItem = this.generateNewItem(item);
       const fullOperation = {
         operation: Operation.create,
@@ -800,10 +808,10 @@ export class MongoPersistence implements IPersistence {
         } else {
           // console.log('doc:', doc);
           resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
+            this.cleanReceived.bind(this)({
+              receivedItem: this.generateReceivedItem.bind(this)(
                 doc,
-                model,
+                scheme,
                 fullOperation
               ),
               result: doc,
@@ -812,8 +820,8 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'create',
         [newItem],
         fullOperation,
@@ -836,7 +844,6 @@ export class MongoPersistence implements IPersistence {
     };
 
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.getModel(scheme);
       const callback = (error, docs) => {
         // console.log('Scheme ARRAY:', scheme, item, items);
         if (error) {
@@ -844,13 +851,13 @@ export class MongoPersistence implements IPersistence {
           reject(error);
         } else {
           // console.log('docs:', docs);
-          const receivedItem = this.generateReceivedArray(
+          const receivedItem = this.generateReceivedArray.bind(this)(
             docs,
-            model,
+            scheme,
             fullOperation
           );
           resolve(
-            this.cleanReceived({
+            this.cleanReceived.bind(this)({
               receivedItem: receivedItem,
               result: docs,
               sentItem: item,
@@ -858,8 +865,8 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'insertMany',
         [items, options],
         fullOperation,
@@ -877,7 +884,6 @@ export class MongoPersistence implements IPersistence {
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
-      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
         operation: Operation.read,
@@ -889,18 +895,18 @@ export class MongoPersistence implements IPersistence {
         if (error) {
           reject(error);
         } else {
-          await this.count(
-            model,
+          await this.count.bind(this)(
+            scheme,
             newSelectedItem,
             options,
             eventOptions,
             compiledOptions
           );
           resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedArray(
+            this.cleanReceived.bind(this)({
+              receivedItem: this.generateReceivedArray.bind(this)(
                 docs,
-                model,
+                scheme,
                 fullOperation
               ),
               result: docs,
@@ -909,8 +915,8 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'find',
         [newSelectedItem, additionalOptions, compiledOptions],
         fullOperation,
@@ -928,7 +934,6 @@ export class MongoPersistence implements IPersistence {
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
-      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
         operation: Operation.read,
@@ -940,18 +945,18 @@ export class MongoPersistence implements IPersistence {
         if (error) {
           reject(error);
         } else {
-          await this.count(
-            model,
+          await this.count.bind(this)(
+            scheme,
             newSelectedItem,
             options,
             eventOptions,
             compiledOptions
           );
           resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
+            this.cleanReceived.bind(this)({
+              receivedItem: this.generateReceivedItem.bind(this)(
                 doc,
-                model,
+                scheme,
                 fullOperation
               ),
               result: doc,
@@ -960,8 +965,8 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'findOne',
         [newSelectedItem, additionalOptions, compiledOptions],
         fullOperation,
@@ -979,7 +984,6 @@ export class MongoPersistence implements IPersistence {
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
-      const model = this.getModel(scheme);
       const fullOperation = {
         operation: Operation.read,
         type: Type.item,
@@ -989,18 +993,18 @@ export class MongoPersistence implements IPersistence {
         if (error) {
           reject(error);
         } else {
-          await this.count(
-            model,
+          await this.count.bind(this)(
+            scheme,
             { id: id } as Event,
             options,
             eventOptions,
             compiledOptions
           );
           resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
+            this.cleanReceived.bind(this)({
+              receivedItem: this.generateReceivedItem.bind(this)(
                 doc,
-                model,
+                scheme,
                 fullOperation
               ),
               result: doc,
@@ -1009,8 +1013,8 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'findById',
         [id, additionalOptions, compiledOptions],
         fullOperation,
@@ -1026,17 +1030,16 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>(async (resolve) => {
-      const model = this.getModel(scheme);
       const newItem = this.generateNewItem(item);
       const newSelectedItem = this.generateNewItem(selectedItem);
-      const response = await this.findOneAndUpdate(
-        model,
+      const response = await this.findOneAndUpdate.bind(this)(
+        scheme,
         newSelectedItem,
         newItem,
         options
       );
       resolve(
-        this.cleanReceived({
+        this.cleanReceived.bind(this)({
           ...response,
           selectedItem: selectedItem,
           sentItem: item,
@@ -1053,7 +1056,6 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
-      const model = this.getModel(scheme);
       const newItem = Array.isArray(item)
         ? this.generateNewArray(item, regular)
         : this.generateNewItem(item);
@@ -1083,8 +1085,8 @@ export class MongoPersistence implements IPersistence {
           // );
 
           promisedResponses.push(
-            this.findOneAndUpdate(
-              model,
+            this.findOneAndUpdate.bind(this)(
+              scheme,
               selectedItemElement,
               newItemElement,
               options
@@ -1095,7 +1097,7 @@ export class MongoPersistence implements IPersistence {
         // console.log('responses:', responses);
 
         resolve(
-          this.cleanReceived({
+          this.cleanReceived.bind(this)({
             receivedItem: responses.map((response) => response.receivedItem),
             result: responses.map((response) => response.result),
             selectedItem: selectedItem,
@@ -1115,10 +1117,10 @@ export class MongoPersistence implements IPersistence {
             reject(error);
           } else {
             resolve(
-              this.cleanReceived({
-                receivedItem: this.generateReceivedItem(
+              this.cleanReceived.bind(this)({
+                receivedItem: this.generateReceivedItem.bind(this)(
                   doc,
-                  model,
+                  scheme,
                   fullOperation
                 ),
                 result: doc,
@@ -1128,8 +1130,8 @@ export class MongoPersistence implements IPersistence {
             );
           }
         };
-        this.populateAll(
-          model,
+        this.populateAll.bind(this)(
+          scheme,
           'updateMany',
           [selectedItem, newItem, options],
           fullOperation,
@@ -1145,7 +1147,6 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
         operation: Operation.delete,
@@ -1158,14 +1159,14 @@ export class MongoPersistence implements IPersistence {
           reject(error);
         } else {
           resolve(
-            this.cleanReceived({
+            this.cleanReceived.bind(this)({
               selectedItem,
             })
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'deleteMany',
         [newSelectedItem, options],
         fullOperation,
@@ -1180,7 +1181,6 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.getModel(scheme);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
         operation: Operation.delete,
@@ -1193,10 +1193,10 @@ export class MongoPersistence implements IPersistence {
           reject(error);
         } else {
           resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
+            this.cleanReceived.bind(this)({
+              receivedItem: this.generateReceivedItem.bind(this)(
                 doc,
-                model,
+                scheme,
                 fullOperation
               ),
               result: doc,
@@ -1205,8 +1205,8 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'findOneAndDelete',
         [newSelectedItem, options],
         fullOperation,
@@ -1221,7 +1221,6 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions
   ): Promise<IOutput<unknown, unknown>> {
     return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
-      const model = this.getModel(scheme);
       const fullOperation = {
         operation: Operation.delete,
         type: Type.item,
@@ -1233,10 +1232,10 @@ export class MongoPersistence implements IPersistence {
           reject(error);
         } else {
           resolve(
-            this.cleanReceived({
-              receivedItem: this.generateReceivedItem(
+            this.cleanReceived.bind(this)({
+              receivedItem: this.generateReceivedItem.bind(this)(
                 doc,
-                model,
+                scheme,
                 fullOperation
               ),
               result: doc,
@@ -1245,8 +1244,8 @@ export class MongoPersistence implements IPersistence {
           );
         }
       };
-      this.populateAll(
-        model,
+      this.populateAll.bind(this)(
+        scheme,
         'findByIdAndDelete',
         [id, options],
         fullOperation,
@@ -1263,21 +1262,25 @@ export class MongoPersistence implements IPersistence {
     error: unknown,
     doc: Document,
     result: unknown,
-    model?: Model<unknown, unknown, unknown, unknown>,
+    scheme?: string,
     fullOperation?: FullOperation
   ): Promise<void> {
     if (error) {
       reject(error);
     } else {
       const item = {
-        receivedItem: this.generateReceivedItem(doc, model, fullOperation),
+        receivedItem: this.generateReceivedItem.bind(this)(
+          doc,
+          scheme,
+          fullOperation
+        ),
         result: result ? { doc, result } : doc,
       };
       resolve(item);
     }
   }
   async findOneAndUpdate(
-    model: Model<unknown>,
+    scheme: string,
     selectedItem: Event,
     item: Event,
     options?: QueryOptions
@@ -1296,18 +1299,18 @@ export class MongoPersistence implements IPersistence {
           fullOperation.subType = SubType.byId;
           const callback = (error, doc, result) => {
             // console.log('selectedItem:', selectedItem);
-            this.findOneAndUpdateResult(
+            this.findOneAndUpdateResult.bind(this)(
               resolve,
               reject,
               error,
               doc as Document,
               result,
-              model,
+              scheme,
               fullOperation
             );
           };
-          this.populateAll(
-            model,
+          this.populateAll.bind(this)(
+            scheme,
             'findByIdAndUpdate',
             [id, item, { new: true, ...options }],
             fullOperation,
@@ -1317,18 +1320,18 @@ export class MongoPersistence implements IPersistence {
           fullOperation.subType = SubType.byFilter;
           const callback = (error, doc, result) => {
             // console.log('selectedItem:', selectedItem);
-            this.findOneAndUpdateResult(
+            this.findOneAndUpdateResult.bind(this)(
               resolve,
               reject,
               error,
               doc as Document,
               result,
-              model,
+              scheme,
               fullOperation
             );
           };
-          this.populateAll(
-            model,
+          this.populateAll.bind(this)(
+            scheme,
             'findOneAndUpdate',
             [selectedItem, item, options],
             fullOperation,
