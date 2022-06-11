@@ -43,8 +43,8 @@
     "pg": "latest"
   },
   "devDependencies": {
-    "jest": "27.5.1",
-    "@types/jest": "27.4.1",
+    "jest": "28.1.1",
+    "@types/jest": "28.1.1",
     "@types/node": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
