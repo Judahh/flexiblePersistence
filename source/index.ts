@@ -50,7 +50,16 @@ import {
   Read as TypeRead,
   Create as TypeCreate,
 } from './database/noSQL/mongoDB/populate';
-import { CastType, Read as CastRead, Create as CastCreate, ToCast } from './database/noSQL/mongoDB/toCast';
+import {
+  CastType,
+  Read as CastRead,
+  Create as CastCreate,
+  ToCast,
+} from './database/noSQL/mongoDB/toCast';
+import {
+  PipelineCRUDType,
+  PipelineCRUD,
+} from './database/noSQL/mongoDB/pipelineCRUD';
 import { Virtual } from './database/noSQL/mongoDB/virtual';
 import { FullOperation } from './event/fullOperation';
 import { SubType } from './event/subType';
@@ -107,4 +116,6 @@ export {
   FullOperation,
   SubType,
   Type,
+  PipelineCRUDType,
+  PipelineCRUD,
 };
