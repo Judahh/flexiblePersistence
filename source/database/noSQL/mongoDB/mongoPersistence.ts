@@ -627,6 +627,16 @@ export class MongoPersistence implements IPersistence {
   }
 
   read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
+    if (input?.id)
+      input.id =
+        typeof input.id === 'string' && input.id.includes('ObjectId')
+          ? new ObjectId(
+              input.id
+                .replaceAll('ObjectId(', '')
+                .replaceAll(')', '')
+                .replaceAll("'", '')
+            )
+          : input.id;
     if (input?.selectedItem)
       for (const key in input?.selectedItem) {
         if (Object.hasOwnProperty.call(input.selectedItem, key)) {
@@ -634,7 +644,10 @@ export class MongoPersistence implements IPersistence {
           input.selectedItem[key] =
             typeof element === 'string' && element.includes('ObjectId')
               ? new ObjectId(
-                  element.replaceAll('ObjectId(', '').replaceAll(')', '')
+                  element
+                    .replaceAll('ObjectId(', '')
+                    .replaceAll(')', '')
+                    .replaceAll("'", '')
                 )
               : element;
         }
@@ -673,6 +686,16 @@ export class MongoPersistence implements IPersistence {
       : Array.isArray((input.item as Event).content);
     const isArray = isContentArray || isRegularArray;
     // console.log('Input:', input);
+    if (input?.id)
+      input.id =
+        typeof input.id === 'string' && input.id.includes('ObjectId')
+          ? new ObjectId(
+              input.id
+                .replaceAll('ObjectId(', '')
+                .replaceAll(')', '')
+                .replaceAll("'", '')
+            )
+          : input.id;
     if (input?.selectedItem)
       for (const key in input?.selectedItem) {
         if (Object.hasOwnProperty.call(input.selectedItem, key)) {
@@ -680,7 +703,10 @@ export class MongoPersistence implements IPersistence {
           input.selectedItem[key] =
             typeof element === 'string' && element.includes('ObjectId')
               ? new ObjectId(
-                  element.replaceAll('ObjectId(', '').replaceAll(')', '')
+                  element
+                    .replaceAll('ObjectId(', '')
+                    .replaceAll(')', '')
+                    .replaceAll("'", '')
                 )
               : element;
         }
