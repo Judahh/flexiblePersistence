@@ -627,6 +627,17 @@ export class MongoPersistence implements IPersistence {
   }
 
   read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
+    for (const key in input?.selectedItem) {
+      if (Object.hasOwnProperty.call(input.selectedItem, key)) {
+        const element = input.selectedItem[key];
+        input.selectedItem[key] =
+          typeof element === 'string' && element.includes('ObjectId')
+            ? new ObjectId(
+                element.replaceAll('ObjectId(', '').replaceAll(')', '')
+              )
+            : element;
+      }
+    }
     if (input.single || (input.id && !Array.isArray(input.id))) {
       if (input.id)
         return this.readItemById(
@@ -661,7 +672,17 @@ export class MongoPersistence implements IPersistence {
       : Array.isArray((input.item as Event).content);
     const isArray = isContentArray || isRegularArray;
     // console.log('Input:', input);
-
+    for (const key in input?.selectedItem) {
+      if (Object.hasOwnProperty.call(input.selectedItem, key)) {
+        const element = input.selectedItem[key];
+        input.selectedItem[key] =
+          typeof element === 'string' && element.includes('ObjectId')
+            ? new ObjectId(
+                element.replaceAll('ObjectId(', '').replaceAll(')', '')
+              )
+            : element;
+      }
+    }
     if ((input.single || (input.id && !Array.isArray(input.id))) && !isArray) {
       return this.updateItem(
         input.scheme,
