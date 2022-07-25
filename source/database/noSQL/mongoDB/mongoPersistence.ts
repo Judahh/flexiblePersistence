@@ -432,94 +432,107 @@ export class MongoPersistence implements IPersistence {
   }
 
   create(input: IInputCreate<Event>): Promise<IOutput<unknown, unknown>> {
-    const isRegularArray = Array.isArray(input.item);
+    const isRegularArray = Array.isArray(input?.item);
     const isContentArray = isRegularArray
       ? false
-      : Array.isArray((input.item as Event).content);
+      : Array.isArray((input?.item as Event)?.content);
     const isArray = isContentArray || isRegularArray;
     input.single =
-      input.single === undefined || input.single === null ? true : input.single;
+      input?.single === undefined || input?.single === null
+        ? true
+        : input?.single;
     // console.log('Input Item:', input.item);
     // console.log('Is Array:', isArray);
     // console.log('Is Content Array:', isRegularArray);
     // console.log('Is Regular Array:', isContentArray);
     // console.log('Is single:', input.single);
 
-    const isEvent = input.item instanceof Event;
+    const isEvent = input?.item instanceof Event;
 
-    if ((input.single && !isArray) || isEvent) {
-      return this.createItem(input.scheme, input.item as Event);
+    if ((input?.single && !isArray) || isEvent) {
+      return this.createItem(input?.scheme, input?.item as Event);
     } else {
       return this.createArray(
-        input.scheme,
-        input.item,
+        input?.scheme,
+        input?.item,
         isRegularArray,
-        input.options
+        input?.options
       );
     }
   }
 
   read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
-    if (input.single || (input.id && !Array.isArray(input.id))) {
+    if (input?.single || (input?.id && !Array.isArray(input?.id))) {
       if (input.id)
         return this.readItemById(
-          input.scheme,
-          input.id,
-          input.options,
-          input.additionalOptions,
-          input.eventOptions
+          input?.scheme,
+          input?.id,
+          input?.options,
+          input?.additionalOptions,
+          input?.eventOptions
         );
       return this.readItem(
-        input.scheme,
-        input.selectedItem,
-        input.options,
-        input.additionalOptions,
-        input.eventOptions
+        input?.scheme,
+        input?.selectedItem,
+        input?.options,
+        input?.additionalOptions,
+        input?.eventOptions
       );
     } else {
       return this.readArray(
-        input.scheme,
-        input.selectedItem,
-        input.options,
-        input.additionalOptions,
-        input.eventOptions
+        input?.scheme,
+        input?.selectedItem,
+        input?.options,
+        input?.additionalOptions,
+        input?.eventOptions
       );
     }
   }
 
   update(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
-    const isRegularArray = Array.isArray(input.item);
+    const isRegularArray = Array.isArray(input?.item);
     const isContentArray = isRegularArray
       ? false
-      : Array.isArray((input.item as Event).content);
+      : Array.isArray((input?.item as Event)?.content);
     const isArray = isContentArray || isRegularArray;
     // console.log('Input:', input);
 
-    if ((input.single || (input.id && !Array.isArray(input.id))) && !isArray) {
+    if (
+      (input?.single || (input?.id && !Array.isArray(input?.id))) &&
+      !isArray
+    ) {
       return this.updateItem(
-        input.scheme,
-        input.selectedItem,
-        input.item as Event,
-        input.options
+        input?.scheme,
+        input?.selectedItem,
+        input?.item as Event,
+        input?.options
       );
     } else {
       return this.updateArray(
-        input.scheme,
-        input.selectedItem,
-        input.item,
+        input?.scheme,
+        input?.selectedItem,
+        input?.item,
         isRegularArray,
-        input.options
+        input?.options
       );
     }
   }
 
   delete(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
-    if (input.single || (input.id && !Array.isArray(input.id))) {
-      if (input.id)
-        return this.deleteItemById(input.scheme, input.id, input.options);
-      return this.deleteItem(input.scheme, input.selectedItem, input.options);
+    if (input?.single || (input?.id && !Array.isArray(input?.id))) {
+      if (input?.id)
+        return this.deleteItemById(input?.scheme, input?.id, input?.options);
+      return this.deleteItem(
+        input?.scheme,
+        input?.selectedItem,
+        input?.options
+      );
     } else {
-      return this.deleteArray(input.scheme, input.selectedItem, input.options);
+      return this.deleteArray(
+        input?.scheme,
+        input?.selectedItem,
+        input?.options
+      );
     }
   }
 
