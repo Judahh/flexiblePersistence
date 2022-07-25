@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
-  Model,
   Schema,
   Mongoose,
   QueryOptions,
@@ -34,6 +33,7 @@ import { CastType, ToCast } from './toCast';
 import { FullOperation } from '../../../event/fullOperation';
 import { ObjectId } from 'mongodb';
 import { PipelineCRUD, PipelineCRUDType } from './pipelineCRUD';
+import { AnyModel } from './anyModel';
 export class MongoPersistence implements IPersistence {
   protected persistenceInfo: PersistenceInfo;
   protected mongooseInstance: Mongoose;
@@ -130,19 +130,16 @@ export class MongoPersistence implements IPersistence {
     this.initElement();
   }
 
-  getModel(name: string): Model<unknown, unknown, unknown, unknown> {
+  getModel(name: string): AnyModel {
     if (this.getModels()[name]) return this.getModels()[name];
     return this.getModels()['Generic'];
   }
 
-  getModels(): { [index: string]: Model<unknown, unknown, unknown, unknown> } {
+  getModels(): { [index: string]: AnyModel } {
     return this.mongooseInstance.models;
   }
 
-  addModel(
-    name: string,
-    schema: Schema
-  ): Model<unknown, unknown, unknown, unknown> {
+  addModel(name: string, schema: Schema): AnyModel {
     // this.model[name] =
     return this.mongooseInstance.model(name, schema);
   }
