@@ -18,6 +18,10 @@ export class Write {
     this._read = read;
   }
 
+  getPersistence(): IPersistence {
+    return this._eventDB;
+  }
+
   getRead(): Read | undefined {
     return this._read;
   }

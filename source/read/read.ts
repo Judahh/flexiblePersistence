@@ -10,6 +10,11 @@ export class Read {
   constructor(readDB: IPersistence) {
     this.readDB = readDB;
   }
+
+  getPersistence(): IPersistence {
+    return this.readDB;
+  }
+
   //  deepcode ignore no-any: any needed
   newEvent(event: Event): Promise<IOutput<unknown, unknown>> {
     //Operation.create.valueOf();
