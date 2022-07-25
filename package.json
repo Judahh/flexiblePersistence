@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "3.1.8",
+  "version": "3.2.0",
   "description": "A CQRS and Event Sourcing platform",
   "main": "dist/source/index.js",
   "keywords": [

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
-  Model,
   Schema,
   Mongoose,
   QueryOptions,
@@ -34,6 +33,7 @@ import { CastType, ToCast } from './toCast';
 import { FullOperation } from '../../../event/fullOperation';
 import { ObjectId } from 'mongodb';
 import { PipelineCRUD, PipelineCRUDType } from './pipelineCRUD';
+import { AnyModel } from './anyModel';
 export class MongoPersistence implements IPersistence {
   protected persistenceInfo: PersistenceInfo;
   protected mongooseInstance: Mongoose;
@@ -130,19 +130,16 @@ export class MongoPersistence implements IPersistence {
     this.initElement();
   }
 
-  getModel(name: string): Model<unknown, unknown, unknown, unknown> {
+  getModel(name: string): AnyModel {
     if (this.getModels()[name]) return this.getModels()[name];
     return this.getModels()['Generic'];
   }
 
-  getModels(): { [index: string]: Model<unknown, unknown, unknown, unknown> } {
+  getModels(): { [index: string]: AnyModel } {
     return this.mongooseInstance.models;
   }
 
-  addModel(
-    name: string,
-    schema: Schema
-  ): Model<unknown, unknown, unknown, unknown> {
+  addModel(name: string, schema: Schema): AnyModel {
     // this.model[name] =
     return this.mongooseInstance.model(name, schema);
   }
@@ -629,113 +626,124 @@ export class MongoPersistence implements IPersistence {
   read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
     if (input?.id)
       input.id =
-        typeof input.id === 'string' && input.id.includes('ObjectId')
+        typeof input?.id === 'string' && input?.id?.includes('ObjectId')
           ? new ObjectId(
-              input.id
-                .replaceAll('ObjectId(', '')
-                .replaceAll(')', '')
-                .replaceAll("'", '')
+              input?.id
+                ?.replaceAll('ObjectId(', '')
+                ?.replaceAll(')', '')
+                ?.replaceAll("'", '')
             )
-          : input.id;
+          : input?.id;
     if (input?.selectedItem)
       for (const key in input?.selectedItem) {
-        if (Object.hasOwnProperty.call(input.selectedItem, key)) {
-          const element = input.selectedItem[key];
+        if (Object.hasOwnProperty.call(input?.selectedItem, key)) {
+          const element = input?.selectedItem[key];
           input.selectedItem[key] =
-            typeof element === 'string' && element.includes('ObjectId')
+            typeof element === 'string' && element?.includes('ObjectId')
               ? new ObjectId(
                   element
-                    .replaceAll('ObjectId(', '')
-                    .replaceAll(')', '')
-                    .replaceAll("'", '')
+                    ?.replaceAll('ObjectId(', '')
+                    ?.replaceAll(')', '')
+                    ?.replaceAll("'", '')
                 )
               : element;
         }
       }
-    if (input.single || (input.id && !Array.isArray(input.id))) {
-      if (input.id)
+    if (input?.single || (input?.id && !Array.isArray(input?.id))) {
+      if (input?.id)
         return this.readItemById(
-          input.scheme,
-          input.id,
-          input.options,
-          input.additionalOptions,
-          input.eventOptions
+          input?.scheme,
+          input?.id,
+          input?.options,
+          input?.additionalOptions,
+          input?.eventOptions
         );
       return this.readItem(
-        input.scheme,
-        input.selectedItem,
-        input.options,
-        input.additionalOptions,
-        input.eventOptions
+        input?.scheme,
+        input?.selectedItem,
+        input?.options,
+        input?.additionalOptions,
+        input?.eventOptions
       );
     } else {
       return this.readArray(
-        input.scheme,
-        input.selectedItem,
-        input.options,
-        input.additionalOptions,
-        input.eventOptions
+        input?.scheme,
+        input?.selectedItem,
+        input?.options,
+        input?.additionalOptions,
+        input?.eventOptions
       );
     }
   }
 
   update(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
-    const isRegularArray = Array.isArray(input.item);
+    const isRegularArray = Array.isArray(input?.item);
     const isContentArray = isRegularArray
       ? false
-      : Array.isArray((input.item as Event).content);
+      : Array.isArray((input?.item as Event)?.content);
     const isArray = isContentArray || isRegularArray;
     // console.log('Input:', input);
     if (input?.id)
       input.id =
-        typeof input.id === 'string' && input.id.includes('ObjectId')
+        typeof input?.id === 'string' && input?.id?.includes('ObjectId')
           ? new ObjectId(
-              input.id
-                .replaceAll('ObjectId(', '')
-                .replaceAll(')', '')
-                .replaceAll("'", '')
+              input?.id
+                ?.replaceAll('ObjectId(', '')
+                ?.replaceAll(')', '')
+                ?.replaceAll("'", '')
             )
-          : input.id;
+          : input?.id;
     if (input?.selectedItem)
       for (const key in input?.selectedItem) {
-        if (Object.hasOwnProperty.call(input.selectedItem, key)) {
-          const element = input.selectedItem[key];
+        if (Object.hasOwnProperty.call(input?.selectedItem, key)) {
+          const element = input?.selectedItem[key];
           input.selectedItem[key] =
-            typeof element === 'string' && element.includes('ObjectId')
+            typeof element === 'string' && element?.includes('ObjectId')
               ? new ObjectId(
                   element
-                    .replaceAll('ObjectId(', '')
-                    .replaceAll(')', '')
-                    .replaceAll("'", '')
+                    ?.replaceAll('ObjectId(', '')
+                    ?.replaceAll(')', '')
+                    ?.replaceAll("'", '')
                 )
               : element;
         }
       }
-    if ((input.single || (input.id && !Array.isArray(input.id))) && !isArray) {
+    if (
+      (input?.single || (input?.id && !Array.isArray(input?.id))) &&
+      !isArray
+    ) {
       return this.updateItem(
-        input.scheme,
-        input.selectedItem,
-        input.item as Event,
-        input.options
+        input?.scheme,
+        input?.selectedItem,
+        input?.item as Event,
+        input?.options
       );
     } else {
       return this.updateArray(
-        input.scheme,
-        input.selectedItem,
-        input.item,
+        input?.scheme,
+        input?.selectedItem,
+        input?.item,
         isRegularArray,
-        input.options
+        input?.options
       );
     }
   }
 
   delete(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
-    if (input.single || (input.id && !Array.isArray(input.id))) {
-      if (input.id)
-        return this.deleteItemById(input.scheme, input.id, input.options);
-      return this.deleteItem(input.scheme, input.selectedItem, input.options);
+    if (input?.single || (input?.id && !Array.isArray(input?.id))) {
+      if (input?.id)
+        return this.deleteItemById(input?.scheme, input?.id, input?.options);
+      return this.deleteItem(
+        input?.scheme,
+        input?.selectedItem,
+        input?.options
+      );
     } else {
-      return this.deleteArray(input.scheme, input.selectedItem, input.options);
+      return this.deleteArray(
+        input?.scheme,
+        input?.selectedItem,
+        input?.options
+      );
     }
   }
 
