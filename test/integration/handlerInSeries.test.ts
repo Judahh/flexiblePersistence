@@ -655,7 +655,7 @@ describe('Disable Read In Series', () => {
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
-    // console.log('read events', persistencePromise3?.receivedItem);
+    // console.log('read events', persistencePromise3);
 
     expect(persistencePromise2?.receivedItem?.length).toBe(1);
     expect(persistencePromise3?.receivedItem?.length).toBe(1);
@@ -701,6 +701,7 @@ describe('Enable Read In Series', () => {
     write = undefined;
     handler = undefined;
   });
+
   test('Enable Read', async () => {
     const obj = { test: 'test' };
 
@@ -726,7 +727,7 @@ describe('Enable Read In Series', () => {
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
-    // console.log('read events', persistencePromise3?.receivedItem);
+    // console.log('read events', persistencePromise3);
 
     expect(persistencePromise2?.receivedItem?.length).toBe(1);
     expect(persistencePromise3?.receivedItem?.length).toBe(2);

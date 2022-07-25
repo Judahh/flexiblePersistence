@@ -27,7 +27,7 @@ export class Write {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  resolvePromises(
+  async resolvePromises(
     promises: Array<Promise<IOutput<unknown, unknown>>>,
     resolve: (
       value: IOutput<unknown, unknown> | PromiseLike<IOutput<unknown, unknown>>
@@ -37,14 +37,14 @@ export class Write {
     if (this.options?.isInSeries) {
       for (let index = 0; index < promises.length; index++) {
         const promise = promises[index];
-        Promise.resolve(promise)
+        await Promise.resolve(promise)
           .then((value) =>
             index === promises.length - 1 ? resolve(value) : undefined
           )
           .catch(reject);
       }
     } else {
-      Promise.all(promises)
+      await Promise.all(promises)
         .then((value) => resolve(value[value.length - 1]))
         .catch(reject);
     }
@@ -62,7 +62,8 @@ export class Write {
       ) => {
         const promises: Array<Promise<IOutput<unknown, unknown>>> = [];
         const operation = Operation[event.getOperation()];
-        if (!(this.options?.drop && this.options?.drop[operation])) {
+        if (!this.options?.drop?.[operation]) {
+          // console.log('EVENT CREATE', operation, this._eventDB);
           promises.push(
             this._eventDB.create({
               scheme: 'events',
@@ -71,12 +72,13 @@ export class Write {
           );
         }
         if (this._read) promises.push(this._read.newEvent(event));
-        this.resolvePromises(promises, resolve, reject);
+        await this.resolvePromises(promises, resolve, reject);
       }
     );
   }
 
   read(input?: IInputRead): Promise<IOutput<unknown, unknown>> {
+    // console.log('EVENT READ', this._eventDB);
     return this._eventDB.read(input ? input : { scheme: 'events' });
   }
 
