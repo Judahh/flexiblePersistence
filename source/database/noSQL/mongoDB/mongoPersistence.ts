@@ -782,6 +782,75 @@ export class MongoPersistence implements IPersistence {
         ...options,
         limit: pageSize ? +pageSize : undefined,
         skip: skip ? +skip : undefined,
+        sort: eventOptions.sort ? JSON.parse(eventOptions.sort) : undefined,
+        perDocumentLimit: eventOptions.perDocumentLimit
+          ? JSON.parse(eventOptions.perDocumentLimit)
+          : undefined,
+        _recursed: eventOptions.recursed
+          ? JSON.parse(eventOptions.recursed)
+          : undefined,
+        tailable: eventOptions.tailable
+          ? JSON.parse(eventOptions.tailable)
+          : undefined,
+        allowDiskUse: eventOptions.allowDiskUse
+          ? JSON.parse(eventOptions.allowDiskUse)
+          : undefined,
+        batchSize: eventOptions.batchSize
+          ? JSON.parse(eventOptions.batchSize)
+          : undefined,
+        readPreference: eventOptions.readPreference
+          ? JSON.parse(eventOptions.readPreference)
+          : undefined,
+        hint: eventOptions.hint ? JSON.parse(eventOptions.hint) : undefined,
+        comment: eventOptions.comment
+          ? JSON.parse(eventOptions.comment)
+          : undefined,
+        snapshot: eventOptions.snapshot
+          ? JSON.parse(eventOptions.snapshot)
+          : undefined,
+        maxscan: eventOptions.maxscan
+          ? JSON.parse(eventOptions.maxscan)
+          : undefined,
+        upsert: eventOptions.upsert
+          ? JSON.parse(eventOptions.upsert)
+          : undefined,
+        writeConcern: eventOptions.writeConcern
+          ? JSON.parse(eventOptions.writeConcern)
+          : undefined,
+        timestamps: eventOptions.timestamps
+          ? JSON.parse(eventOptions.timestamps)
+          : undefined,
+        overwriteDiscriminatorKey: eventOptions.overwriteDiscriminatorKey
+          ? JSON.parse(eventOptions.overwriteDiscriminatorKey)
+          : undefined,
+        lean: eventOptions.lean ? JSON.parse(eventOptions.lean) : undefined,
+        populate: eventOptions.populate
+          ? JSON.parse(eventOptions.populate)
+          : undefined,
+        projection: eventOptions.projection
+          ? JSON.parse(eventOptions.projection)
+          : undefined,
+        sanitizeProjection: eventOptions.sanitizeProjection
+          ? JSON.parse(eventOptions.sanitizeProjection)
+          : undefined,
+        maxTimeMS: eventOptions.maxTimeMS
+          ? JSON.parse(eventOptions.maxTimeMS)
+          : undefined,
+        rawResult: eventOptions.rawResult
+          ? JSON.parse(eventOptions.rawResult)
+          : undefined,
+        strict: eventOptions.strict
+          ? JSON.parse(eventOptions.strict)
+          : undefined,
+        collation: eventOptions.collation
+          ? JSON.parse(eventOptions.collation)
+          : undefined,
+        session: eventOptions.session
+          ? JSON.parse(eventOptions.session)
+          : undefined,
+        explain: eventOptions.explain
+          ? JSON.parse(eventOptions.explain)
+          : undefined,
       };
       return compiledOptions;
     }
