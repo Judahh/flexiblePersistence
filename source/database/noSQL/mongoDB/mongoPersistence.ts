@@ -782,76 +782,81 @@ export class MongoPersistence implements IPersistence {
         ...options,
         limit: pageSize ? +pageSize : undefined,
         skip: skip ? +skip : undefined,
-        sort: eventOptions.sort ? JSON.parse(eventOptions.sort) : undefined,
-        perDocumentLimit: eventOptions.perDocumentLimit
-          ? JSON.parse(eventOptions.perDocumentLimit)
+        sort: eventOptions?.sort ? JSON.parse(eventOptions?.sort) : undefined,
+        perDocumentLimit: eventOptions?.perDocumentLimit
+          ? JSON.parse(eventOptions?.perDocumentLimit)
           : undefined,
-        _recursed: eventOptions.recursed
-          ? JSON.parse(eventOptions.recursed)
+        _recursed: eventOptions?.recursed
+          ? JSON.parse(eventOptions?.recursed)
           : undefined,
-        tailable: eventOptions.tailable
-          ? JSON.parse(eventOptions.tailable)
+        tailable: eventOptions?.tailable
+          ? JSON.parse(eventOptions?.tailable)
           : undefined,
-        allowDiskUse: eventOptions.allowDiskUse
-          ? JSON.parse(eventOptions.allowDiskUse)
+        allowDiskUse: eventOptions?.allowDiskUse
+          ? JSON.parse(eventOptions?.allowDiskUse)
           : undefined,
-        batchSize: eventOptions.batchSize
-          ? JSON.parse(eventOptions.batchSize)
+        batchSize: eventOptions?.batchSize
+          ? JSON.parse(eventOptions?.batchSize)
           : undefined,
-        readPreference: eventOptions.readPreference
-          ? JSON.parse(eventOptions.readPreference)
+        readPreference: eventOptions?.readPreference
+          ? JSON.parse(eventOptions?.readPreference)
           : undefined,
-        hint: eventOptions.hint ? JSON.parse(eventOptions.hint) : undefined,
-        comment: eventOptions.comment
-          ? JSON.parse(eventOptions.comment)
+        hint: eventOptions?.hint ? JSON.parse(eventOptions?.hint) : undefined,
+        comment: eventOptions?.comment
+          ? JSON.parse(eventOptions?.comment)
           : undefined,
-        snapshot: eventOptions.snapshot
-          ? JSON.parse(eventOptions.snapshot)
+        snapshot: eventOptions?.snapshot
+          ? JSON.parse(eventOptions?.snapshot)
           : undefined,
-        maxscan: eventOptions.maxscan
-          ? JSON.parse(eventOptions.maxscan)
+        maxscan: eventOptions?.maxscan
+          ? JSON.parse(eventOptions?.maxscan)
           : undefined,
-        upsert: eventOptions.upsert
-          ? JSON.parse(eventOptions.upsert)
+        upsert: eventOptions?.upsert
+          ? JSON.parse(eventOptions?.upsert)
           : undefined,
-        writeConcern: eventOptions.writeConcern
-          ? JSON.parse(eventOptions.writeConcern)
+        writeConcern: eventOptions?.writeConcern
+          ? JSON.parse(eventOptions?.writeConcern)
           : undefined,
-        timestamps: eventOptions.timestamps
-          ? JSON.parse(eventOptions.timestamps)
+        timestamps: eventOptions?.timestamps
+          ? JSON.parse(eventOptions?.timestamps)
           : undefined,
-        overwriteDiscriminatorKey: eventOptions.overwriteDiscriminatorKey
-          ? JSON.parse(eventOptions.overwriteDiscriminatorKey)
+        overwriteDiscriminatorKey: eventOptions?.overwriteDiscriminatorKey
+          ? JSON.parse(eventOptions?.overwriteDiscriminatorKey)
           : undefined,
-        lean: eventOptions.lean ? JSON.parse(eventOptions.lean) : undefined,
-        populate: eventOptions.populate
-          ? JSON.parse(eventOptions.populate)
+        lean: eventOptions?.lean ? JSON.parse(eventOptions?.lean) : undefined,
+        populate: eventOptions?.populate
+          ? JSON.parse(eventOptions?.populate)
           : undefined,
-        projection: eventOptions.projection
-          ? JSON.parse(eventOptions.projection)
+        projection: eventOptions?.projection
+          ? JSON.parse(eventOptions?.projection)
           : undefined,
-        sanitizeProjection: eventOptions.sanitizeProjection
-          ? JSON.parse(eventOptions.sanitizeProjection)
+        sanitizeProjection: eventOptions?.sanitizeProjection
+          ? JSON.parse(eventOptions?.sanitizeProjection)
           : undefined,
-        maxTimeMS: eventOptions.maxTimeMS
-          ? JSON.parse(eventOptions.maxTimeMS)
+        maxTimeMS: eventOptions?.maxTimeMS
+          ? JSON.parse(eventOptions?.maxTimeMS)
           : undefined,
-        rawResult: eventOptions.rawResult
-          ? JSON.parse(eventOptions.rawResult)
+        rawResult: eventOptions?.rawResult
+          ? JSON.parse(eventOptions?.rawResult)
           : undefined,
-        strict: eventOptions.strict
-          ? JSON.parse(eventOptions.strict)
+        strict: eventOptions?.strict
+          ? JSON.parse(eventOptions?.strict)
           : undefined,
-        collation: eventOptions.collation
-          ? JSON.parse(eventOptions.collation)
+        collation: eventOptions?.collation
+          ? JSON.parse(eventOptions?.collation)
           : undefined,
-        session: eventOptions.session
-          ? JSON.parse(eventOptions.session)
+        session: eventOptions?.session
+          ? JSON.parse(eventOptions?.session)
           : undefined,
-        explain: eventOptions.explain
-          ? JSON.parse(eventOptions.explain)
+        explain: eventOptions?.explain
+          ? JSON.parse(eventOptions?.explain)
           : undefined,
       };
+      for (const key in compiledOptions) {
+        if (Object.hasOwnProperty.call(compiledOptions, key)) {
+          if (compiledOptions[key] === undefined) delete compiledOptions[key];
+        }
+      }
       return compiledOptions;
     }
     return options;
