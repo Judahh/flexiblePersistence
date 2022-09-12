@@ -5,7 +5,7 @@ import { Read } from './../read/read';
 import { Event } from '../event/event';
 import { IPersistence } from '../iPersistence/iPersistence';
 import { IOutput } from '../iPersistence/output/iOutput';
-import { IInputRead } from '../iPersistence/input/read/iInputRead';
+import { IInputRead } from '../iPersistence/input/iInputRead';
 import IOptions from './iOptions';
 import { Operation } from '../event/operation';
 import { mongo } from 'mongoose';
@@ -36,7 +36,7 @@ export class Handler {
 
   protected async doRead(
     input: IInputRead
-  ): Promise<IOutput<unknown, unknown> | undefined> {
+  ): Promise<IOutput<unknown, unknown, unknown> | undefined> {
     if (!this.read && !this.write) {
       throw new Error('Handler must have a ReadDB.');
     }
@@ -83,7 +83,7 @@ export class Handler {
     return event;
   }
 
-  addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
+  addEvent(event: Event): Promise<IOutput<unknown, unknown, unknown>> {
     event = this.restoreEvent(event);
     if (!this.write) {
       if (this.read) return this.read.newEvent(event);
@@ -95,21 +95,21 @@ export class Handler {
   readArray(
     scheme: string,
     selectedItem?: unknown
-  ): Promise<IOutput<unknown, unknown> | undefined> {
+  ): Promise<IOutput<unknown, unknown, unknown> | undefined> {
     return this.doRead({ scheme, selectedItem, single: false });
   }
 
   readItem(
     scheme: string,
     selectedItem?: unknown
-  ): Promise<IOutput<unknown, unknown> | undefined> {
+  ): Promise<IOutput<unknown, unknown, unknown> | undefined> {
     return this.doRead({ scheme, selectedItem, single: true });
   }
 
   readItemById(
     scheme: string,
     id: unknown
-  ): Promise<IOutput<unknown, unknown> | undefined> {
+  ): Promise<IOutput<unknown, unknown, unknown> | undefined> {
     return this.doRead({ scheme, id });
   }
 
@@ -204,10 +204,10 @@ export class Handler {
           const events = (await this.getWrite()?.read({
             scheme: 'events',
             single: false,
-          })) as IOutput<unknown, Event[]>;
+          })) as IOutput<unknown, unknown, Event[]>;
           await this.getRead()?.clear();
           await this.getWrite()?.clear();
-          const rEvents: IOutput<unknown, unknown>[] = [];
+          const rEvents: IOutput<unknown, unknown, unknown>[] = [];
           if (events.receivedItem)
             for (const event of events.receivedItem) {
               try {

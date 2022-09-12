@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { IOutput } from '../../output/iOutput';
-import { IInputRead } from '../../input/read/iInputRead';
+import { IInputRead } from '../../input/iInputRead';
 
-export interface IRead<Input, Output> {
-  read(input: IInputRead): Promise<IOutput<Input, Output>>;
+export interface IRead<Filter, Input, Output> {
+  read(
+    input: IInputRead<Filter, Input>
+  ): Promise<IOutput<Filter, Input, Output>>;
 }

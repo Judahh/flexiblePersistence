@@ -4,7 +4,7 @@ import { ISRAR } from './sRAR/iSRAR';
 import { IBasePersistence } from './iBasePersistence';
 export interface IPersistence
   //  deepcode ignore no-any: any needed
-  extends ISRAR<any, any>,
+  extends ISRAR<any, any, any>,
     IBasePersistence {
   element: {
     [name: string]: Default;
