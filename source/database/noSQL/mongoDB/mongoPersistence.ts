@@ -587,15 +587,19 @@ export class MongoPersistence implements IPersistence {
     });
   }
 
-  other(input: IInput<Event>): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve) => {
+  other(
+    input: IInput<unknown, Event>
+  ): Promise<IOutput<unknown, unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown, unknown>>((resolve) => {
       resolve({
         receivedItem: input,
       });
     });
   }
 
-  create(input: IInputCreate<Event>): Promise<IOutput<unknown, unknown>> {
+  create(
+    input: IInputCreate<Event, Event>
+  ): Promise<IOutput<Event, Event, unknown>> {
     const isRegularArray = Array.isArray(input.item);
     const isContentArray = isRegularArray
       ? false
@@ -623,7 +627,7 @@ export class MongoPersistence implements IPersistence {
     }
   }
 
-  read(input: IInputRead): Promise<IOutput<unknown, unknown>> {
+  read(input: IInputRead<Event>): Promise<IOutput<Event, unknown, unknown>> {
     if (input?.id)
       input.id =
         typeof input?.id === 'string' && input?.id?.includes('ObjectId')
@@ -676,7 +680,9 @@ export class MongoPersistence implements IPersistence {
     }
   }
 
-  update(input: IInputUpdate<Event>): Promise<IOutput<unknown, unknown>> {
+  update(
+    input: IInputUpdate<Event, Event>
+  ): Promise<IOutput<Event, Event, unknown>> {
     const isRegularArray = Array.isArray(input?.item);
     const isContentArray = isRegularArray
       ? false
@@ -729,7 +735,9 @@ export class MongoPersistence implements IPersistence {
     }
   }
 
-  delete(input: IInputDelete): Promise<IOutput<unknown, unknown>> {
+  delete(
+    input: IInputDelete<Event>
+  ): Promise<IOutput<Event, unknown, unknown>> {
     if (input?.single || (input?.id && !Array.isArray(input?.id))) {
       if (input?.id)
         return this.deleteItemById(input?.scheme, input?.id, input?.options);
@@ -782,7 +790,81 @@ export class MongoPersistence implements IPersistence {
         ...options,
         limit: pageSize ? +pageSize : undefined,
         skip: skip ? +skip : undefined,
+        sort: eventOptions?.sort ? JSON.parse(eventOptions?.sort) : undefined,
+        perDocumentLimit: eventOptions?.perDocumentLimit
+          ? JSON.parse(eventOptions?.perDocumentLimit)
+          : undefined,
+        _recursed: eventOptions?.recursed
+          ? JSON.parse(eventOptions?.recursed)
+          : undefined,
+        tailable: eventOptions?.tailable
+          ? JSON.parse(eventOptions?.tailable)
+          : undefined,
+        allowDiskUse: eventOptions?.allowDiskUse
+          ? JSON.parse(eventOptions?.allowDiskUse)
+          : undefined,
+        batchSize: eventOptions?.batchSize
+          ? JSON.parse(eventOptions?.batchSize)
+          : undefined,
+        readPreference: eventOptions?.readPreference
+          ? JSON.parse(eventOptions?.readPreference)
+          : undefined,
+        hint: eventOptions?.hint ? JSON.parse(eventOptions?.hint) : undefined,
+        comment: eventOptions?.comment
+          ? JSON.parse(eventOptions?.comment)
+          : undefined,
+        snapshot: eventOptions?.snapshot
+          ? JSON.parse(eventOptions?.snapshot)
+          : undefined,
+        maxscan: eventOptions?.maxscan
+          ? JSON.parse(eventOptions?.maxscan)
+          : undefined,
+        upsert: eventOptions?.upsert
+          ? JSON.parse(eventOptions?.upsert)
+          : undefined,
+        writeConcern: eventOptions?.writeConcern
+          ? JSON.parse(eventOptions?.writeConcern)
+          : undefined,
+        timestamps: eventOptions?.timestamps
+          ? JSON.parse(eventOptions?.timestamps)
+          : undefined,
+        overwriteDiscriminatorKey: eventOptions?.overwriteDiscriminatorKey
+          ? JSON.parse(eventOptions?.overwriteDiscriminatorKey)
+          : undefined,
+        lean: eventOptions?.lean ? JSON.parse(eventOptions?.lean) : undefined,
+        populate: eventOptions?.populate
+          ? JSON.parse(eventOptions?.populate)
+          : undefined,
+        projection: eventOptions?.projection
+          ? JSON.parse(eventOptions?.projection)
+          : undefined,
+        sanitizeProjection: eventOptions?.sanitizeProjection
+          ? JSON.parse(eventOptions?.sanitizeProjection)
+          : undefined,
+        maxTimeMS: eventOptions?.maxTimeMS
+          ? JSON.parse(eventOptions?.maxTimeMS)
+          : undefined,
+        rawResult: eventOptions?.rawResult
+          ? JSON.parse(eventOptions?.rawResult)
+          : undefined,
+        strict: eventOptions?.strict
+          ? JSON.parse(eventOptions?.strict)
+          : undefined,
+        collation: eventOptions?.collation
+          ? JSON.parse(eventOptions?.collation)
+          : undefined,
+        session: eventOptions?.session
+          ? JSON.parse(eventOptions?.session)
+          : undefined,
+        explain: eventOptions?.explain
+          ? JSON.parse(eventOptions?.explain)
+          : undefined,
       };
+      for (const key in compiledOptions) {
+        if (Object.hasOwnProperty.call(compiledOptions, key)) {
+          if (compiledOptions[key] === undefined) delete compiledOptions[key];
+        }
+      }
       return compiledOptions;
     }
     return options;
@@ -824,11 +906,11 @@ export class MongoPersistence implements IPersistence {
   }
 
   protected generateNewArray(
-    item: Event | Event[],
+    item?: Event | Event[],
     regular?: boolean
   ): Event | Event[] {
-    let items: Event | Event[] = item;
-    if (!Array.isArray(item) && item.content && Array.isArray(item.content)) {
+    let items: Event | Event[] = item || ({} as Event);
+    if (!Array.isArray(item) && item?.content && Array.isArray(item.content)) {
       if (regular)
         items = item?.content?.map((itemC) => this.generateNewItem(itemC));
       else
@@ -891,8 +973,11 @@ export class MongoPersistence implements IPersistence {
     return receivedItem;
   }
 
-  createItem(scheme: string, item: Event): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+  createItem(
+    scheme: string,
+    item: Event
+  ): Promise<IOutput<Event, Event, unknown>> {
+    return new Promise<IOutput<Event, Event, unknown>>((resolve, reject) => {
       const newItem = this.generateNewItem(item);
       const fullOperation = {
         operation: Operation.create,
@@ -931,10 +1016,10 @@ export class MongoPersistence implements IPersistence {
 
   async createArray(
     scheme: string,
-    item: Event | Event[],
-    regular: boolean,
+    item?: Event | Event[],
+    regular?: boolean,
     options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
+  ): Promise<IOutput<Event, Event, unknown>> {
     const items = this.generateNewArray(item, regular);
     const fullOperation = {
       operation: Operation.create,
@@ -942,7 +1027,7 @@ export class MongoPersistence implements IPersistence {
       subType: SubType.byFilter,
     };
 
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+    return new Promise<IOutput<Event, Event, unknown>>((resolve, reject) => {
       const callback = (error, docs) => {
         // console.log('Scheme ARRAY:', scheme, item, items);
         if (error) {
@@ -980,8 +1065,8 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions,
     additionalOptions?: unknown,
     eventOptions?: IOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+  ): Promise<IOutput<Event, unknown, unknown>> {
+    return new Promise<IOutput<Event, unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
@@ -1030,8 +1115,8 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions,
     additionalOptions?: unknown,
     eventOptions?: IOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+  ): Promise<IOutput<Event, unknown, unknown>> {
+    return new Promise<IOutput<Event, unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
@@ -1080,8 +1165,8 @@ export class MongoPersistence implements IPersistence {
     options?: QueryOptions,
     additionalOptions?: unknown,
     eventOptions?: IOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+  ): Promise<IOutput<Event, unknown, unknown>> {
+    return new Promise<IOutput<Event, unknown, unknown>>((resolve, reject) => {
       const compiledOptions = this.generateOptions(options, eventOptions);
       const fullOperation = {
         operation: Operation.read,
@@ -1127,8 +1212,8 @@ export class MongoPersistence implements IPersistence {
     selectedItem?: Event,
     item?: Event,
     options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>(async (resolve) => {
+  ): Promise<IOutput<Event, Event, unknown>> {
+    return new Promise<IOutput<Event, Event, unknown>>(async (resolve) => {
       const newItem = this.generateNewItem(item);
       const newSelectedItem = this.generateNewItem(selectedItem);
       const response = await this.findOneAndUpdate.bind(this)(
@@ -1149,103 +1234,107 @@ export class MongoPersistence implements IPersistence {
 
   updateArray(
     scheme: string,
-    selectedItem?: Record<string, unknown>,
+    selectedItem?: Event,
     item?: Event | Event[],
     regular?: boolean,
     options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>(async (resolve, reject) => {
-      const newItem = Array.isArray(item)
-        ? this.generateNewArray(item, regular)
-        : this.generateNewItem(item);
+  ): Promise<IOutput<Event, Event, unknown>> {
+    return new Promise<IOutput<Event, Event, unknown>>(
+      async (resolve, reject) => {
+        const newItem = Array.isArray(item)
+          ? this.generateNewArray(item, regular)
+          : this.generateNewItem(item);
 
-      if (Array.isArray(newItem)) {
-        // console.log('newItem Array:', newItem);
+        if (Array.isArray(newItem)) {
+          // console.log('newItem Array:', newItem);
 
-        const promisedResponses: Array<Promise<IOutput<unknown, unknown>>> = [];
-        for (let index = 0; index < newItem.length; index++) {
-          const newItemElement = newItem[index];
+          const promisedResponses: Array<
+            Promise<IOutput<unknown, unknown, unknown>>
+          > = [];
+          for (let index = 0; index < newItem.length; index++) {
+            const newItemElement = newItem[index];
 
-          const selectedItemElement = Array.isArray(selectedItem)
-            ? selectedItem[index]
-            : {
-                id: newItemElement.id,
-                _id: newItemElement._id,
-                ...selectedItem,
-              };
+            const selectedItemElement = Array.isArray(selectedItem)
+              ? selectedItem[index]
+              : {
+                  id: newItemElement.id,
+                  _id: newItemElement._id,
+                  ...selectedItem,
+                };
 
-          // delete newItemElement.id;
-          // delete newItemElement._id;
+            // delete newItemElement.id;
+            // delete newItemElement._id;
 
-          // console.log(
-          //   '-selectedItemElement:',
-          //   selectedItemElement,
-          //   newItemElement
-          // );
+            // console.log(
+            //   '-selectedItemElement:',
+            //   selectedItemElement,
+            //   newItemElement
+            // );
 
-          promisedResponses.push(
-            this.findOneAndUpdate.bind(this)(
-              scheme,
-              selectedItemElement,
-              newItemElement,
-              options
-            )
-          );
-        }
-        const responses = await Promise.all(promisedResponses);
-        // console.log('responses:', responses);
-
-        resolve(
-          this.cleanReceived.bind(this)({
-            receivedItem: responses.map((response) => response.receivedItem),
-            result: responses.map((response) => response.result),
-            selectedItem: selectedItem,
-            sentItem: item,
-          })
-        );
-      } else {
-        // console.log('newItem:', newItem);
-        const fullOperation = {
-          operation: Operation.update,
-          type: Type.array,
-          subType: SubType.byFilter,
-        };
-        const callback = (error, doc) => {
-          // console.log('Scheme:', scheme);
-          if (error) {
-            reject(error);
-          } else {
-            resolve(
-              this.cleanReceived.bind(this)({
-                receivedItem: this.generateReceivedItem.bind(this)(
-                  doc,
-                  scheme,
-                  fullOperation
-                ),
-                result: doc,
-                selectedItem: selectedItem,
-                sentItem: item,
-              })
+            promisedResponses.push(
+              this.findOneAndUpdate.bind(this)(
+                scheme,
+                selectedItemElement,
+                newItemElement,
+                options
+              )
             );
           }
-        };
-        this.populateAll.bind(this)(
-          scheme,
-          'updateMany',
-          [selectedItem, newItem, options],
-          fullOperation,
-          callback.bind(this)
-        );
+          const responses = await Promise.all(promisedResponses);
+          // console.log('responses:', responses);
+
+          resolve(
+            this.cleanReceived.bind(this)({
+              receivedItem: responses.map((response) => response.receivedItem),
+              result: responses.map((response) => response.result),
+              selectedItem: selectedItem,
+              sentItem: item,
+            })
+          );
+        } else {
+          // console.log('newItem:', newItem);
+          const fullOperation = {
+            operation: Operation.update,
+            type: Type.array,
+            subType: SubType.byFilter,
+          };
+          const callback = (error, doc) => {
+            // console.log('Scheme:', scheme);
+            if (error) {
+              reject(error);
+            } else {
+              resolve(
+                this.cleanReceived.bind(this)({
+                  receivedItem: this.generateReceivedItem.bind(this)(
+                    doc,
+                    scheme,
+                    fullOperation
+                  ),
+                  result: doc,
+                  selectedItem: selectedItem,
+                  sentItem: item,
+                })
+              );
+            }
+          };
+          this.populateAll.bind(this)(
+            scheme,
+            'updateMany',
+            [selectedItem, newItem, options],
+            fullOperation,
+            callback.bind(this)
+          );
+        }
       }
-    });
+    );
   }
 
   deleteArray(
     scheme: string,
     selectedItem?: Event,
     options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+  ): Promise<IOutput<Event, unknown, unknown>> {
+    return new Promise<IOutput<Event, unknown, unknown>>((resolve, reject) => {
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
         operation: Operation.delete,
@@ -1278,8 +1367,8 @@ export class MongoPersistence implements IPersistence {
     scheme: string,
     selectedItem?: Event,
     options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+  ): Promise<IOutput<Event, unknown, unknown>> {
+    return new Promise<IOutput<Event, unknown, unknown>>((resolve, reject) => {
       const newSelectedItem = this.generateNewItem(selectedItem);
       const fullOperation = {
         operation: Operation.delete,
@@ -1318,8 +1407,8 @@ export class MongoPersistence implements IPersistence {
     scheme: string,
     id: unknown,
     options?: QueryOptions
-  ): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>((resolve, reject) => {
+  ): Promise<IOutput<Event, unknown, unknown>> {
+    return new Promise<IOutput<Event, unknown, unknown>>((resolve, reject) => {
       const fullOperation = {
         operation: Operation.delete,
         type: Type.item,

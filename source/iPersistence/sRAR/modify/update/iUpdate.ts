@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 import { IOutput } from '../../../output/iOutput';
-import { IInputUpdate } from '../../../input/update/iInputUpdate';
+import { IInputUpdate } from '../../../input/iInputUpdate';
 
-export interface IUpdate<Input, Output> {
-  update(input: IInputUpdate<Input>): Promise<IOutput<Input, Output>>;
+export interface IUpdate<Filter = unknown, Input = unknown, Output = unknown> {
+  update(
+    input: IInputUpdate<Filter, Input>
+  ): Promise<IOutput<Filter, Input, Output>>;
 }

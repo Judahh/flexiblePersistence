@@ -81,6 +81,7 @@ describe('Read and Write', () => {
       {}
     )) as IOutput<
       { id: ObjectId; test: string },
+      { id: ObjectId; test: string },
       { id: ObjectId; test: string }
     >;
 
@@ -91,6 +92,7 @@ describe('Read and Write', () => {
     const persistencePromise2 = (await handler.addEvent(
       new Event({ operation: Operation.delete, name: 'object' })
     )) as IOutput<
+      { id: ObjectId; test: string },
       { id: ObjectId; test: string },
       { id: ObjectId; test: string }
     >;
@@ -205,7 +207,7 @@ describe('Read and Write', () => {
         name: 'object',
         content: obj,
       })
-    )) as IOutput<unknown, { id: ObjectId; test: string }>;
+    )) as IOutput<unknown, unknown, { id: ObjectId; test: string }>;
 
     expect(persistencePromise3.receivedItem).toMatchObject(obj);
 
@@ -264,7 +266,7 @@ describe('Read and Write', () => {
         name: 'object',
         content: obj2,
       })
-    )) as IOutput<unknown, { id: ObjectId; test: string }>;
+    )) as IOutput<unknown, unknown, { id: ObjectId; test: string }>;
 
     expect(persistencePromise35.receivedItem).toMatchObject(obj2);
 
@@ -367,6 +369,7 @@ describe('Read and Write', () => {
       obj['id']
     )) as IOutput<
       { id: ObjectId; test: string },
+      { id: ObjectId; test: string },
       { id: ObjectId; test: string }
     >;
 
@@ -461,8 +464,9 @@ describe('Just Write', () => {
     const persistencePromise = (await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     )) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }
     >;
 
     // console.log(obj);
@@ -506,6 +510,7 @@ describe('Just Write', () => {
       })
     )) as IOutput<
       { id: ObjectId; test: string; timestamp: string },
+      { id: ObjectId; test: string; timestamp?: string },
       { id: ObjectId; test: string; timestamp: string }
     >;
 
@@ -536,8 +541,9 @@ describe('Just Write', () => {
       'object',
       {}
     )) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }[]
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }[]
     >;
 
     // console.log(persistencePromise3?.receivedItem);
@@ -559,22 +565,25 @@ describe('Just Write', () => {
     (await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     )) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }
     >;
     // console.log('create object', persistencePromise);
 
     const persistencePromise2 = (await handler.addEvent(
       new Event({ operation: Operation.read, name: 'object', single: false })
     )) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }[]
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }[]
     >;
     // console.log('read object', persistencePromise2);
 
     const persistencePromise3 = (await handler.getWrite()?.read()) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }[]
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }[]
     >;
     // console.log('read events', persistencePromise3?.receivedItem);
 
@@ -591,8 +600,9 @@ describe('Just Write', () => {
     (await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     )) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }
     >;
 
     // console.log('create object', persistencePromise);
@@ -600,15 +610,17 @@ describe('Just Write', () => {
     const persistencePromise2 = (await handler.addEvent(
       new Event({ operation: Operation.read, name: 'object', single: false })
     )) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }[]
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }[]
     >;
 
     // console.log('read object', persistencePromise2);
 
     const persistencePromise3 = (await handler.getWrite()?.read()) as IOutput<
-      { id: ObjectId; test: string; timestamp: unknown },
-      { id: ObjectId; test: string; timestamp: unknown }[]
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string },
+      { id: ObjectId; test: string; timestamp?: string }[]
     >;
     // console.log('read events', persistencePromise3?.receivedItem);
     // while (true) { }

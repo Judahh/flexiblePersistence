@@ -3,7 +3,7 @@ import { Event } from '../event/event';
 import { Read } from '../read/read';
 import { IPersistence } from '../iPersistence/iPersistence';
 import { IOutput } from '../iPersistence/output/iOutput';
-import { IInputRead } from '../iPersistence/input/read/iInputRead';
+import { IInputRead } from '../iPersistence/input/iInputRead';
 import { Operation } from '..';
 import IOptions from '../handler/iOptions';
 export class Write {
@@ -28,9 +28,11 @@ export class Write {
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async resolvePromises(
-    promises: Array<Promise<IOutput<unknown, unknown>>>,
+    promises: Array<Promise<IOutput<unknown, unknown, unknown>>>,
     resolve: (
-      value: IOutput<unknown, unknown> | PromiseLike<IOutput<unknown, unknown>>
+      value:
+        | IOutput<unknown, unknown, unknown>
+        | PromiseLike<IOutput<unknown, unknown, unknown>>
     ) => void,
     reject: (reason?: unknown) => void
   ) {
@@ -50,17 +52,17 @@ export class Write {
     }
   }
 
-  addEvent(event: Event): Promise<IOutput<unknown, unknown>> {
-    return new Promise<IOutput<unknown, unknown>>(
+  addEvent(event: Event): Promise<IOutput<unknown, unknown, unknown>> {
+    return new Promise<IOutput<unknown, unknown, unknown>>(
       async (
         resolve: (
           value:
-            | IOutput<unknown, unknown>
-            | PromiseLike<IOutput<unknown, unknown>>
+            | IOutput<unknown, unknown, unknown>
+            | PromiseLike<IOutput<unknown, unknown, unknown>>
         ) => void,
         reject: (reason?: unknown) => void
       ) => {
-        const promises: Array<Promise<IOutput<unknown, unknown>>> = [];
+        const promises: Array<Promise<IOutput<unknown, unknown, unknown>>> = [];
         const operation = Operation[event.getOperation()];
         if (!this.options?.drop?.[operation]) {
           // console.log('EVENT CREATE', operation, this._eventDB);
@@ -77,12 +79,15 @@ export class Write {
     );
   }
 
-  read(input?: IInputRead): Promise<IOutput<unknown, unknown>> {
+  read(input?: IInputRead): Promise<IOutput<unknown, undefined, unknown>> {
     // console.log('EVENT READ', this._eventDB);
     return this._eventDB.read(input ? input : { scheme: 'events' });
   }
 
-  clear(): Promise<IOutput<unknown, unknown>> {
-    return this._eventDB.delete({ scheme: 'events', single: false });
+  clear(): Promise<IOutput<unknown, undefined, unknown>> {
+    return this._eventDB.delete({
+      scheme: 'events',
+      single: false,
+    });
   }
 }

@@ -59,6 +59,18 @@ export class PersistenceInfo extends Info implements PoolConfig {
       this.user = info.username;
       this.password = info.password;
       this.options = info.options;
+      if (typeof info.options === 'object') {
+        this.options = '';
+        for (const key in info.options) {
+          if (Object.prototype.hasOwnProperty.call(info, key)) {
+            const element = info[key];
+            this.options += `${key}=${element}&`;
+          }
+        }
+        this.options = this.options.substring(0, this.options.length - 1);
+      } else {
+        this.options = info.options;
+      }
       this.connectionType = info.connectionType;
       if (info.host) this.host = info.host;
       else this.host = 'localhost';

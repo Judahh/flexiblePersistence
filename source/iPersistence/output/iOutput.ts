@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export interface IOutput<Input, Output> {
+export interface IOutput<Filter, Input, Output> {
   receivedItem?: Output;
   result?: any;
-  selectedItem?: any;
+  selectedItem?: Filter;
   sentItem?: Input;
 }

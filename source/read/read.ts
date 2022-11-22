@@ -3,7 +3,7 @@ import { Event } from './../event/event';
 import { Operation } from './../event/operation';
 import { IPersistence } from '../iPersistence/iPersistence';
 import { IOutput } from '../iPersistence/output/iOutput';
-import { IInput } from '../iPersistence/input/iInput';
+import { IInputCreate } from '../iPersistence/input/iInputCreate';
 export class Read {
   protected readDB: IPersistence;
 
@@ -16,14 +16,14 @@ export class Read {
   }
 
   //  deepcode ignore no-any: any needed
-  newEvent(event: Event): Promise<IOutput<unknown, unknown>> {
+  newEvent(event: Event): Promise<IOutput<unknown, unknown, unknown>> {
     //Operation.create.valueOf();
     const id = event.getSelection()
       ? (event.getSelection() as any).id
       : event.isSingle() && event.getOperation() == Operation.create
       ? event.getId()
       : undefined;
-    const input: IInput<unknown> = {
+    const input: IInputCreate<unknown, unknown> = {
       single: event.isSingle(),
       scheme: event.getName(),
       id: id ? String(id) : undefined,

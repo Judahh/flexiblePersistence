@@ -88,6 +88,7 @@ describe('Read and Write', () => {
       {}
     )) as IOutput<
       { id: ObjectId; test: string },
+      { id: ObjectId; test: string },
       { id: ObjectId; test: string }
     >;
 
@@ -98,6 +99,7 @@ describe('Read and Write', () => {
     const persistencePromise2 = (await handler.addEvent(
       new Event({ operation: Operation.delete, name: 'object' })
     )) as IOutput<
+      { id: ObjectId; test: string },
       { id: ObjectId; test: string },
       { id: ObjectId; test: string }
     >;
@@ -257,7 +259,7 @@ describe('Read and Write InSeries', () => {
         name: 'object',
         content: obj,
       })
-    )) as IOutput<unknown, { id: ObjectId; test: string }>;
+    )) as IOutput<unknown, unknown, { id: ObjectId; test: string }>;
 
     expect(persistencePromise3.receivedItem).toMatchObject(obj);
 
@@ -314,7 +316,7 @@ describe('Read and Write InSeries', () => {
         name: 'object',
         content: obj2,
       })
-    )) as IOutput<unknown, { id: ObjectId; test: string }>;
+    )) as IOutput<unknown, unknown, { id: ObjectId; test: string }>;
 
     expect(persistencePromise35.receivedItem).toMatchObject(obj2);
 
@@ -415,6 +417,7 @@ describe('Read and Write InSeries', () => {
       obj['id']
     )) as IOutput<
       { id: ObjectId; test: string },
+      { id: ObjectId; test: string },
       { id: ObjectId; test: string }
     >;
 
@@ -506,6 +509,7 @@ describe('Undefined Read and Write In Series', () => {
       new Event({ operation: Operation.create, name: 'object', content: obj })
     )) as IOutput<
       { id: ObjectId; test: string; timestamp: unknown },
+      { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }
     >;
 
@@ -550,6 +554,7 @@ describe('Undefined Read and Write In Series', () => {
       })
     )) as IOutput<
       { id: ObjectId; test: string; timestamp: string },
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: string }
     >;
 
@@ -580,6 +585,7 @@ describe('Undefined Read and Write In Series', () => {
       'object',
       {}
     )) as IOutput<
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
@@ -638,6 +644,7 @@ describe('Disable Read In Series', () => {
     (await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     )) as IOutput<
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }
     >;
@@ -646,12 +653,14 @@ describe('Disable Read In Series', () => {
     const persistencePromise2 = (await handler.addEvent(
       new Event({ operation: Operation.read, name: 'object', single: false })
     )) as IOutput<
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
     // console.log('read object', persistencePromise2);
 
     const persistencePromise3 = (await handler.getWrite()?.read()) as IOutput<
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
@@ -708,6 +717,7 @@ describe('Enable Read In Series', () => {
     (await handler.addEvent(
       new Event({ operation: Operation.create, name: 'object', content: obj })
     )) as IOutput<
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }
     >;
@@ -717,6 +727,7 @@ describe('Enable Read In Series', () => {
     const persistencePromise2 = (await handler.addEvent(
       new Event({ operation: Operation.read, name: 'object', single: false })
     )) as IOutput<
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;
@@ -724,6 +735,7 @@ describe('Enable Read In Series', () => {
     // console.log('read object', persistencePromise2);
 
     const persistencePromise3 = (await handler.getWrite()?.read()) as IOutput<
+      { id: ObjectId; test: string; timestamp: string },
       { id: ObjectId; test: string; timestamp: unknown },
       { id: ObjectId; test: string; timestamp: unknown }[]
     >;

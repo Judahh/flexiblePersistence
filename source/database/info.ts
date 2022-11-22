@@ -9,19 +9,25 @@ export class Info {
   username?: string;
   password?: string;
   pool?: {
-    max: number;
-    min: number;
-    idleTimeoutMillis: number;
-    acquireTimeoutMillis: number;
+    max?: number;
+    min?: number;
+    idleTimeoutMillis?: number;
+    acquireTimeoutMillis?: number;
   };
   options?:
     | string
     | {
-        encrypt: boolean;
-        trustServerCertificate: boolean;
+        encrypt?: boolean;
+        trustServerCertificate?: boolean;
+        authMechanism?: string;
       };
   connectionType?: string;
-  ssl?: ConnectionOptions | tls.ConnectionOptions | boolean | undefined;
+  ssl?:
+    | ConnectionOptions
+    | tls.ConnectionOptions
+    | boolean
+    | string
+    | undefined;
   connectionTimeout?: number;
   requestTimeout?: number;
 }

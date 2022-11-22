@@ -73,7 +73,11 @@ test('add and read array and find object', async () => {
   const persistencePromise1 = (await handler.readArray(
     'object',
     {}
-  )) as IOutput<{ id: ObjectId; test: string }, { id: ObjectId; test: string }>;
+  )) as IOutput<
+    { id: ObjectId; test: string },
+    { id: ObjectId; test: string },
+    { id: ObjectId; test: string }
+  >;
 
   expect(persistencePromise1.receivedItem).toMatchObject([obj]);
 
@@ -81,7 +85,11 @@ test('add and read array and find object', async () => {
 
   const persistencePromise2 = (await handler.addEvent(
     new Event({ operation: Operation.delete, name: 'object' })
-  )) as IOutput<{ id: ObjectId; test: string }, { id: ObjectId; test: string }>;
+  )) as IOutput<
+    { id: ObjectId; test: string },
+    { id: ObjectId; test: string },
+    { id: ObjectId; test: string }
+  >;
 
   const expected = JSON.parse(
     JSON.stringify({
