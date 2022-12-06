@@ -1,4 +1,4 @@
-import { Model, Schema } from 'mongoose';
+import { Model, ResolveSchemaOptions, Schema } from 'mongoose';
 type AnyModel = Model<
   { [x: string]: any },
   Record<string, unknown>,
@@ -11,7 +11,7 @@ type AnyModel = Model<
     Record<string, unknown>,
     any,
     Record<string, unknown>,
-    'type',
+    ResolveSchemaOptions<'type'>,
     { [x: string]: any }
   >
 >;
