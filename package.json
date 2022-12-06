@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "description": "A CQRS and Event Sourcing platform",
   "main": "dist/source/index.js",
   "keywords": [
@@ -30,7 +30,7 @@
     "url": "git+https://github.com/Judahh/flexiblePersistence.git"
   },
   "author": "Judah Holanda Correia Lima <judahholanda7@gmail.com> (https://judahh.com)",
-  "license": "BSD-3-Clause",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Judahh/flexiblePersistence/issues"
   },
