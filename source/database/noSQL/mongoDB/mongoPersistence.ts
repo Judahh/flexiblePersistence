@@ -33,9 +33,15 @@ import { Type } from '../../../event/type';
 import { SubType } from '../../../event/subType';
 import { CastType, ToCast } from './toCast';
 import { FullOperation } from '../../../event/fullOperation';
-import { ObjectId, Transaction, TransactionOptions } from 'mongodb';
+import {
+  ObjectId,
+  Transaction as MTransaction,
+  TransactionOptions,
+} from 'mongodb';
 import { PipelineCRUD, PipelineCRUDType } from './pipelineCRUD';
 import { AnyModel } from './anyModel';
+import { ITransaction } from '../../../iPersistence/iTransaction';
+import { Transaction } from './transaction';
 export class MongoPersistence implements IPersistence {
   protected persistenceInfo: PersistenceInfo;
   protected mongooseInstance: Mongoose;
@@ -70,20 +76,17 @@ export class MongoPersistence implements IPersistence {
     this.setElement(element);
   }
   async transaction(
-    // eslint-disable-next-line no-unused-vars
-    callback: (transaction: Transaction | ClientSession) => Promise<void>,
     options: {
       session?: ClientSessionOptions;
       transaction?: TransactionOptions;
-    }
-  ): Promise<any> {
-    const session = await this.mongooseInstance.startSession(options?.session);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    session.startTransaction(options?.transaction as any);
-    await callback(session);
-    const result = await session.commitTransaction();
-    session.endSession();
-    return result;
+    },
+    // eslint-disable-next-line no-unused-vars
+    callback: (transaction: Transaction) => Promise<void>
+  ): Promise<ITransaction> {
+    const transaction = new Transaction(this.mongooseInstance);
+    await transaction.begin(options);
+    await callback?.(transaction);
+    return transaction;
   }
 
   protected initElement(): void {
