@@ -54,6 +54,7 @@ import { Virtual } from './database/noSQL/mongoDB/virtual';
 import { FullOperation } from './event/fullOperation';
 import { SubType } from './event/subType';
 import { Type } from './event/type';
+import { ITransaction } from './iPersistence/iTransaction';
 
 export {
   Handler,
@@ -66,6 +67,7 @@ export {
   Operation,
   Write,
   Read,
+  ITransaction,
   IBasePersistence,
   IPersistence,
   ISRAR,
