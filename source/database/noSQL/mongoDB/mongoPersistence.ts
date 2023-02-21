@@ -150,7 +150,13 @@ export class MongoPersistence implements IPersistence {
   getModel(name: string): AnyModel {
     if (this.getModels()[name]) return this.getModels()[name];
     const genericSchema = new this.mongooseInstance.Schema(
-      {},
+      {
+        id: {
+          type: Schema.Types.ObjectId,
+          unique: true,
+          index: true,
+        },
+      },
       {
         strict: false,
         id: true,
