@@ -33,11 +33,7 @@ import { Type } from '../../../event/type';
 import { SubType } from '../../../event/subType';
 import { CastType, ToCast } from './toCast';
 import { FullOperation } from '../../../event/fullOperation';
-import {
-  ObjectId,
-  Transaction as MTransaction,
-  TransactionOptions,
-} from 'mongodb';
+import { ObjectId, TransactionOptions } from 'mongodb';
 import { PipelineCRUD, PipelineCRUDType } from './pipelineCRUD';
 import { AnyModel } from './anyModel';
 import { ITransaction } from '../../../iPersistence/iTransaction';
@@ -153,7 +149,15 @@ export class MongoPersistence implements IPersistence {
 
   getModel(name: string): AnyModel {
     if (this.getModels()[name]) return this.getModels()[name];
-    return this.getModels()['Generic'];
+    const genericSchema = new this.mongooseInstance.Schema(
+      {},
+      {
+        strict: false,
+        id: true,
+        versionKey: false,
+      }
+    );
+    return this.addModel(name, genericSchema);
   }
 
   getModels(): { [index: string]: AnyModel } {
