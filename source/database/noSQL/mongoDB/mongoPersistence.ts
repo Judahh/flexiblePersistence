@@ -172,7 +172,8 @@ export class MongoPersistence implements IPersistence {
 
   addModel(name: string, schema: Schema): AnyModel {
     // this.model[name] =
-    return this.mongooseInstance.model(name, schema);
+    const model = this.mongooseInstance.model(name, schema);
+    return model;
   }
 
   protected populateStep(
@@ -586,17 +587,15 @@ export class MongoPersistence implements IPersistence {
     return '';
   }
 
-  protected clearModel(scheme: string): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
+  protected async clearModel(scheme: string): Promise<boolean> {
+    try {
       const model = this.getModel(scheme);
-      model?.deleteMany({}, undefined, (error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(true);
-        }
-      });
-    });
+      await model?.deleteMany({}, undefined);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
   clear(): Promise<boolean> {
     return new Promise<boolean>(async (resolve, reject) => {
@@ -1565,15 +1564,13 @@ export class MongoPersistence implements IPersistence {
     return this.persistenceInfo;
   }
 
-  close(): Promise<boolean> {
-    return new Promise<boolean>((resolve, reject) => {
-      this.mongooseInstance.connection.close((error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(true);
-        }
-      });
-    });
+  async close(): Promise<boolean> {
+    try {
+      await this.mongooseInstance.connection.close(true);
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
   }
 }

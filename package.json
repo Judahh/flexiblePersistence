@@ -1,6 +1,6 @@
 {
   "name": "flexiblepersistence",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "A CQRS and Event Sourcing platform",
   "main": "dist/source/index.js",
   "keywords": [
@@ -39,7 +39,7 @@
     "@flexiblepersistence/default-initializer": "latest",
     "journaly": "latest",
     "mongodb": "latest",
-    "mongoose": "latest",
+    "mongoose": "6.10.1",
     "pg": "latest"
   },
   "devDependencies": {
