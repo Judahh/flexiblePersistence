@@ -60,7 +60,11 @@ export class Handler {
       typeof object === 'object' &&
       !Array.isArray(object)
     ) {
-      if (object.id === undefined && object._id === undefined)
+      if (
+        object.id === undefined &&
+        object._id === undefined &&
+        !JSON.parse(process.env.DISABLE_AUTO_ID || 'false')
+      )
         object.id = new mongo.ObjectId();
       for (const key in object) {
         if (
@@ -77,7 +81,8 @@ export class Handler {
 
   protected restoreEvent(event: Event): Event {
     if (!(event instanceof Event)) event = new Event(event);
-    if (!event['id']) event.setId(new mongo.ObjectId());
+    if (!event['id'] && !JSON.parse(process.env.DISABLE_AUTO_ID || 'false'))
+      event.setId(new mongo.ObjectId());
     const operation = event['operation'];
     if (operation === Operation.create) this.addIds(event);
     return event;
