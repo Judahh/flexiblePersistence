@@ -12,7 +12,7 @@
     "declarationMap": true, /* Generates a sourcemap for each corresponding '.d.ts' file. */
     "skipLibCheck": true, /* Skip type checking of declaration files. Requires TypeScript version 2.0 or later. */
     "sourceMap": true, /* Generates corresponding '.map' file. */
-    "suppressImplicitAnyIndexErrors": true, /* Suppress noImplicitAny errors for indexing objects lacking index signatures. */
+    // "suppressImplicitAnyIndexErrors": true, /* Suppress noImplicitAny errors for indexing objects lacking index signatures. */
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
     "outDir": "./dist", /* Redirect output structure to the directory. */
     // "rootDir": "./",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
