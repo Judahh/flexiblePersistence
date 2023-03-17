@@ -21,16 +21,18 @@ export class Read {
     const selection = event?.getSelection?.();
     const sId = (selection as any)?.id;
     const isArray = Array.isArray(sId);
-    const id =
+    let id =
       selection && !isArray
         ? sId
         : event.isSingle() && event.getOperation() == Operation.create
         ? event.getId()
         : undefined;
+    id = id ? id : sId;
+    id = Array.isArray(id) ? id.map((i) => String(i)) : id ? String(id) : id;
     const input: IInputCreate<unknown, unknown> = {
       single: event.isSingle(),
       scheme: event.getName(),
-      id: id ? String(id) : undefined,
+      id: id,
       selectedItem: selection,
       item: event.getContent(),
       eventOptions: event.getOptions(),
