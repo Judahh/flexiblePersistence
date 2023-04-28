@@ -39,7 +39,7 @@
     "@flexiblepersistence/default-initializer": "latest",
     "journaly": "latest",
     "mongodb": "latest",
-    "mongoose": "6.10.1",
+    "mongoose": "7.1.0",
     "pg": "latest"
   },
   "devDependencies": {
