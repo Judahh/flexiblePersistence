@@ -18,7 +18,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [20.x]
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
@@ -32,7 +32,7 @@ jobs:
           production: true
           ignore: '/source\n/src\n/database\n.test.ts\ntemp.ts\n.yml\ntest\ntests\n'
       - name: Publish
-        if: contains(matrix.node-version, '14.x')
+        if: contains(matrix.node-version, '20.x')
         uses: judahh/npmPublish@main
         with:
           node_auth_token: ${{secrets.NODE_AUTH_TOKEN}}

@@ -20,7 +20,7 @@ jobs:
     # runs all of the steps inside the specified container rather than on the VM host.
     # Because of this the network configuration changes from host based network to a container network.
     container:
-      image: node:10.16-jessie
+      image: node:latest
 
     services:
       mongo:
@@ -30,7 +30,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [20.x]
 
     steps:
       - name: Use Node.js ${{ matrix.node-version }}
