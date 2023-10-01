@@ -65,6 +65,12 @@ export class MongoPersistence implements IPersistence {
       },
     });
 
+    if(process.env.SHOW_DATABASE_URI?.toLowerCase() === 'true' ||
+       process.env.SHOW_DATABASE_URI?.toLowerCase() === '1'){
+      console.log('MongoDB URI:', uri);
+      console.log('MongoDB PersistenceInfo:', persistenceInfo);
+    }
+
     this.mongooseInstance.connect(uri, {
       autoIndex: false,
     });
